@@ -11,6 +11,16 @@ class TestSugarcrm < Test::Unit::TestCase
       @sugarcrm = SugarCRM::Base.new(URL, USER, PASS, {:debug => true})
     end
     
+    should "return a single entry in JSON format when option :to_obj => false" do
+      @test = SugarCRM::Base.new(URL, USER, PASS, {:debug => true, :to_obj => false})
+      response = @test.get_entry(
+        "Users",
+        1,
+        {:fields => ["first_name", "last_name"]} 
+      )
+      assert_kind_of Hash, response
+    end
+    
     should "return a single entry when sent #get_entry." do
       response = @sugarcrm.get_entry(
         "Users",

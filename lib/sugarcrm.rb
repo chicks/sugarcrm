@@ -37,14 +37,19 @@ class Base
   attr :connection, true
   attr :session, true
   attr :debug, true
+  attr :to_obj, true
 
   def initialize(url, user, pass, options={})
-    {:debug => false}.merge! options
+    {
+      :debug  => false,
+      :to_obj => true
+    }.merge! options
 
     @user = user
     @pass = pass
     @url  = URI.parse(url)
-    @debug = options[:debug]
+    @debug  = options[:debug]
+    @to_obj = options[:to_obj]
 
     # Handles http/https in url string
     @ssl  = false
@@ -122,8 +127,13 @@ class Base
             pp response_json
             puts "\n"
           end
-          response_obj = response_json.to_obj
-          return response_obj
+          response_obj = response_json.to_obj 
+      
+          if @to_obj
+            return response_obj
+          else
+            return response_json
+          end
         when Net::HTTPNotFound
           raise InvalidSugarCRMUrl, "#{@url} is invalid"
         else
