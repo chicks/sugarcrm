@@ -39,17 +39,20 @@ class Base
   attr :debug, true
   attr :to_obj, true
 
-  def initialize(url, user, pass, options={})
-    {
+  def initialize(url, user, pass, opts={})
+    options = { 
       :debug  => false,
       :to_obj => true
-    }.merge! options
+    }.merge(opts)
 
-    @user = user
-    @pass = pass
-    @url  = URI.parse(url)
     @debug  = options[:debug]
     @to_obj = options[:to_obj]
+    
+    pp options
+
+    @url  = URI.parse(url)
+    @user = user
+    @pass = pass
 
     # Handles http/https in url string
     @ssl  = false
@@ -73,7 +76,6 @@ class Base
   def logged_in?
     @session ? true : false
   end
-
 
   protected
 
@@ -100,7 +102,13 @@ class Base
       EOF
       json.gsub!(/^\s{8}/,'')
       response = get(:login, json)
-      @session = response.id
+
+      if @to_obj
+        @session = response.id
+      else
+        @session = response["id"]
+      #puts "Session: #{@session}"
+      end
     end
 
     def get(method,json)

@@ -1,4 +1,6 @@
 require 'helper'
+require "test/unit"
+require "pp"
 
 # Replace these with your test instance
 URL   = "http://valet/sugarcrm"
@@ -16,7 +18,7 @@ class TestSugarcrm < Test::Unit::TestCase
       response = @test.get_entry(
         "Users",
         1,
-        {:fields => ["first_name", "last_name"]} 
+        {:fields => ["first_name", "last_name"]}
       )
       assert_kind_of Hash, response
     end
