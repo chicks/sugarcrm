@@ -48,8 +48,6 @@ class Base
     @debug  = options[:debug]
     @to_obj = options[:to_obj]
     
-    pp options
-
     @url  = URI.parse(url)
     @user = user
     @pass = pass
@@ -107,7 +105,6 @@ class Base
         @session = response.id
       else
         @session = response["id"]
-      #puts "Session: #{@session}"
       end
     end
 
