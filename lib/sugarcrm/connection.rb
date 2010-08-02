@@ -14,24 +14,19 @@ module SugarCRM
     
     # This is the singleton connection class. 
     def initialize(url, user, pass, debug=false)
-      @url  = URI.parse(url)
-      @user = user
-      @pass = pass
-
-      @debug = debug
-
+      @url    = URI.parse(url)
+      @user   = user
+      @pass   = pass
+      @debug  = debug
       # Handles http/https in url string
-      @ssl  = false
-      @ssl  = true if @url.scheme == "https"
-      
+      @ssl    = false
+      @ssl    = true if @url.scheme == "https"
       # Appends the rest.php path onto the end of the URL if it's not included
       if @url.path !~ /rest.php$/
         @url.path += URL
       end
-
       login!
       raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
-      
       @modules = get_modules
       @modules.each do |m|
         begin
@@ -69,7 +64,8 @@ module SugarCRM
       end
       @connection.start
     end
-    
+
+    # Send a GET request to the Sugar Instance
     def get(method, json)
       request   = SugarCRM::Request.new(@url, method, json, @debug)
       response  = connection.get(request.to_s)
@@ -99,11 +95,11 @@ module SugarCRM
       end
     end
     
-    # We need a way to dynamically generate a class from
-    #  the list of modules.
+    # Dynamically register objects based on Module name
+    # I.e. a SugarCRM Module named Users will generate
+    # a SugarCRM::User class.
     def register_module(module_name, mod=SugarCRM)
-      klass_name    = module_name.singularize
-
+      klass_name = module_name.singularize
       return if mod.const_defined? klass_name
       klass = Class.new(SugarCRM::Base) do
         self.module_name = module_name

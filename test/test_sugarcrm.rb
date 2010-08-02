@@ -3,26 +3,6 @@ require "test/unit"
 require "pp"
 
 class TestSugarcrm < Test::Unit::TestCase
-  context "A SugarCRM::Connection instance" do
-    
-    setup do
-      @connection = SugarCRM::Connection.new(URL, USER, PASS, false)
-    end
-    
-    should "login and set session id" do
-      assert_not_nil @connection.session    
-    end
-    
-    should "retrieve the list of available modules" do
-      assert_instance_of Array, @connection.modules
-    end
-    
-    should "create sub-classes by module name" do
-      assert SugarCRM.const_defined? "User"
-    end
-    
-  end
-  
   context "A SugarCRM::Module instance" do
   
     should "return the module name" do
