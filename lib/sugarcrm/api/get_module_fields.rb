@@ -1,7 +1,8 @@
-module SugarCRM; class Base
-  
+module SugarCRM; class Connection
+
+# Retrieves the vardef information on fields of the specified bean.  
 def get_module_fields(module_name)
-  login! unless logged_in?
+  login! unless logged_in?  
   json = <<-"EOF"
     {
       \"session\": \"#{@session}\"\,
@@ -11,5 +12,7 @@ def get_module_fields(module_name)
   json.gsub!(/^\s{6}/,'')
   get(:get_module_fields, json)
 end
+
+alias :get_fields :get_module_fields
 
 end; end

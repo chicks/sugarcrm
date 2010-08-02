@@ -3,153 +3,104 @@
 module SugarCRM
 
 Dir["#{File.dirname(__FILE__)}/sugarcrm/**/*.rb"].each { |f| load(f) }
-Dir["#{File.dirname(__FILE__)}/stdlib/**/*.rb"].each { |f| load(f) }
 
 require 'pp'
-require 'ostruct'
 require 'uri'
 require 'net/https'
-require 'openssl'
 require 'digest/md5'
 
 require 'rubygems'
+require 'active_support/core_ext'
 require 'json'
-
-class LoginError < RuntimeError
-end
-
-class EmptyResponse < RuntimeError
-end
-
-class UnhandledResponse < RuntimeError
-end
-
-class InvalidSugarCRMUrl < RuntimeError
-end
+require 'json/add/rails'
 
 class Base 
+  # Unset all of the instance methods we don't need.
+  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^instance_of.$)/ }
 
-  URL = "/service/v2/rest.php"
-  attr :url, true
-  attr :user, false
-  attr :pass, false
-  attr :ssl, false
-  attr :connection, true
-  attr :session, true
+  # This holds our connection
+  cattr_accessor :connection, :instance_writer => false
+  
+  # Contains the name of the module in SugarCRM
+  class_attribute :module_name
+  self.module_name = self.name.split(/::/)[-1]
+  
+  # Contains the fields found on the current module
+  class_attribute :module_fields
+  self.module_fields = {}
+  
+  # Tracks if we have extended our class with attribute methods yet.
+  class_attribute :attribute_methods_generated
+  self.attribute_methods_generated = false
+
+  # Contains a list of attributes
+  attr :attributes, true
   attr :debug, true
-  attr :to_obj, true
 
-  def initialize(url, user, pass, opts={})
+  def self.establish_connection(url, user, pass, opts={})
     options = { 
       :debug  => false,
-      :to_obj => true
     }.merge(opts)
-
     @debug  = options[:debug]
-    @to_obj = options[:to_obj]
-    
-    @url  = URI.parse(url)
-    @user = user
-    @pass = pass
-
-    # Handles http/https in url string
-    @ssl  = false
-    @ssl  = true if @url.scheme == "https"
-
-    # Appends the rest.php path onto the end of the URL if it's not included
-    if @url.path !~ /rest.php$/
-      @url.path += URL
-    end
-      
-    login!
-    raise LoginError, "Invalid Login" unless logged_in?
+    @@connection = SugarCRM::Connection.new(url, user, pass, @debug)
   end
-
-  def connected?
-    return false unless @connection
-    return false unless @connection.started?
-    true
+  
+  # Registers the module fields on the class
+  def self.register_module_fields
+    self.module_fields = connection.get_fields(self.module_name)["module_fields"] if self.module_fields.length == 0
   end
-
-  def logged_in?
-    @session ? true : false
+  
+  def initialize(attributes={})
+    @attributes = attributes_from_module_fields.merge(attributes)
+    define_attribute_methods
   end
 
   protected
 
-    def connect!
-      @connection = Net::HTTP.new(@url.host, @url.port)
-      if @ssl
-        @connection.use_ssl = true
-        @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
+  # Generates get/set methods for keys in the attributes hash
+  def define_attribute_methods
+    return if attribute_methods_generated?
+    @attributes.each_pair do |k,v|
+      self.class.module_eval %Q?
+      def #{k}
+        read_attribute :#{k}
       end
-      @connection.start
+      def #{k}=(value)
+        write_attribute :#{k},value
+      end
+      ?
     end
+    self.class.attribute_methods_generated = true
+  end
 
-    def login!
-      connect! unless connected?
-      json = <<-EOF
-        {
-          \"user_auth\": {
-            \"user_name\": \"#{@user}\"\,
-            \"password\": \"#{OpenSSL::Digest::MD5.new(@pass)}\"\,
-            \"version\": \"2\"\,
-          },
-          \"application\": \"\"
-        }
-      EOF
-      json.gsub!(/^\s{8}/,'')
-      response = get(:login, json)
+  # Wrapper around class attribute
+  def attribute_methods_generated?
+    self.class.attribute_methods_generated
+  end
+  
+  def module_fields_registered?
+    self.class.module_fields.length > 0
+  end
 
-      if @to_obj
-        @session = response.id
-      else
-        @session = response["id"]
-      end
+  # Returns a hash of the module fields from the 
+  def attributes_from_module_fields
+    self.class.register_module_fields unless module_fields_registered?
+    fields = {}
+    self.class.module_fields.keys.sort.each do |k|
+      fields[k.to_s] = nil
     end
+    fields
+  end
 
-    def get(method,json)
-      query =  @url.path.dup
-      query << '?method=' << method.to_s
-      query << '&input_type=JSON'
-      query << '&response_type=JSON'
-      query << '&rest_data=' << json
-
-      if @debug 
-        puts "#{method}: Request"
-        puts query
-        puts "\n"
-      end
-      response = @connection.get(URI.escape(query))
-
-      case response
-        when Net::HTTPOK 
-          raise EmptyResponse unless response.body
-          response_json = JSON.parse response.body
-          return false if response_json["result_count"] == 0
-          if @debug 
-            puts "#{method}: JSON Response:"
-            pp response_json
-            puts "\n"
-          end
-          response_obj = response_json.to_obj 
-      
-          if @to_obj
-            return response_obj
-          else
-            return response_json
-          end
-        when Net::HTTPNotFound
-          raise InvalidSugarCRMUrl, "#{@url} is invalid"
-        else
-          if @debug 
-            puts "#{method}: Raw Response:"
-            puts response.body
-            puts "\n"
-          end
-          raise UnhandledResponse, "Can't handle response #{response}"
-      end
-    end
+  # Wrapper around attributes hash
+  def read_attribute(key)
+    @attributes[key]
+  end
+  
+  # Wrapper around attributes hash
+  def write_attribute(key, value)
+    @attributes[key] = value
+  end
 
 end
 

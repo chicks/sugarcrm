@@ -1,6 +1,8 @@
-module SugarCRM; class Base
-# A standard REST call to get a list of relationships
-def get_relationships(module_name, id, related_to, options={})
+module SugarCRM; class Connection
+# Retrieves a collection of beans that are related 
+# to the specified bean and, optionally, returns 
+# relationship data
+def get_relationship(module_name, id, related_to, options={})
   login! unless logged_in?
   json = <<-EOF
     {
@@ -15,6 +17,9 @@ def get_relationships(module_name, id, related_to, options={})
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  get(:get_relationships, json)
+  get(:get_relationship, json)
 end
+
+alias :get_relationships :get_relationship
+
 end; end

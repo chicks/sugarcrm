@@ -1,4 +1,4 @@
-module SugarCRM; class Base
+module SugarCRM; class Connection
 # Retrieve a list of SugarBeans by ID.  This method will not 
 # work with the report module.
 def get_entries(module_name, ids, options={})
@@ -12,7 +12,7 @@ def get_entries(module_name, ids, options={})
     {
       \"session\": \"#{@session}\"\,
       \"module_name\": \"#{module_name}\"\,
-      \"ids\": \"#{ids.to_json}\"\,
+      \"ids\": #{ids.to_json}\,
       \"select_fields\": #{options[:fields].to_json}\,
       \"link_name_to_fields_array\": #{options[:link_fields].to_json}\,
     }

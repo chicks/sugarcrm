@@ -2,61 +2,67 @@ require 'helper'
 require "test/unit"
 require "pp"
 
-# Replace these with your test instance
-URL   = "http://valet/sugarcrm"
-USER  = "admin"
-PASS  = 'letmein' 
-
 class TestSugarcrm < Test::Unit::TestCase
-  context "A SugarCRM::Base instance" do
+  context "A SugarCRM::Connection instance" do
+    
     setup do
-      @sugarcrm = SugarCRM::Base.new(URL, USER, PASS, {:debug => true})
+      @connection = SugarCRM::Connection.new(URL, USER, PASS, false)
     end
     
-    should "return a single entry in JSON format when option :to_obj => false" do
-      @test = SugarCRM::Base.new(URL, USER, PASS, {:debug => true, :to_obj => false})
-      response = @test.get_entry(
-        "Users",
-        1,
-        {:fields => ["first_name", "last_name"]}
-      )
-      assert_kind_of Hash, response
+    should "login and set session id" do
+      assert_not_nil @connection.session    
     end
     
-    should "return a single entry when sent #get_entry." do
-      response = @sugarcrm.get_entry(
-        "Users",
-        1,
-        {:fields => ["first_name", "last_name"]} 
-      )
-      assert_respond_to 'response', :entry_list
+    should "retrieve the list of available modules" do
+      assert_instance_of Array, @connection.modules
     end
     
-    should "return a list of entries when sent #get_entries." do
-      response = @sugarcrm.get_entries(
-        "Users",
-        [1],
-        {:fields => ["first_name", "last_name"]} 
-      )
-      assert_respond_to 'response', :entry_list
-    end
-    
-    should "return a list of entries when sent #get_entry_list." do
-      response = @sugarcrm.get_entry_list(
-        "Users",
-        "users.user_name = \'#{USER}\'",
-        {
-          :fields => ["first_name", "last_name"],
-          :link_fields => [
-            {
-              "name"  => "accounts",
-              "value" => ["id", "name"]
-            }
-          ]          
-        } 
-      )
-      assert_respond_to 'response', :entry_list
+    should "create sub-classes by module name" do
+      assert SugarCRM.const_defined? "User"
     end
     
   end
+  
+  context "A SugarCRM::Module instance" do
+  
+    should "return the module name" do
+      assert_equal "Users", SugarCRM::User.module_name
+    end
+    
+    should "respond to self.connection" do
+      assert_respond_to SugarCRM::User, :connection
+      assert_instance_of SugarCRM::Connection, SugarCRM::User.connection
+    end
+    
+    should "respond to self.register_module_fields" do
+      assert_respond_to SugarCRM::User, :register_module_fields
+      SugarCRM::User.register_module_fields
+      assert SugarCRM::User.module_fields.length > 0
+    end
+    
+    should "respond to self.connection.logged_in?" do
+      assert SugarCRM::User.connection.logged_in?
+    end
+  
+    should "return an instance of itself when #new" do
+      assert_instance_of SugarCRM::User, SugarCRM::User.new
+    end
+    
+    should "define instance level attributes when #new" do
+      u = SugarCRM::User.new
+      assert SugarCRM::User.attribute_methods_generated
+    end
+
+    should "respond to attributes derived from module_fields" do
+      u = SugarCRM::User.new
+      u.last_name = "Test"
+      assert_equal "Test", u.last_name
+    end
+    
+    should "return an an instance of itself when sent #find(id)" do
+      u = SugarCRM::User.find(1)
+      assert_instance_of SugarCRM::User, u
+    end
+  end
+  
 end
