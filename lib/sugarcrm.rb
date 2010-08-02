@@ -54,6 +54,43 @@ class Base
     @attributes = attributes_from_module_fields.merge(attributes)
     define_attribute_methods
   end
+  
+  def inspect
+    self
+  end
+  
+  def to_s
+    attrs = []
+    @attributes.each_key do |k|
+       attrs << "#{k}: #{attribute_for_inspect(k)}"
+    end
+    "#<#{self.class} #{attrs.join(", ")}>"
+  end
+
+  # Returns an <tt>#inspect</tt>-like string for the value of the
+  # attribute +attr_name+. String attributes are elided after 50
+  # characters, and Date and Time attributes are returned in the
+  # <tt>:db</tt> format. Other attributes return the value of
+  # <tt>#inspect</tt> without modification.
+  #
+  #   person = Person.create!(:name => "David Heinemeier Hansson " * 3)
+  #
+  #   person.attribute_for_inspect(:name)
+  #   # => '"David Heinemeier Hansson David Heinemeier Hansson D..."'
+  #
+  #   person.attribute_for_inspect(:created_at)
+  #   # => '"2009-01-12 04:48:57"'
+  def attribute_for_inspect(attr_name)
+    value = read_attribute(attr_name)
+
+    if value.is_a?(String) && value.length > 50
+      "#{value[0..50]}...".inspect
+    elsif value.is_a?(Date) || value.is_a?(Time)
+      %("#{value.to_s(:db)}")
+    else
+      value.inspect
+    end
+  end
 
   protected
 
