@@ -12,7 +12,6 @@ require 'digest/md5'
 require 'rubygems'
 require 'active_support/core_ext'
 require 'json'
-require 'json/add/rails'
 
 class Base 
   # Unset all of the instance methods we don't need.

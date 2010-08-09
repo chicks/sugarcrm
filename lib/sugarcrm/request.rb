@@ -15,7 +15,8 @@ class Request
     @request << '&rest_data=' << json
     
     if debug
-      puts "#{method}: Request:\n#{@request}" 
+      puts "#{method}: Request:"
+      pp @request 
     end
   end
   
