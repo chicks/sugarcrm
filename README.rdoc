@@ -6,7 +6,7 @@ REST Bindings for SugarCRM!
 
 == SUMMARY: 
 
-Ruby Gem for interacting with SugarCRM via REST.  
+RubyGem for interacting with SugarCRM via REST.  
 
 == Description:
 
@@ -16,14 +16,20 @@ objects.  Some of this functionality is included today.
 
 == FEATURES/PROBLEMS:
 
-* Auto-generation of Module specific objects.  When a connection is established, get_available_modules is called
-and the resultant modules are turned into SugarCRM::Module classes.  
+* Auto-generation of Module specific objects.  When a connection is established, get_available_modules is called and the resultant modules are turned into SugarCRM::Module classes.  
 * If you just want to use the vanilla API, you can access the methods directly on the connection object.
 
 == SYNOPSIS:
 
   require 'sugarcrm'
-  sugarcrm = SugarCRM::Base.new("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
+  # Establish a connection
+  sugarcrm = SugarCRM::Base.establish_connection("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
+
+  # Retrieve a user by ID, using the SugarCRM::User Proxy object
+  SugarCRM::User.find(id)
+  
+  # Show a list of available modules
+  sugarcrm.connection.modules
 
   # Lookup a user by name.  Find any associated accounts
   sugarcrm.connection.get_entry_list(
@@ -39,9 +45,6 @@ and the resultant modules are turned into SugarCRM::Module classes.
       ]          
     } 
   )
-
-	# Retrieve a user by ID, using the SugarCRM::User Proxy object
-	user = SugarCRM::User.find(id)
 
 == REQUIREMENTS:
 
