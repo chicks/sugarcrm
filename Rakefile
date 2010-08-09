@@ -6,13 +6,15 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "sugarcrm"
     gem.summary = %Q{Ruby based REST client for SugarCRM}
-    gem.description = %Q{A Ruby based REST client for SugarCRM.}
+    gem.description = %Q{I've implemented all of the basic API calls that SugarCRM supports, and am actively building an abstraction layer
+    on top of the basic API methods.  The end result will be to provide ActiveRecord style finders and first class
+    objects.  Some of this functionality is included today.}
     gem.email = "carl.hicks@gmail.com"
     gem.homepage = "http://github.com/chicks/sugarcrm"
     gem.authors = ["Carl Hicks"]
     gem.add_development_dependency "shoulda", ">= 0"
     gem.add_dependency "json", ">= 0"
-    gem.add_dependency "activemodel", ">= 0"    
+    gem.add_dependency "activesupport", ">= 0"    
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new

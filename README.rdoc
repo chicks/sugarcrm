@@ -6,18 +6,19 @@ REST Bindings for SugarCRM!
 
 == SUMMARY: 
 
-Ruby Gem for interacting with SugarCRM via REST
+Ruby Gem for interacting with SugarCRM via REST.  
+
+== Description:
+
+I've implemented all of the basic API calls that SugarCRM supports, and am actively building an abstraction layer
+on top of the basic API methods.  The end result will be to provide ActiveRecord style finders and first class
+objects.  Some of this functionality is included today. 
 
 == FEATURES/PROBLEMS:
 
-* The response hash gets converted into a Ruby object, via Hash#to_obj method.
-* Only the following methods are currently implemented:
-
-  * get_entry
-  * get_entries
-  * get_entry_list
-  * get_module_fields
-  * get_relationships
+* Auto-generation of Module specific objects.  When a connection is established, get_available_modules is called
+and the resultant modules are turned into SugarCRM::Module classes.  
+* If you just want to use the vanilla API, you can access the methods directly on the connection object.
 
 == SYNOPSIS:
 
@@ -25,7 +26,7 @@ Ruby Gem for interacting with SugarCRM via REST
   sugarcrm = SugarCRM::Base.new("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
 
   # Lookup a user by name.  Find any associated accounts
-  sugarcrm.get_entry_list(
+  sugarcrm.connection.get_entry_list(
     "Users",
     "users.user_name = \'#{USER}\'",
     {
@@ -39,8 +40,12 @@ Ruby Gem for interacting with SugarCRM via REST
     } 
   )
 
+	# Retrieve a user by ID, using the SugarCRM::User Proxy object
+	user = SugarCRM::User.find(id)
+
 == REQUIREMENTS:
 
+* activesupport gem
 * json gem
 
 == INSTALL:
