@@ -4,15 +4,27 @@ module SugarCRM
     
     attr :response, false
     attr :module, false
-    attr :attributes, false
-    attr :object, false
     attr :id, false
     
     def initialize(json)
       @response   = json
       @module     = @response["entry_list"][0]["module_name"].singularize
-      @attributes = flatten(@response["entry_list"][0]["name_value_list"])
-      @object     = SugarCRM.const_get(@module).new(@attributes) if SugarCRM.const_get(@module)
+      self
+    end
+    
+    # Tries to instantiate and return an object with the valutes
+    # populated from the response
+    def to_obj
+      attributes = nil
+      begin
+        attributes = flatten(@response["entry_list"][0]["name_value_list"])
+      rescue ArgumentError => e
+      end
+      object = SugarCRM.const_get(@module).new(attributes) if SugarCRM.const_get(@module)
+    end
+    
+    def to_json
+      @response.to_json
     end
     
     # Takes a hash like { "first_name" => {"name" => "first_name", "value" => "John"}}

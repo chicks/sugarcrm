@@ -107,6 +107,6 @@ module SugarCRM
       mod.const_set klass_name, klass
       klass
     end
-
+    
   end
 end

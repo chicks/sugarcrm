@@ -25,11 +25,11 @@ class TestSugarcrm < Test::Unit::TestCase
     end
     
     should "flatten the name_value_list into an attributes hash" do
-      assert_equal "never", @response.attributes[:pwd_last_changed]
+      assert_equal "never", @response.to_obj.attributes[:pwd_last_changed]
     end
       
     should "return an instance of a SugarCRM Module when #object" do
-      assert_instance_of SugarCRM::User, @response.object
+      assert_instance_of SugarCRM::User, @response.to_obj
     end
       
   end

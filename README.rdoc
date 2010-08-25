@@ -29,10 +29,10 @@ objects.  Some of this functionality is included today.
   SugarCRM::User.find(id)
   
   # Show a list of available modules
-  sugarcrm.connection.modules
+  sugarcrm.modules
 
   # Lookup a user by name.  Find any associated accounts
-  sugarcrm.connection.get_entry_list(
+  sugarcrm.get_entry_list(
     "Users",
     "users.user_name = \'#{USER}\'",
     {

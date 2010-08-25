@@ -38,6 +38,11 @@ class TestSugarcrm < Test::Unit::TestCase
       )
       assert response.key? "entry_list"
     end
+    
+    should "return a list of entries when sent #get_entry_list and no fields." do
+      response = @connection.get_entry_list("Users",1)
+      assert_equal response["entry_list"][0]["name_value_list"]["title"]["value"], "Administrator"
+    end
 
     should "return a list of entries when sent #get_entry_list." do
       response = @connection.get_entry_list(

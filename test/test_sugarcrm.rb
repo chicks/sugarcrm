@@ -43,6 +43,11 @@ class TestSugarcrm < Test::Unit::TestCase
       u = SugarCRM::User.find(1)
       assert_instance_of SugarCRM::User, u
     end
+    
+    should "receive a response containing all fields when sent #get_entry" do
+      u = SugarCRM::User.find(1)
+      assert_equal u.user_name, "admin"
+    end
   end
   
 end
