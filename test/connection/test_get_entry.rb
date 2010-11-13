@@ -10,11 +10,11 @@ class TestGetEntry < Test::Unit::TestCase
         {:fields => ["first_name", "last_name"]} 
       )
     end
-    should "return a single entry when sent #get_entry." do
-      assert @response.response.key? "entry_list"
-    end
-    should "return an object when #get_entry#to_obj" do 
-      assert_instance_of SugarCRM::User, @response.to_obj
+#    should "return a single entry when sent #get_entry." do
+#      assert @response.response. "entry_list"
+#    end
+    should "return an object when #get_entry" do 
+      assert_instance_of SugarCRM::User, @response
     end
   end
 end

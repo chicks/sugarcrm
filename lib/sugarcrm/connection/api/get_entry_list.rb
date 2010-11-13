@@ -26,7 +26,6 @@ def get_entry_list(module_name, query, opts={})
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  SugarCRM::Response.new(send!(:get_entry_list, json))
-  #send!(:get_entry_list, json)
+  SugarCRM::Response.handle(send!(:get_entry_list, json))
 end
 end; end

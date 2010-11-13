@@ -34,7 +34,6 @@ class Base
     # Runs a find against the remote service
     def find(id)
       response = SugarCRM.connection.get_entry(self._module.name, id,{:fields => self._module.fields.keys})
-      response.to_obj
     end
   end
 

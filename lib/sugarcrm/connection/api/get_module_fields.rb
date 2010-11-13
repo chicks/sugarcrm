@@ -10,7 +10,8 @@ def get_module_fields(module_name)
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  send!(:get_module_fields, json)
+  SugarCRM::Response.handle(send!(:get_module_fields, json))
+  #send!(:get_module_fields, json)
 end
 
 alias :get_fields :get_module_fields

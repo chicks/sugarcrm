@@ -10,12 +10,12 @@ class TestGetEntries < Test::Unit::TestCase
         {:fields => ["first_name", "last_name"]} 
       )
     end
-    should "return a list of entries when sent #get_entries." do
-      assert @response.response.key? "entry_list"
-    end
-    should "return an object when #get_entries#to_obj" do
-      assert_instance_of Array, @response.to_obj
-      assert_instance_of SugarCRM::User, @response.to_obj[0]
+#    should "return a list of entries when sent #get_entries." do
+#      assert @response.response.key? "entry_list"
+#    end
+    should "return an object when #get_entries" do
+      assert_instance_of Array, @response
+      assert_instance_of SugarCRM::User, @response[0]
     end
   end
 end

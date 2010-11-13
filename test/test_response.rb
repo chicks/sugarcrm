@@ -16,11 +16,11 @@ class TestResponse < Test::Unit::TestCase
               }],
              "relationship_list"=>[]}
   
-      @response = SugarCRM::Response.new(@json)
+      @response = SugarCRM::Response.handle(@json)
     end
       
-    should "return an instance of a SugarCRM Module when #to_obj" do
-      assert_instance_of SugarCRM::User, @response.to_obj
+    should "return an instance of a SugarCRM Module" do
+      assert_instance_of SugarCRM::User, @response
     end
       
   end
