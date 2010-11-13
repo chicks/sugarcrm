@@ -9,7 +9,12 @@ module SugarCRM; class Connection
     EOF
     
     json.gsub!(/^\s{6}/,'')
-    get(:get_available_modules, json)["modules"]
+    mods = send!(:get_available_modules, json)["modules"]
+    modules = []
+    mods.each do |mod|
+      modules << Module.new(mod)
+    end
+    modules
   end
   
   alias :get_modules :get_available_modules

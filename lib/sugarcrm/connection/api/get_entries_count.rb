@@ -15,6 +15,6 @@ def get_entries_count(module_name, query, options={})
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  get(:get_entries_count, json)
+  send!(:get_entries_count, json)
 end
 end; end

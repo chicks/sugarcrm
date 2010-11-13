@@ -10,6 +10,6 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{6}/,'')
-    get(:set_entries, json)
+    send!(:set_entries, json)
   end
 end; end

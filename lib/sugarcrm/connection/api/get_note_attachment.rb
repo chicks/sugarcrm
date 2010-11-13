@@ -10,6 +10,6 @@ def get_note_attachment(id)
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  get(:get_note_attachment, json)
+  send!(:get_note_attachment, json)
 end
 end; end

@@ -13,4 +13,10 @@ module SugarCRM
   
   class InvalidRequest < RuntimeError
   end
+  
+  class InvalidModule <RuntimeError
+  end
+  
+  class AttributeParsingError < RuntimeError
+  end
 end

@@ -14,6 +14,6 @@ def get_report_entries(ids, options={})
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  get(:get_report_entries, json)
+  send!(:get_report_entries, json)
 end
 end; end

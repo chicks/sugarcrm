@@ -11,5 +11,8 @@ class Test::Unit::TestCase
   URL   = "http://valet/sugarcrm6"
   USER  = "admin"
   PASS  = 'letmein' 
-  CRM   = SugarCRM::Base.establish_connection(URL, USER, PASS, {:debug => true})
+
+  def setup_connection
+    SugarCRM::Base.establish_connection(URL, USER, PASS, {:debug => true})
+  end
 end

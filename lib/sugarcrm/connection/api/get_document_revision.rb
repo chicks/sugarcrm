@@ -9,6 +9,6 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{6}/,'')
-    get(:get_document_revision, json)
+    send!(:get_document_revision, json)
   end
 end; end

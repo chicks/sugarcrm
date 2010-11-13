@@ -9,7 +9,7 @@ module SugarCRM; class Connection
     # FIXME: This is to work around a bug in SugarCRM 6.0
     # where no fields are returned if no fields are specified
     if options[:fields].length == 0
-      obj = SugarCRM.const_get(module_name.singularize).new
+      obj = SugarCRM.const_send!(module_name.singularize).new
       options[:fields] = obj.module_fields.keys
     end
     
@@ -24,6 +24,6 @@ module SugarCRM; class Connection
     EOF
         
     json.gsub!(/^\s{6}/,'')
-    SugarCRM::Response.new(get(:get_entry, json))
+    SugarCRM::Response.new(send!(:get_entry, json))
   end
 end; end

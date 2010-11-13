@@ -18,6 +18,7 @@ def get_entries(module_name, ids, options={})
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  get(:get_entries, json)
+  SugarCRM::Response.new(send!(:get_entries, json))
+  #send!(:get_entries, json)
 end
 end; end

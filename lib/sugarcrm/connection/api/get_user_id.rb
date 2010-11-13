@@ -8,6 +8,6 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{8}/,'')
-    response = get(:get_user_id, json)
+    response = send!(:get_user_id, json)
   end
 end; end

@@ -17,7 +17,7 @@ def get_relationship(module_name, id, related_to, options={})
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  get(:get_relationship, json)
+  send!(:get_relationship, json)
 end
 
 alias :get_relationships :get_relationship

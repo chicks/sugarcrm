@@ -15,7 +15,7 @@ def get_entry_list(module_name, query, opts={})
   # FIXME: This is to work around a bug in SugarCRM 6.0
   # where no fields are returned if no fields are specified
   if options[:fields].length == 0
-    options[:fields] = lookup_fields_for_module
+    options[:fields] = Module.find(module_name).fields
   end
 
   json = <<-EOF
@@ -32,6 +32,7 @@ def get_entry_list(module_name, query, opts={})
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  get(:get_entry_list, json)
+  SugarCRM::Response.new(send!(:get_entry_list, json))
+  #send!(:get_entry_list, json)
 end
 end; end

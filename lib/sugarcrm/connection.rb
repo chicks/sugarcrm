@@ -1,112 +1,119 @@
-module SugarCRM
-  class Connection
-    
-    URL = "/service/v2/rest.php"
-    
-    attr :url, true
-    attr :user, false
-    attr :pass, false
-    attr :ssl, false
-    attr :session, true
-    attr :connection, true
-    attr :modules, false  
-    attr :debug, true
-    
-    # This is the singleton connection class. 
-    def initialize(url, user, pass, debug=false)
-      @url    = URI.parse(url)
-      @user   = user
-      @pass   = pass
-      @debug  = debug
-      # Handles http/https in url string
-      @ssl    = false
-      @ssl    = true if @url.scheme == "https"
-      # Appends the rest.php path onto the end of the URL if it's not included
-      if @url.path !~ /rest.php$/
-        @url.path += URL
-      end
-      login!
-      raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
-      @modules = get_modules
-      @modules.each do |m|
-        begin
-          register_module(m)
-        rescue SugarCRM::InvalidRequest
-          next
-        end
-      end
-    end
-    
-    # Check to see if we are logged in
-    def logged_in?
-      @session ? true : false
-    end
-    
-    # Login
-    def login!
-      response = login
-      @session = response["id"]
-    end
 
-    # Check to see if we are connected
-    def connected?
-      return false unless @connection
-      return false unless @connection.started?
-      true
-    end
-    
-    # Connect
-    def connect!
-      @connection = Net::HTTP.new(@url.host, @url.port)
-      if @ssl
-        @connection.use_ssl = true
-        @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-      @connection.start
-    end
+require 'uri'
+require 'net/https'
 
-    # Send a GET request to the Sugar Instance
-    def get(method, json)
-      request   = SugarCRM::Request.new(@url, method, json, @debug)
-      response  = connection.get(request.to_s)
+require 'rubygems'
+require 'json'
+
+Dir["#{File.dirname(__FILE__)}/connection/api/*.rb"].each { |f| load(f) }
+
+module SugarCRM; class Connection
+
+  URL = "/service/v2/rest.php"
+  DONT_SHOW_DEBUG_FOR = [:get_module_fields, :get_available_modules]
+  
+  attr :url, true
+  attr :user, false
+  attr :pass, false
+  attr :session, true
+  attr :connection, true
+  attr :options, true
+  attr :request, true
+  attr :response, true
+  
+  # This is the singleton connection class. 
+  def initialize(url, user, pass, options={})
+    @options  = {
+      :debug => false,
+      :register_modules => true      
+    }.merge(options)
     
-      case response
-        when Net::HTTPOK 
-          raise SugarCRM::EmptyResponse unless response.body
-          response_json = JSON.parse response.body
-          return false if response_json["result_count"] == 0
-          if @debug 
-            puts "#{method}: JSON Response:"
-            pp response_json
-            puts "\n"
-          end
-          return response_json
-        when Net::HTTPNotFound
-          raise SugarCRM::InvalidSugarCRMUrl, "#{@url} is invalid"
-        when Net::HTTPInternalServerError
-          raise SugarCRM::InvalidRequest, "#{request} is invalid"
-        else
-          if @debug 
-            puts "#{method}: Raw Response:"
-            puts response.body
-            puts "\n"
-          end
-          raise SugarCRM::UnhandledResponse, "Can't handle response #{response}"
-      end
-    end
-    
-    # Dynamically register objects based on Module name
-    # I.e. a SugarCRM Module named Users will generate
-    # a SugarCRM::User class.
-    def register_module(module_name, mod=SugarCRM)
-      klass_name = module_name.singularize
-      return if mod.const_defined? klass_name
-      klass = Class.new(SugarCRM::Base) do
-        self.module_name = module_name
-      end 
-      mod.const_set klass_name, klass
-      klass
-    end
-    
+    @url      = URI.parse(url)
+    @user     = user
+    @pass     = pass
+    @request  = ""
+    @response = ""
+
+    resolve_url
+    login!
+    self
   end
-end
+  
+  # Check to see if we are logged in
+  def logged_in?
+    @session ? true : false
+  end
+  
+  # Login
+  def login!
+    @session = login["id"]
+    raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
+    SugarCRM.connection = self
+    SugarCRM::Base.connection = self
+    Module.register_all if @options[:register_modules]
+  end
+
+  # Check to see if we are connected
+  def connected?
+    return false unless @connection
+    return false unless @connection.started?
+    true
+  end
+  
+  # Connect
+  def connect!
+    @connection = Net::HTTP.new(@url.host, @url.port)
+    if @url.scheme == "https"
+      @connection.use_ssl = true
+      @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    end
+    @connection.start
+  end
+  
+  # Send a GET request to the Sugar Instance
+  def send!(method, json)
+    @request   = SugarCRM::Request.new(@url, method, json, @options[:debug])
+    @response  = @connection.get(@request.to_s)
+    handle_response
+  end
+  
+  private
+  
+  def handle_response
+    case @response
+    when Net::HTTPOK 
+      return process_response
+    when Net::HTTPNotFound
+      raise SugarCRM::InvalidSugarCRMUrl, "#{@url} is invalid"
+    when Net::HTTPInternalServerError
+      raise SugarCRM::InvalidRequest, "#{@request} is invalid"
+    else
+      if @options[:debug]
+        puts "#{@request.method}: Raw Response:"
+        puts @response.body
+        puts "\n"
+      end
+      raise SugarCRM::UnhandledResponse, "Can't handle response #{@response}"
+    end
+  end
+
+  def process_response
+    raise SugarCRM::EmptyResponse unless @response.body
+    response_json = JSON.parse @response.body
+    return false if response_json["result_count"] == 0
+    if @options[:debug] && !(DONT_SHOW_DEBUG_FOR.include? @request.method)
+      puts "#{@request.method}: JSON Response:"
+      pp response_json
+      puts "\n"
+    end
+    return response_json
+  end
+  
+  def resolve_url
+    # Appends the rest.php path onto the end of the URL if it's not included
+    if @url.path !~ /rest.php$/
+      @url.path += URL
+    end
+  end
+  
+end; end

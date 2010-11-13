@@ -1,6 +1,7 @@
 module SugarCRM; class Connection
-  # Performs a seamless login during synchronization.
-  def seamless_login
+  # Retrieves the ID of the default team of the user 
+  # who is logged into the current session.
+  def get_user_team_id
     login! unless logged_in?
     json = <<-EOF
       {
@@ -8,6 +9,6 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{8}/,'')
-    response = get(:seamless_login, json)
+    response = send!(:get_user_team_id, json)
   end
 end; end
