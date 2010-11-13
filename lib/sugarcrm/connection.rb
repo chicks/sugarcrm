@@ -12,6 +12,7 @@ module SugarCRM; class Connection
 
   URL = "/service/v2/rest.php"
   DONT_SHOW_DEBUG_FOR = [:get_available_modules]
+  RESPONSE_IS_NOT_JSON = [:get_user_id, :get_user_team_id]
   
   attr :url, true
   attr :user, false
@@ -107,9 +108,15 @@ module SugarCRM; class Connection
   end
 
   def process_response
+    # Complain if our body is empty.
     raise SugarCRM::EmptyResponse unless @response.body
+    # Some methods are dumb and don't return a JSON Response
+    return @response.body if RESPONSE_IS_NOT_JSON.include? @request.method
+    # Push it through the old meat grinder.
     response_json = JSON.parse @response.body
+    # Empty result.  Is this wise?
     return false if response_json["result_count"] == 0
+    # Filter debugging on REALLY BIG responses
     if @options[:debug] && !(DONT_SHOW_DEBUG_FOR.include? @request.method)
       puts "#{@request.method}: JSON Response:"
       pp response_json

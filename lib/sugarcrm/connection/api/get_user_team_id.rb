@@ -8,7 +8,7 @@ module SugarCRM; class Connection
         \"session\": \"#{@session}\"
       }
     EOF
-    json.gsub!(/^\s{8}/,'')
-    response = send!(:get_user_team_id, json)
+    json.gsub!(/^\s{6}/,'')
+    send!(:get_user_team_id, json)
   end
 end; end
