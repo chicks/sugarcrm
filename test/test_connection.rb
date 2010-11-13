@@ -1,15 +1,16 @@
 require 'helper'
-require "test/unit"
-require "pp"
 
-require 'connection/test_login'
-require 'connection/test_get_available_modules'
-require 'connection/test_get_entry'
+#require 'connection/test_login'
+#require 'connection/test_get_available_modules'
+#require 'connection/test_get_module_fields'
+#require 'connection/test_get_entry'
+#require 'connection/test_get_entries'
+#require 'connection/test_get_entry_list'
 
 class TestConnection < Test::Unit::TestCase
   context "A SugarCRM::Connection instance" do
     setup do
-      @connection = SugarCRM::Connection.new(URL, USER, PASS, {:register_modules => false})
+      @connection = SugarCRM::Connection.new(URL, USER, PASS)
     end
     should "retrieve the list of available modules" do
       assert_instance_of Array, SugarCRM.modules

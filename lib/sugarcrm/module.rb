@@ -4,6 +4,7 @@ module SugarCRM
     attr :name, false
     attr :klass, false
     attr :fields, false
+    attr :link_fields, false
 
     # Dynamically register objects based on Module name
     # I.e. a SugarCRM Module named Users will generate
@@ -12,15 +13,18 @@ module SugarCRM
       @name   = name
       @klass  = name.classify
       @fields = {}
+      @link_fields  = {}
       @fields_registered = false
       self
     end
     
     def fields
       return @fields if fields?
-      @fields = SugarCRM.connection.get_fields(@name)
+      all_fields  = SugarCRM.connection.get_fields(@name)
+      @fields     = all_fields["module_fields"]
+      @link_fields= all_fields["link_fields"] 
       @fields_registered = true
-      @fields.keys
+      @fields
     end
     
     def fields?
@@ -72,6 +76,7 @@ module SugarCRM
 
       # Finds a module by name, or klass name
       def find(name)
+        register_all unless initialized?
         SugarCRM.modules.each do |m|
           return m if m.name  == name
           return m if m.klass == name

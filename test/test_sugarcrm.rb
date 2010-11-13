@@ -1,6 +1,4 @@
 require 'helper'
-require "test/unit"
-require "pp"
 
 class TestSugarcrm < Test::Unit::TestCase
   context "A SugarCRM::Base instance" do

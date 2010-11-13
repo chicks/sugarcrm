@@ -1,11 +1,9 @@
 require 'helper'
-require "test/unit"
-require "pp"
 
 class TestGetEntry < Test::Unit::TestCase
   context "A SugarCRM.connection" do
     setup do
-      SugarCRM::Connection.new(URL, USER, PASS, {:register_modules => false})
+      SugarCRM::Connection.new(URL, USER, PASS, {:debug => false })
       @response = SugarCRM.connection.get_entry(
         "Users",
         1,

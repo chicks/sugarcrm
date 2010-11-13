@@ -46,7 +46,7 @@ class Base
   # Returns a hash of the module fields from the 
   def attributes_from_module_fields
     fields = {}
-    self.class._module.fields.sort.each do |k|
+    self.class._module.fields.keys.sort.each do |k|
       fields[k.to_s] = nil
     end
     fields

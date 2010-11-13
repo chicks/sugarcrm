@@ -1,8 +1,6 @@
 require 'helper'
-require "test/unit"
-require "pp"
 
-class TestLog < Test::Unit::TestCase
+class TestLogin < Test::Unit::TestCase
   context "A SugarCRM.connection" do
     setup do
       SugarCRM::Connection.new(URL, USER, PASS, {:register_modules => false})

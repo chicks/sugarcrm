@@ -1,6 +1,4 @@
 require 'helper'
-require "test/unit"
-require "pp"
 
 class TestResponse < Test::Unit::TestCase
   context "A SugarCRM::Response instance" do
@@ -19,10 +17,6 @@ class TestResponse < Test::Unit::TestCase
              "relationship_list"=>[]}
   
       @response = SugarCRM::Response.new(@json)
-    end
-    
-    should "set the module name" do
-      assert_equal "User", @response.module
     end
       
     should "return an instance of a SugarCRM Module when #to_obj" do

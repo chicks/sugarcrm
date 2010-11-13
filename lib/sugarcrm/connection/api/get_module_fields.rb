@@ -10,8 +10,7 @@ def get_module_fields(module_name)
     }
   EOF
   json.gsub!(/^\s{6}/,'')
-  # TODO: Add unit test for this
-  send!(:get_module_fields, json)["module_fields"]
+  send!(:get_module_fields, json)
 end
 
 alias :get_fields :get_module_fields

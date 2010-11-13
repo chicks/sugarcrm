@@ -3,12 +3,12 @@ module SugarCRM
   class Response
     
     attr :response, false
-    attr :module, false
+    #attr :module, false
     attr :id, false
     
     def initialize(json)
       @response   = json
-      @module     = @response["entry_list"][0]["module_name"].classify
+      #@module     = @response["entry_list"][0]["module_name"].classify
       self
     end
     
@@ -18,15 +18,19 @@ module SugarCRM
       objects = []
       @response["entry_list"].each do |object|
         attributes = []
+        _module    = resolve_module(object)
         begin
           attributes = flatten_name_value_list(object)
         rescue ArgumentError => e
         end
-        if SugarCRM.const_get(@module)
-          raise AttributeParsingError unless attributes.length > 0
-          objects << SugarCRM.const_get(@module).new(attributes) 
+        if SugarCRM.const_get(_module)
+          if attributes.length == 0
+            pp object
+            raise AttributeParsingError, "response contains objects without attributes!"
+          end
+          objects << SugarCRM.const_get(_module).new(attributes) 
         else
-          raise InvalidModule, "#{@module} does not exist, or is not accessible"
+          raise InvalidModule, "#{_module} does not exist, or is not accessible"
         end
       end
       # If we only have one result, just return the object
@@ -39,6 +43,10 @@ module SugarCRM
     
     def to_json
       @response.to_json
+    end
+    
+    def resolve_module(list)
+      list["module_name"].classify
     end
     
     def flatten_name_value_list(list)

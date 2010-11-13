@@ -1,6 +1,4 @@
 require 'helper'
-require "test/unit"
-require "pp"
 
 class TestGetEntries < Test::Unit::TestCase
   context "A SugarCRM.connection" do

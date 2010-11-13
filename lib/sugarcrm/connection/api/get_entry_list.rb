@@ -12,12 +12,6 @@ def get_entry_list(module_name, query, opts={})
     :deleted => ''
   }.merge! opts
 
-  # FIXME: This is to work around a bug in SugarCRM 6.0
-  # where no fields are returned if no fields are specified
-  if options[:fields].length == 0
-    options[:fields] = Module.find(module_name).fields
-  end
-
   json = <<-EOF
     {
       \"session\": \"#{@session}\"\,
@@ -25,7 +19,7 @@ def get_entry_list(module_name, query, opts={})
       \"query\": \"#{query}\"\,
       \"order_by\": \"#{options[:order_by]}\"\,
       \"offset\": \"#{options[:offset]}\"\,
-      \"select_fields\": #{options[:fields].to_json}\,
+      \"select_fields\": #{resolve_fields(module_name, options[:fields])}\,
       \"link_name_to_fields_array\": #{options[:link_fields].to_json}\,
       \"max_results\": \"#{options[:max_results]}\"\,
       \"deleted\": #{options[:deleted]}

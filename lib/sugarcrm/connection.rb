@@ -5,12 +5,13 @@ require 'net/https'
 require 'rubygems'
 require 'json'
 
+require 'sugarcrm/connection/helper'
 Dir["#{File.dirname(__FILE__)}/connection/api/*.rb"].each { |f| load(f) }
 
 module SugarCRM; class Connection
 
   URL = "/service/v2/rest.php"
-  DONT_SHOW_DEBUG_FOR = [:get_module_fields, :get_available_modules]
+  DONT_SHOW_DEBUG_FOR = [:get_available_modules]
   
   attr :url, true
   attr :user, false
@@ -72,9 +73,17 @@ module SugarCRM; class Connection
   
   # Send a GET request to the Sugar Instance
   def send!(method, json)
-    @request   = SugarCRM::Request.new(@url, method, json, @options[:debug])
-    @response  = @connection.get(@request.to_s)
+    @request  = SugarCRM::Request.new(@url, method, json, @options[:debug])
+    if @request.length > 3900
+      @response = @connection.post(@url.path, @request)
+    else
+      @response = @connection.get(@url.path.dup + "?" + @request.to_s)
+    end
     handle_response
+  end
+  
+  def debug=(debug)
+    options[:debug] = debug
   end
   
   private
