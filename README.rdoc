@@ -11,8 +11,8 @@ RubyGem for interacting with SugarCRM via REST.
 == Description:
 
 I've implemented all of the basic API calls that SugarCRM supports, and am actively building an abstraction layer
-on top of the basic API methods.  The end result will be to provide ActiveRecord style finders and first class
-objects.  Some of this functionality is included today. 
+on top of the basic API methods.  The end result will be ActiveRecord style finders and first class objects.  Some 
+of this functionality is included today. 
 
 == FEATURES/PROBLEMS:
 
@@ -23,20 +23,25 @@ objects.  Some of this functionality is included today.
 
   require 'sugarcrm'
   # Establish a connection
-  sugarcrm = SugarCRM::Base.establish_connection("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
+  SugarCRM::Base.establish_connection("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
 
   # Retrieve a user by ID, using the SugarCRM::User Proxy object
   SugarCRM::User.find(id)
   
   # Show a list of available modules
-  sugarcrm.modules
+  SugarCRM.modules
+  
+  # Use the HTTP for direct API calls
+  SugarCRM.connection.get_entry(1)
 
   # Lookup a user by name.  Find any associated accounts
-  sugarcrm.get_entry_list(
+  SugarCRM::User.find_by_username('sarah').accounts
+  
+  # Same operation, but using the direct API calls
+  SugarCRM.connection.get_entry_list(
     "Users",
-    "users.user_name = \'#{USER}\'",
+    "users.user_name = \'sarah\'",
     {
-      :fields => ["first_name", "last_name"],
       :link_fields => [
         {
           "name"  => "accounts",
@@ -48,7 +53,7 @@ objects.  Some of this functionality is included today.
 
 == REQUIREMENTS:
 
-* activesupport gem
+* >= activesupport 3.0.0 gem
 * json gem
 
 == INSTALL:
