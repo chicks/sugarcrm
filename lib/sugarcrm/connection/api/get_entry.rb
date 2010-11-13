@@ -1,10 +1,10 @@
 module SugarCRM; class Connection
   # Retrieves a single SugarBean based on the ID.
-  def get_entry(module_name, id, options={})
+  def get_entry(module_name, id, opts={})
     login! unless logged_in?
-    { :fields => [], 
+    options = { :fields => [], 
       :link_fields => [], 
-    }.merge! options
+    }.merge! opts
     
     json = <<-EOF
       {

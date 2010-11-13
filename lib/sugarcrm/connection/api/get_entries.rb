@@ -1,11 +1,11 @@
 module SugarCRM; class Connection
 # Retrieve a list of SugarBeans by ID.  This method will not 
 # work with the report module.
-def get_entries(module_name, ids, options={})
+def get_entries(module_name, ids, opts={})
   login! unless logged_in?
-  { :fields => '', 
+  options = { :fields => [], 
     :link_fields => [], 
-  }.merge! options
+  }.merge! opts
 
   json = <<-EOF
     {

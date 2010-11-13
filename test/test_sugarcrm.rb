@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestSugarcrm < Test::Unit::TestCase
+class TestSugarCRM < Test::Unit::TestCase
   context "A SugarCRM::Base instance" do
   
     should "return the module name" do
@@ -39,6 +39,12 @@ class TestSugarcrm < Test::Unit::TestCase
       u = SugarCRM::User.find(1)
       assert_equal u.user_name, "admin"
     end
+    
+    should "return an email address when sent #email_addresses" do
+      u = SugarCRM::User.find("seed_sarah_id")
+      assert_equal "sarah@example.com", u.email_addresses.first.email_address
+    end
+
   end
   
 end

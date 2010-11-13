@@ -27,6 +27,7 @@ module SugarCRM; class Response
     @response["entry_list"].each do |object|
       attributes = []
       _module    = resolve_module(object)
+      id         = object["id"]
       begin
         attributes = flatten_name_value_list(object)
       rescue ArgumentError => e
@@ -36,7 +37,7 @@ module SugarCRM; class Response
           pp object
           raise AttributeParsingError, "response contains objects without attributes!"
         end
-        objects << SugarCRM.const_get(_module).new(attributes) 
+        objects << SugarCRM.const_get(_module).new(id, attributes) 
       else
         raise InvalidModule, "#{_module} does not exist, or is not accessible"
       end

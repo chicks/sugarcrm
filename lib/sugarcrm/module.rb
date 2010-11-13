@@ -31,6 +31,22 @@ module SugarCRM
       @fields_registered
     end
     
+    def link_fields
+      self.fields unless link_fields?
+      handle_empty_array
+      @link_fields
+    end
+    
+    def link_fields?
+      @fields_registered
+    end  
+  
+    def handle_empty_array
+      if @link_fields.class == Array && @link_fields.length == 0
+        @link_fields = {}
+      end
+    end
+    
     # Registers a single module by name
     # Adds module to SugarCRM.modules (SugarCRM.modules << Module.new("Users"))
     # Adds module class to SugarCRM parent module (SugarCRM.constants << User)

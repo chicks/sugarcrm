@@ -1,8 +1,8 @@
+require 'pp'
 require 'rubygems'
 require 'active_support/core_ext'
 
 require 'sugarcrm/module_methods'
-
 require 'sugarcrm/base'
 require 'sugarcrm/connection'
 require 'sugarcrm/exceptions'
