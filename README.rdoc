@@ -30,6 +30,9 @@ e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM:
   # Establish a connection
   SugarCRM::Base.establish_connection("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
 
+  # Get the logged in user
+  SugarCRM.current_user
+
   # Retrieve a user by user_name
   SugarCRM::User.find_by_user_name("admin")
 
