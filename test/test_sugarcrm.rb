@@ -2,6 +2,11 @@ require 'helper'
 
 class TestSugarCRM < Test::Unit::TestCase
   context "A SugarCRM::Base instance" do
+    
+    should "establish a connection when Base#establish_connection" do
+      SugarCRM::Base.establish_connection(URL, USER, PASS)
+      assert SugarCRM.connection.connected?
+    end
   
     should "return the module name" do
       assert_equal "Users", SugarCRM::User._module.name
@@ -13,7 +18,11 @@ class TestSugarCRM < Test::Unit::TestCase
     end
 
     should "respond to self.connection.logged_in?" do
-      assert SugarCRM::User.connection.logged_in?
+      assert_respond_to SugarCRM::User.connection, :logged_in?
+    end
+    
+    should "respond to self.current_user" do
+      assert_instance_of SugarCRM::User, SugarCRM.current_user
     end
   
     should "respond to self.attributes_from_modules_fields" do

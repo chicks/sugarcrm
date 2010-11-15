@@ -15,4 +15,9 @@ module SugarCRM
   def self.modules=(modules)
     @@modules = modules
   end
+  
+  def self.current_user
+    SugarCRM::User.find_by_user_name(connection.user)
+  end
+  
 end
