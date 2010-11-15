@@ -21,6 +21,7 @@ module SugarCRM; class Base
   
   # Contains a list of attributes
   attr :attributes, true
+  attr :associations, true
   attr :id, true
   attr :debug, true
 
