@@ -10,34 +10,39 @@ RubyGem for interacting with SugarCRM via REST.
 
 == Description:
 
-I've implemented all of the basic API calls that SugarCRM supports, and am actively building an abstraction layer
-on top of the basic API methods.  The end result will be ActiveRecord style finders and first class objects.  Some 
-of this functionality is included today. 
+A less clunky way to interact with SugarCRM via REST.
+
+I've built an abstraction layer on top of the SugarCRM REST API, instead of +get_entry("Users", "1")+ you can 
+call +SugarCRM::User.find(1)+.  There is also support for collections à la +SugarCRM::User.find(1).accounts+.  
+ActiveRecord style finders are in place, with limited support for conditions and joins 
+e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM::Contacts.find_by_title("VP of Sales", {:conditions => {:deleted => 0}})+ will not.  
 
 == FEATURES/PROBLEMS:
 
+* Supports all v2 API calls
 * Auto-generation of Module specific objects.  When a connection is established, get_available_modules is called and the resultant modules are turned into SugarCRM::Module classes.  
-* If you just want to use the vanilla API, you can access the methods directly on the connection object.
+* If you just want to use the vanilla API, you can access the methods directly on the SugarCRM.connection object.
 
 == SYNOPSIS:
 
   require 'sugarcrm'
+  
   # Establish a connection
   SugarCRM::Base.establish_connection("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
 
-  # Retrieve a user by ID, using the SugarCRM::User Proxy object
-  SugarCRM::User.find(id)
-  
+  # Retrieve a user by user_name
+  SugarCRM::User.find_by_user_name("admin")
+
+  # Retrieve all Accounts owned by a particular user.
+  SugarCRM::User.find_by_user_name('sarah').accounts
+
   # Show a list of available modules
   SugarCRM.modules
   
-  # Use the HTTP for direct API calls
-  SugarCRM.connection.get_entry(1)
+  # Use the HTTP Connection and SugarCRM API to load the Admin user
+  SugarCRM.connection.get_entry("Users", 1)
 
-  # Lookup a user by name.  Find any associated accounts
-  SugarCRM::User.find_by_username('sarah').accounts
-  
-  # Same operation, but using the direct API calls
+  # Retrieve all Accounts by user name (direct API method)
   SugarCRM.connection.get_entry_list(
     "Users",
     "users.user_name = \'sarah\'",
