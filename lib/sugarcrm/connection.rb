@@ -11,7 +11,7 @@ Dir["#{File.dirname(__FILE__)}/connection/api/*.rb"].each { |f| load(f) }
 module SugarCRM; class Connection
 
   URL = "/service/v2/rest.php"
-  DONT_SHOW_DEBUG_FOR = [:get_available_modules]
+  DONT_SHOW_DEBUG_FOR = []
   RESPONSE_IS_NOT_JSON = [:get_user_id, :get_user_team_id]
   
   attr :url, true

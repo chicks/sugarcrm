@@ -2,6 +2,7 @@ module SugarCRM
   # A class for handling SugarCRM Modules
   class Module
     attr :name, false
+    attr :table_name, false
     attr :klass, false
     attr :fields, false
     attr :link_fields, false
@@ -12,6 +13,7 @@ module SugarCRM
     def initialize(name)
       @name   = name
       @klass  = name.classify
+      @table_name = name.tableize
       @fields = {}
       @link_fields  = {}
       @fields_registered = false

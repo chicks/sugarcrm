@@ -16,6 +16,10 @@ class TestSugarCRM < Test::Unit::TestCase
       assert SugarCRM::User.connection.logged_in?
     end
   
+    should "respond to self.attributes_from_modules_fields" do
+      assert_instance_of Hash, SugarCRM::User.attributes_from_module_fields
+    end
+  
     should "return an instance of itself when #new" do
       assert_instance_of SugarCRM::User, SugarCRM::User.new
     end
@@ -42,6 +46,16 @@ class TestSugarCRM < Test::Unit::TestCase
     
     should "return an email address when sent #email_addresses" do
       u = SugarCRM::User.find("seed_sarah_id")
+      assert_equal "sarah@example.com", u.email_addresses.first.email_address
+    end
+
+    should "return an array of records when sent #find([id1, id2, id3])" do
+      users = SugarCRM::User.find(["seed_sarah_id", 1])
+      assert_equal "Administrator", users.last.title
+    end
+    
+    should "return an instance of User when sent User#find_by_username" do
+      u = SugarCRM::User.find_by_user_name("sarah")
       assert_equal "sarah@example.com", u.email_addresses.first.email_address
     end
 

@@ -1,12 +1,14 @@
 module SugarCRM; module AttributeMethods
 
-  # Returns a hash of the module fields from the 
-  def attributes_from_module_fields
-    fields = {}
-    self.class._module.fields.keys.sort.each do |k|
-      fields[k.to_s] = nil
+  module ClassMethods
+    # Returns a hash of the module fields from the module
+    def attributes_from_module_fields
+      fields = {}
+      self._module.fields.keys.sort.each do |k|
+        fields[k.to_s] = nil
+      end
+      fields
     end
-    fields
   end
 
   # Generates get/set methods for keys in the attributes hash

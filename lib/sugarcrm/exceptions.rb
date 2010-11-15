@@ -19,4 +19,7 @@ module SugarCRM
   
   class AttributeParsingError < RuntimeError
   end
+  
+  class RecordNotFound < RuntimeError
+  end
 end
