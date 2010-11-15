@@ -33,14 +33,27 @@ e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM:
   # Get the logged in user
   SugarCRM.current_user
 
-  # Retrieve a user by user_name
-  SugarCRM::User.find_by_user_name("admin")
-
-  # Retrieve all Accounts owned by a particular user.
-  SugarCRM::User.find_by_user_name('sarah').accounts
-
   # Show a list of available modules
   SugarCRM.modules
+
+  # Retrieve a User by user_name
+  SugarCRM::User.find_by_user_name("admin")
+
+  # Retrieve all Contacts assigned to a particular user.
+  SugarCRM::User.find_by_user_name('sarah').contacts
+  
+  # Retrieve all email addresses on an Account
+  SugarCRM::Account.find_by_name("JAB Funds Ltd.").contacts.each do |contact|
+    contact.email_addresses.each do |email|
+      puts "#{email.email_address}" unless email.opt_out == "1"
+    end
+  end
+  
+  # Look up the fields for a given module
+  SugarCRM::Module.find("Accounts").fields
+  
+  # Look up the relationships for a given module
+  SugarCRM::Module.find("Accounts").link_fields
   
   # Use the HTTP Connection and SugarCRM API to load the Admin user
   SugarCRM.connection.get_entry("Users", 1)

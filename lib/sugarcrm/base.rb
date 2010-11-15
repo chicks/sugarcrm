@@ -61,7 +61,8 @@ module SugarCRM; class Base
     private 
     
     def find_initial(options)
-      options.update(:max_results => 1)
+      # TODO: Look into fixing this to actually work
+      #options.update(:max_results => 1)
       find_every(options)
     end
   
