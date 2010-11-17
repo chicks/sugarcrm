@@ -31,6 +31,7 @@ module SugarCRM; module AssociationMethods
   #
   def query_association(association)
     klass = self.class._module.link_fields[association.to_s]["module"]
+    klass = self.class._module.link_fields[association.to_s].classify unless klass
     objects = SugarCRM.connection.get_relationships(
       self.class._module.name,
       self.id,

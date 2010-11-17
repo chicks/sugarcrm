@@ -13,7 +13,7 @@ RubyGem for interacting with SugarCRM via REST.
 A less clunky way to interact with SugarCRM via REST.
 
 I've built an abstraction layer on top of the SugarCRM REST API, instead of +get_entry("Users", "1")+ you can 
-call +SugarCRM::User.find(1)+.  There is also support for collections à la +SugarCRM::User.find(1).accounts+.  
+call +SugarCRM::User.find(1)+.  There is also support for collections à la +SugarCRM::User.find(1).contacts+.  
 ActiveRecord style finders are in place, with limited support for conditions and joins 
 e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM::Contacts.find_by_title("VP of Sales", {:conditions => {:deleted => 0}})+ will not.  
 
@@ -43,7 +43,7 @@ e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM:
   SugarCRM::User.find_by_user_name('sarah').contacts
   
   # Retrieve all email addresses on an Account
-  SugarCRM::Account.find_by_name("JAB Funds Ltd.").contacts.each do |contact|
+  SugarCRM::Account.find_by_name("JAB Funds Ltd.").first.contacts.each do |contact|
     contact.email_addresses.each do |email|
       puts "#{email.email_address}" unless email.opt_out == "1"
     end
