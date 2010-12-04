@@ -33,6 +33,16 @@ module SugarCRM
       @fields_registered
     end
     
+    def required_fields
+      required_fields = []
+      ignore_fields = ["id", "date_entered", "date_modified"]
+      self.fields.each_value do |field|
+        next if ignore_fields.include? field["name"]
+        required_fields << field["name"] if field["required"] == 1
+      end 
+      required_fields
+    end
+    
     def link_fields
       self.fields unless link_fields?
       handle_empty_array

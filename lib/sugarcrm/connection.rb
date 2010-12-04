@@ -87,6 +87,10 @@ module SugarCRM; class Connection
     options[:debug] = debug
   end
   
+  def debug?
+    options[:debug]
+  end
+  
   private
   
   def handle_response

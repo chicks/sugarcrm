@@ -3,7 +3,8 @@ module SugarCRM; class Connection
 # work with the report module.
 def get_entries(module_name, ids, opts={})
   login! unless logged_in?
-  options = { :fields => [], 
+  options = { 
+    :fields => [], 
     :link_fields => [], 
   }.merge! opts
 

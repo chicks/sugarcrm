@@ -16,5 +16,8 @@ class TestGetEntry < Test::Unit::TestCase
     should "return an object when #get_entry" do 
       assert_instance_of SugarCRM::User, @response
     end
+    should "typecast boolean fields properly" do
+      assert !(@response.deleted)
+    end
   end
 end

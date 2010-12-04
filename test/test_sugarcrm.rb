@@ -3,6 +3,11 @@ require 'helper'
 class TestSugarCRM < Test::Unit::TestCase
   context "A SugarCRM::Base instance" do
     
+    should "establish a connection when SugarCRM#connect!" do
+      SugarCRM.connect!(URL, USER, PASS)
+      assert SugarCRM.connection.connected?
+    end
+    
     should "establish a connection when Base#establish_connection" do
       SugarCRM::Base.establish_connection(URL, USER, PASS)
       assert SugarCRM.connection.connected?
@@ -10,6 +15,10 @@ class TestSugarCRM < Test::Unit::TestCase
   
     should "return the module name" do
       assert_equal "Users", SugarCRM::User._module.name
+    end
+    
+    should "responsd to self#methods" do
+      assert_instance_of Array, SugarCRM::User.new.methods
     end
     
     should "respond to self.connection" do
@@ -26,7 +35,7 @@ class TestSugarCRM < Test::Unit::TestCase
     end
   
     should "respond to self.attributes_from_modules_fields" do
-      assert_instance_of Hash, SugarCRM::User.attributes_from_module_fields
+      assert_instance_of ActiveSupport::HashWithIndifferentAccess, SugarCRM::User.attributes_from_module_fields
     end
   
     should "return an instance of itself when #new" do
@@ -38,10 +47,24 @@ class TestSugarCRM < Test::Unit::TestCase
       assert SugarCRM::User.attribute_methods_generated
     end
 
-    should "respond to attributes derived from #_module.fields" do
+    should "not save a record that is missing required attributes" do
       u = SugarCRM::User.new
       u.last_name = "Test"
-      assert_equal "Test", u.last_name
+      assert !u.save
+      assert_raise SugarCRM::MissingRequiredAttributes do
+        u.save!
+      end
+    end
+
+    should "create, modify, and save a new record" do
+      u = SugarCRM::User.new
+      u.email1 = "abc@abc.com"
+      u.last_name = "Test"
+      u.system_generated_password = 0
+      u.user_name = "test_user"
+      u.status = {"Active"=>{"name"=>"Active", "value"=>"Active"}}
+      assert_equal "Test", u.modified_attributes[:last_name][:new]
+      assert u.save!
     end
     
     should "return an an instance of itself when sent #find(id)" do

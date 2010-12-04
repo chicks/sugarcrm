@@ -7,6 +7,12 @@ module SugarCRM
   def self.connection=(connection)
     @@connection = connection
   end
+  def self.connect(url, user, pass, options={})
+    SugarCRM::Base.establish_connection(url, user, pass, options)
+  end
+  class << self
+    alias :connect! :connect
+  end
   
   @@modules = []
   def self.modules

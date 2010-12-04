@@ -8,8 +8,8 @@ def get_entry_list(module_name, query, opts={})
     :offset => '', 
     :fields => [], 
     :link_fields => [], 
-    :max_results => '', 
-    :deleted => ''
+    :limit => '', 
+    :deleted => 0
   }.merge! opts
 
   json = <<-EOF
@@ -21,7 +21,7 @@ def get_entry_list(module_name, query, opts={})
       \"offset\": \"#{options[:offset]}\"\,
       \"select_fields\": #{resolve_fields(module_name, options[:fields])}\,
       \"link_name_to_fields_array\": #{options[:link_fields].to_json}\,
-      \"max_results\": \"#{options[:max_results]}\"\,
+      \"max_results\": \"#{options[:limit]}\"\,
       \"deleted\": #{options[:deleted]}
     }
   EOF

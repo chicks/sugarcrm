@@ -8,7 +8,12 @@ module SugarCRM; class Response
       r = new(json)
       begin
         return r.to_obj
-      rescue
+      rescue => e
+        if SugarCRM.connection.debug?
+          puts "Failed to process JSON:"
+          pp json
+          puts e
+        end
         return json
       end
     end
@@ -23,18 +28,17 @@ module SugarCRM; class Response
   # Tries to instantiate and return an object with the values
   # populated from the response
   def to_obj
+    # If this is not a "entry_list" response, just return
+    return @response unless @response["entry_list"]
+    
     objects = []
     @response["entry_list"].each do |object|
       attributes = []
       _module    = resolve_module(object)
       id         = object["id"]
-      begin
-        attributes = flatten_name_value_list(object)
-      rescue ArgumentError => e
-      end
+      attributes = flatten_name_value_list(object)
       if SugarCRM.const_get(_module)
         if attributes.length == 0
-          pp object
           raise AttributeParsingError, "response contains objects without attributes!"
         end
         objects << SugarCRM.const_get(_module).new(id, attributes) 
@@ -53,7 +57,7 @@ module SugarCRM; class Response
   def to_json
     @response.to_json
   end
-  
+    
   def resolve_module(list)
     list["module_name"].classify
   end

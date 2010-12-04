@@ -1,8 +1,10 @@
 module SugarCRM; module AssociationMethods
   
-  # Returns an array of the module link fields
-  def associations_from_module_link_fields
-    self.class._module.link_fields.keys
+  module ClassMethods
+    # Returns an array of the module link fields
+    def associations_from_module_link_fields
+      self._module.link_fields.keys
+    end
   end
   
   # Generates the association proxy methods for related modules
@@ -30,9 +32,7 @@ module SugarCRM; module AssociationMethods
   #     "type"=>"link"},
   #
   def query_association(association)
-    klass = self.class._module.link_fields[association.to_s]["module"]
-    klass = self.class._module.link_fields[association.to_s].classify unless klass
-    objects = SugarCRM.connection.get_relationships(
+    collection = SugarCRM.connection.get_relationships(
       self.class._module.name,
       self.id,
       association.to_s

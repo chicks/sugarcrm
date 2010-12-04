@@ -1,4 +1,5 @@
 require 'pp'
+require 'set'
 require 'rubygems'
 require 'active_support/core_ext'
 

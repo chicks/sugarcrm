@@ -4,7 +4,7 @@ require 'sugarcrm/association_methods'
 module SugarCRM; class Base 
 
   # Unset all of the instance methods we don't need.
-  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^instance_of.$)/ }
+  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^methods$|^instance_of.$|^respond_to.$)/ }
 
   # This holds our connection
   cattr_accessor :connection, :instance_writer => false
@@ -21,9 +21,11 @@ module SugarCRM; class Base
   
   # Contains a list of attributes
   attr :attributes, true
+  attr :modified_attributes, true
   attr :associations, true
   attr :id, true
   attr :debug, true
+  attr :errors, true
 
   class << self # Class methods
     def establish_connection(url, user, pass, opts={})
@@ -74,7 +76,7 @@ module SugarCRM; class Base
 
       case ids.size
         when 0
-          raise RecordNotFound, "Couldn't find #{name} without an ID"
+          raise RecordNotFound, "Couldn't find #{self._module.name} without an ID"
         when 1
           result = find_one(ids.first, options)
           expects_array ? [ result ] : result
@@ -124,6 +126,8 @@ module SugarCRM; class Base
     end
     
     def query_from_options(options)
+      # If we dont have conditions, just return an empty query
+      return "" unless options[:conditions]
       conditions = []
       options[:conditions].each_pair do |column, value| 
         conditions << "#{self._module.table_name}.#{column} = \'#{value}\'"
@@ -282,9 +286,13 @@ module SugarCRM; class Base
   def initialize(id=nil, attributes={})
     @id = id
     @attributes = self.class.attributes_from_module_fields.merge(attributes)
-    @associations = associations_from_module_link_fields
+    @modified_attributes = {}
+    @associations = self.class.associations_from_module_link_fields
+    @errors = Set.new
     define_attribute_methods
     define_association_methods
+    typecast_attributes
+    self
   end
 
   def inspect
@@ -293,14 +301,27 @@ module SugarCRM; class Base
   
   def to_s
     attrs = []
-    @attributes.each_key do |k|
-       attrs << "#{k}: #{attribute_for_inspect(k)}"
+    @attributes.keys.sort.each do |k|
+      attrs << "#{k}: #{attribute_for_inspect(k)}"
     end
     "#<#{self.class} #{attrs.join(", ")}>"
   end
 
+  # Saves the current object, checks that required fields are present.
+  # returns true or false
   def save
-    response = SugarCRM.connection.set_entry(self._module.name, @attributes)
+    return false unless changed?
+    return false unless valid?
+    # If we get a Hash back, return true.  Otherwise return false.
+    (SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes).class == Hash)
+  end
+  
+  # Saves the current object, checks that required fields are present.
+  # raises an exception if a save fails
+  def save!
+    raise MissingRequiredAttributes, errors.to_a.join(", ") unless valid?
+    # If we get a Hash back, return true.  Otherwise return false.
+    (SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes).class == Hash)   
   end
   
   # Wrapper around class attribute
@@ -316,6 +337,7 @@ module SugarCRM; class Base
     include AttributeMethods
     extend  AttributeMethods::ClassMethods
     include AssociationMethods
+    extend  AssociationMethods::ClassMethods
   end
 
 end; end 
