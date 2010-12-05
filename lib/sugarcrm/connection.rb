@@ -1,8 +1,8 @@
-
 require 'uri'
 require 'net/https'
 
 require 'rubygems'
+# TODO: Remove this dependency - ActiveSupport should cover it.
 require 'json'
 
 require 'sugarcrm/connection/helper'
@@ -72,7 +72,7 @@ module SugarCRM; class Connection
     @connection.start
   end
   
-  # Send a GET request to the Sugar Instance
+  # Send a request to the Sugar Instance
   def send!(method, json)
     @request  = SugarCRM::Request.new(@url, method, json, @options[:debug])
     if @request.length > 3900

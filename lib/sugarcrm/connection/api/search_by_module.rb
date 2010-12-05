@@ -2,7 +2,7 @@ module SugarCRM; class Connection
   # Returns the ID, module name and fields for specified modules. 
   # Supported modules are Accounts, Bugs, Calls, Cases, Contacts, 
   # Leads, Opportunities, Projects, Project Tasks, and Quotes.
-  def search_by_module(search_string, modules, ops={})
+  def search_by_module(search_string, modules, opts={})
     login! unless logged_in?
     
     options = { 
