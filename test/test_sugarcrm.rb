@@ -51,20 +51,27 @@ class TestSugarCRM < Test::Unit::TestCase
       u = SugarCRM::User.new
       u.last_name = "Test"
       assert !u.save
-      assert_raise SugarCRM::MissingRequiredAttributes do
+      assert_raise SugarCRM::InvalidRecord do
         u.save!
       end
     end
 
-    should "create, modify, and save a new record" do
+    should "create, modify, and delete a record" do
+      #SugarCRM.connection.debug = true
       u = SugarCRM::User.new
       u.email1 = "abc@abc.com"
-      u.last_name = "Test"
-      u.system_generated_password = 0
+      u.first_name = "Test"
+      u.last_name = "User"
+      u.system_generated_password = false
       u.user_name = "test_user"
-      u.status = {"Active"=>{"name"=>"Active", "value"=>"Active"}}
-      assert_equal "Test", u.modified_attributes[:last_name][:new]
+      u.status = "Active"
+      assert_equal "Test", u.modified_attributes[:first_name][:new]
       assert u.save!
+      m = SugarCRM::User.find_by_first_name_and_last_name("Test", "User")
+      m.title = "Test User"
+      assert m.save!
+      assert m.delete
+      #SugarCRM.connection.debug = false
     end
     
     should "return an an instance of itself when sent #find(id)" do

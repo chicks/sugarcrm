@@ -12,14 +12,15 @@ RubyGem for interacting with SugarCRM via REST.
 
 A less clunky way to interact with SugarCRM via REST.
 
-I've built an abstraction layer on top of the SugarCRM REST API, instead of +get_entry("Users", "1")+ you can 
-call +SugarCRM::User.find(1)+.  There is also support for collections à la +SugarCRM::User.find(1).contacts+.  
+I've built an abstraction layer on top of the SugarCRM REST API, instead of get_entry("Users", "1") you can 
+call SugarCRM::User.find(1).  There is also support for collections à la SugarCRM::User.find(1).email_addresses.  
 ActiveRecord style finders are in place, with limited support for conditions and joins 
-e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM::Contacts.find_by_title("VP of Sales", {:conditions => {:deleted => 0}})+ will not.  
+e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Contacts.find_by_title("VP of Sales", {:conditions => {:deleted => 0}}) will not.  
 
 == FEATURES/PROBLEMS:
 
 * Supports all v2 API calls
+* Supports saving of Module specific objects.
 * Auto-generation of Module specific objects.  When a connection is established, get_available_modules is called and the resultant modules are turned into SugarCRM::Module classes.  
 * If you just want to use the vanilla API, you can access the methods directly on the SugarCRM.connection object.
 
@@ -28,7 +29,10 @@ e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM:
   require 'sugarcrm'
   
   # Establish a connection
-  SugarCRM::Base.establish_connection("http://localhost/sugarcrm", 'user', 'password', {:debug => false})
+  SugarCRM.connect("http://localhost/sugarcrm", 'user', 'password')
+
+  # Enable debugging on the current connection
+  SugarCRM.connection.debug = true
 
   # Get the logged in user
   SugarCRM.current_user
@@ -38,12 +42,27 @@ e.g. +SugarCRM::Contacts.find_by_title("VP of Sales")+ will work, but +SugarCRM:
 
   # Retrieve a User by user_name
   SugarCRM::User.find_by_user_name("admin")
+  
+  # Update a User's title
+  u = SugarCRM::User.find_by_first_name_and_last_name("Will", "Westin")
+  u.title = "Sales Manager Central"
+  u.save
+  
+  # Check if an object is valid (i.e. if it has the required fields to save)
+  u.valid?
+  
+  # Access the errors collection
+  u.errors
+  
+  # Delete an Account
+  a = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
+  a.delete
 
-  # Retrieve all Contacts assigned to a particular user.
-  SugarCRM::User.find_by_user_name('sarah').contacts
+  # Retrieve all Email Addresses assigned to a particular user.
+  SugarCRM::User.find_by_user_name('sarah').email_addresses
   
   # Retrieve all email addresses on an Account
-  SugarCRM::Account.find_by_name("JAB Funds Ltd.").first.contacts.each do |contact|
+  SugarCRM::Account.find_by_name("JAB Funds Ltd.").contacts.each do |contact|
     contact.email_addresses.each do |email|
       puts "#{email.email_address}" unless email.opt_out == "1"
     end

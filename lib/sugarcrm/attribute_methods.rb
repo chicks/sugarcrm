@@ -16,6 +16,7 @@ module SugarCRM; module AttributeMethods
     @modified_attributes.length > 0
   end
   
+  # Is this a new record?
   def new?
     @id.blank?
   end
@@ -50,10 +51,23 @@ module SugarCRM; module AttributeMethods
   def valid?
     valid = true
     self.class._module.required_fields.each do |attribute|
-      if @attributes[attribute].blank?
-        @errors.add "#{attribute} cannot be blank"
-        valid = false
-      end  
+      case attr_type_for(attribute)
+      when "bool"
+        case @attributes[attribute]
+        when TrueClass:
+          next
+        when FalseClass:
+          next
+        else
+          @errors.add "#{attribute} must be true or false"
+          valid = false
+        end
+      else 
+        if @attributes[attribute].blank?
+          @errors.add "#{attribute} cannot be blank"
+          valid = false
+        end
+      end
     end
     valid
   end
@@ -121,6 +135,7 @@ module SugarCRM; module AttributeMethods
 
   protected
   
+  # Returns the attribute type for a given attribute
   def attr_type_for(attribute)
     field = self.class._module.fields[attribute]
     return false unless field

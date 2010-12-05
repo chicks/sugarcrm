@@ -319,10 +319,19 @@ module SugarCRM; class Base
   # Saves the current object, checks that required fields are present.
   # raises an exception if a save fails
   def save!
-    raise MissingRequiredAttributes, errors.to_a.join(", ") unless valid?
+    raise InvalidRecord, errors.to_a.join(", ") unless valid?
     # If we get a Hash back, return true.  Otherwise return false.
     (SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes).class == Hash)   
   end
+  
+  def delete
+    return false if @id.blank?
+    params          = {}
+    params[:id]     = serialize_id
+    params[:deleted]= {:name => "deleted", :value => "1"}
+    (SugarCRM.connection.set_entry(self.class._module.name, params).class == Hash)       
+  end
+    
   
   # Wrapper around class attribute
   def attribute_methods_generated?

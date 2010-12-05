@@ -23,6 +23,6 @@ module SugarCRM
   class RecordNotFound < RuntimeError
   end
   
-  class MissingRequiredAttributes < RuntimeError
+  class InvalidRecord < RuntimeError
   end
 end
