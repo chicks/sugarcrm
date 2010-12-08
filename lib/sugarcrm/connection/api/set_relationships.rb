@@ -13,7 +13,7 @@ module SugarCRM; class Connection
         \"module_names\": \"#{module_names.to_json}\"\,
         \"module_ids\": #{module_ids.to_json}\,
         \"link_field_names\": #{link_field_names.to_json}\,
-        \"related_ids\": #{link_field_name.to_json}   
+        \"related_ids\": #{related_ids.to_json}   
       }
     EOF
     json.gsub!(/^\s{6}/,'')
