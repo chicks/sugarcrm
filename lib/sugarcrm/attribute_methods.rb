@@ -54,9 +54,9 @@ module SugarCRM; module AttributeMethods
       case attr_type_for(attribute)
       when "bool"
         case @attributes[attribute]
-        when TrueClass:
+        when TrueClass
           next
-        when FalseClass:
+        when FalseClass
           next
         else
           @errors.add "#{attribute} must be true or false"
