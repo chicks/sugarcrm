@@ -129,20 +129,23 @@ module SugarCRM; class Base
       # If we dont have conditions, just return an empty query
       return "" unless options[:conditions]
       conditions = []
-      options[:conditions].each_pair do |column, value| 
-      
-        # parse operator in cases where (e.g.) :attribute => '>= some_value', fallback to '=' operator as default
-        operator = value.to_s[/^([<>=]*)(.*)$/,1]
-        operator = '=' if operator.nil? || operator.strip == ''
+      options[:conditions].each_pair do |column, v| 
+        v = [] << v unless v.class == Array
         
-        value = $2 # strip the operator from value passed to query
-        value = value.strip[/'?([^']*)'?/,1]
-        unless column =~ /_c$/ # attribute name ending with _c implies a custom attribute
-          condition_attribute = "#{self._module.table_name}.#{column}"
-        else
-          condition_attribute = column # if setting a condition on a customer attribute, don't add model table name (or query breaks)
-        end
-        conditions << "#{condition_attribute} #{operator} \'#{value}\'"
+        v.each{|value|
+          # parse operator in cases where (e.g.) :attribute => '>= some_value', fallback to '=' operator as default
+          operator = value.to_s[/^([<>=]*)(.*)$/,1]
+          operator = '=' if operator.nil? || operator.strip == ''
+          
+          value = $2 # strip the operator from value passed to query
+          value = value.strip[/'?([^']*)'?/,1]
+          unless column =~ /_c$/ # attribute name ending with _c implies a custom attribute
+            condition_attribute = "#{self._module.table_name}.#{column}"
+          else
+            condition_attribute = column # if setting a condition on a customer attribute, don't add model table name (or query breaks)
+          end
+          conditions << "#{condition_attribute} #{operator} \'#{value}\'"
+        }
       end
       conditions.join(" AND ")
     end
