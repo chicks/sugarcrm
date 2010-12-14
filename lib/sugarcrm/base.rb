@@ -270,7 +270,7 @@ module SugarCRM; class Base
     end
     
     VALID_FIND_OPTIONS = [ :conditions, :include, :joins, :limit, :offset,
-                           :order, :select, :readonly, :group, :having, :from, :lock ]
+                           :order_by, :select, :readonly, :group, :having, :from, :lock ]
 
     def validate_find_options(options) #:nodoc:
       options.assert_valid_keys(VALID_FIND_OPTIONS)
