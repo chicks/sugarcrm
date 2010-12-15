@@ -78,13 +78,11 @@ e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Co
   SugarCRM.connection.get_entry("Users", 1)
   
   # Retrieve the first 10 Accounts with a zip code between 10000 and 10500
-  SugarCRM::Account.all(
-  {
-    :conditions => { :primary_address_postalcode => ["> '10000'", "<= '10500'" ] },
+  SugarCRM::Account.all({
+    :conditions => { :billing_address_postalcode => ["> '10000'", "<= '10500'" ] },
     :limit => '10',
-    :order_by => 'primary_address_postalcode'
-  }
-)
+    :order_by => 'billing_address_postalcode'
+  })
 
   # Retrieve all Accounts by user name (direct API method)
   SugarCRM.connection.get_entry_list(

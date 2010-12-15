@@ -74,6 +74,16 @@ class TestSugarCRM < Test::Unit::TestCase
       #SugarCRM.connection.debug = false
     end
     
+    should "support searching based on conditions" do
+      accounts = SugarCRM::Account.all({
+        :conditions => { :billing_address_postalcode => ["> '70000'", "< '72000'" ] },
+        :limit => '10',
+       	:order_by => 'billing_address_postalcode'
+      })
+      assert_instance_of Array, accounts
+      assert_instance_of SugarCRM::Account, accounts.first
+    end
+    
     should "return an an instance of itself when sent #find(id)" do
       assert_instance_of SugarCRM::User, SugarCRM::User.find(1)
     end
