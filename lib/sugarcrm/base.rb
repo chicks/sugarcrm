@@ -142,7 +142,7 @@ module SugarCRM; class Base
           unless column =~ /_c$/ # attribute name ending with _c implies a custom attribute
             condition_attribute = "#{self._module.table_name}.#{column}"
           else
-            condition_attribute = column # if setting a condition on a customer attribute, don't add model table name (or query breaks)
+            condition_attribute = column # if setting a condition on a custom attribute (i.e. created by user in Studio), don't add model table name (or query breaks)
           end
           conditions << "#{condition_attribute} #{operator} \'#{value}\'"
         }
