@@ -84,6 +84,11 @@ e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Co
     :order_by => 'billing_address_postalcode'
   })
   
+  # Retrieve all Accounts with a zip code
+  SugarCRM::Account.all({
+    :conditions => { :billing_address_postalcode => "<> NULL" }
+  })
+  
   # Link module instances dynamically
   my_account = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
   my_contact = SugarCRM::Contact.new
