@@ -74,6 +74,13 @@ class TestSugarCRM < Test::Unit::TestCase
       #SugarCRM.connection.debug = false
     end
     
+    should "support finding first instance (sorted by attribute)" do
+      account = SugarCRM::Account.first({
+       	:order_by => 'name'
+      })
+      assert_instance_of SugarCRM::Account, account
+    end
+    
     should "support searching based on conditions" do
       accounts = SugarCRM::Account.all({
         :conditions => { :billing_address_postalcode => ["> '70000'", "< '72000'" ] },
