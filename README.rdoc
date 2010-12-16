@@ -83,6 +83,14 @@ e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Co
     :limit => '10',
     :order_by => 'billing_address_postalcode'
   })
+  
+  # Link module instances dynamically
+  my_account = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
+  my_contact = SugarCRM::Contact.new
+  my_contact.last_name = 'Doe'
+  my_contact.save
+  my_account.add_contact(my_contact) # add_contact is a dynamic instance method
+  # By extension, you can also do something like my_contact.add_case(my_case)
 
   # Retrieve all Accounts by user name (direct API method)
   SugarCRM.connection.get_entry_list(
