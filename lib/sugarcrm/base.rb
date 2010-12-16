@@ -346,7 +346,28 @@ module SugarCRM; class Base
     params[:deleted]= {:name => "deleted", :value => "1"}
     (SugarCRM.connection.set_entry(self.class._module.name, params).class == Hash)       
   end
-    
+  
+  # add syntactic sugar to link module instances with dynamic add_* instance methods
+  # e.g. my_account.add_contact(my_contact) or  # my_contact.add_case(my_case)
+  def method_missing(method_id, *arguments, &block)
+    if match = DynamicRelaterMatch.match(method_id)
+      self.class.class_eval <<-EOS, __FILE__, __LINE__ + 1
+        def #{method_id}(*args)
+          raise "Too many arguments for method '#{method_id}'. You can only link modules one at a time." if args.size > 1
+          module_to_link = args.first
+          SugarCRM.connection.set_relationship(
+            self.class._module.name,
+            self.id,
+            '#{match.module_instance.pluralize}',
+            [module_to_link.id]
+          )
+        end
+      EOS
+      send(method_id, *arguments)
+    else
+      super
+    end
+  end
   
   # Wrapper around class attribute
   def attribute_methods_generated?
