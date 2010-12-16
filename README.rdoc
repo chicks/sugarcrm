@@ -77,6 +77,11 @@ e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Co
   # Use the HTTP Connection and SugarCRM API to load the Admin user
   SugarCRM.connection.get_entry("Users", 1)
   
+  # Look up the Case with the smallest case number
+  SugarCRM::Case.first({
+    :order_by => 'case_number'
+  })
+  
   # Retrieve the first 10 Accounts with a zip code between 10000 and 10500
   SugarCRM::Account.all({
     :conditions => { :billing_address_postalcode => ["> '10000'", "<= '10500'" ] },
