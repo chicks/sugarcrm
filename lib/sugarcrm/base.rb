@@ -1,10 +1,7 @@
-require 'sugarcrm/attribute_methods'
-require 'sugarcrm/association_methods'
-
 module SugarCRM; class Base 
 
   # Unset all of the instance methods we don't need.
-  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^methods$|^instance_of.$|^respond_to.$)/ }
+  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^nil.$|^methods$|^instance_of.$|^respond_to.$)/ }
 
   # This holds our connection
   cattr_accessor :connection, :instance_writer => false
@@ -58,6 +55,39 @@ module SugarCRM; class Base
     # to find(:all)
     def all(*args)
       find(:all, *args)
+    end
+    
+    # Creates an object (or multiple objects) and saves it to SugarCRM, if validations pass.
+    # The resulting object is returned whether the object was saved successfully to the database or not.
+    #
+    # The +attributes+ parameter can be either be a Hash or an Array of Hashes.  These Hashes describe the
+    # attributes on the objects that are to be created.
+    #
+    # ==== Examples
+    #   # Create a single new object
+    #   User.create(:first_name => 'Jamie')
+    #
+    #   # Create an Array of new objects
+    #   User.create([{ :first_name => 'Jamie' }, { :first_name => 'Jeremy' }])
+    #
+    #   # Create a single object and pass it into a block to set other attributes.
+    #   User.create(:first_name => 'Jamie') do |u|
+    #     u.is_admin = false
+    #   end
+    #
+    #   # Creating an Array of new objects using a block, where the block is executed for each object:
+    #   User.create([{ :first_name => 'Jamie' }, { :first_name => 'Jeremy' }]) do |u|
+    #     u.is_admin = false
+    #   end
+    def create(attributes = nil, &block)
+      if attributes.is_a?(Array)
+        attributes.collect { |attr| create(attr, &block) }
+      else
+        object = new(attributes)
+        yield(object) if block_given?
+        object.save
+        object
+      end
     end
 
     private 
@@ -297,12 +327,13 @@ module SugarCRM; class Base
   # are using Base.establish_connection, you should be fine.  But if you are 
   # using the Connection class by itself, you may need to prime the pump with
   # a call to Module.register_all
-  def initialize(id=nil, attributes={})
+  def initialize(attributes={}, id=nil)
     @id = id
     @attributes = self.class.attributes_from_module_fields.merge(attributes)
     @modified_attributes = {}
     @associations = self.class.associations_from_module_link_fields
-    @errors = Set.new
+    @association_cache = {}
+    @modified_associations = {}
     define_attribute_methods
     define_association_methods
     typecast_attributes
@@ -324,18 +355,22 @@ module SugarCRM; class Base
   # Saves the current object, checks that required fields are present.
   # returns true or false
   def save
-    return false unless changed?
-    return false unless valid?
-    # If we get a Hash back, return true.  Otherwise return false.
-    (SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes).class == Hash)
+    return false if !changed?
+    return false if !valid?
+    begin
+      save!
+    rescue
+      return false
+    end
+    true
   end
   
   # Saves the current object, checks that required fields are present.
   # raises an exception if a save fails
   def save!
-    raise InvalidRecord, errors.to_a.join(", ") unless valid?
-    # If we get a Hash back, return true.  Otherwise return false.
-    (SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes).class == Hash)   
+    save_modified_attributes
+    save_modified_associations
+    true
   end
   
   def delete
@@ -344,28 +379,6 @@ module SugarCRM; class Base
     params[:id]     = serialize_id
     params[:deleted]= {:name => "deleted", :value => "1"}
     (SugarCRM.connection.set_entry(self.class._module.name, params).class == Hash)       
-  end
-  
-  # add syntactic sugar to link module instances with dynamic add_* instance methods
-  # e.g. my_account.add_contact(my_contact) or  # my_contact.add_case(my_case)
-  def method_missing(method_id, *arguments, &block)
-    if match = DynamicRelaterMatch.match(method_id)
-      self.class.class_eval <<-EOS, __FILE__, __LINE__ + 1
-        def #{method_id}(*args)
-          raise "Too many arguments for method '#{method_id}'. You can only link modules one at a time." if args.size > 1
-          module_to_link = args.first
-          SugarCRM.connection.set_relationship(
-            self.class._module.name,
-            self.id,
-            '#{match.module_instance.pluralize}',
-            [module_to_link.id]
-          )
-        end
-      EOS
-      send(method_id, *arguments)
-    else
-      super
-    end
   end
   
   # Wrapper around class attribute
@@ -380,6 +393,9 @@ module SugarCRM; class Base
   Base.class_eval do
     include AttributeMethods
     extend  AttributeMethods::ClassMethods
+    include AttributeValidations
+    include AttributeSerializers
+    include AttributeTypeCast        
     include AssociationMethods
     extend  AssociationMethods::ClassMethods
   end

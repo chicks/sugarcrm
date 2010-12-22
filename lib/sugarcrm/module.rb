@@ -15,16 +15,18 @@ module SugarCRM
       @klass  = name.classify
       @table_name = name.tableize
       @fields = {}
-      @link_fields  = {}
+      @link_fields = {}
       @fields_registered = false
       self
     end
     
+    # Returns the fields associated with the module
     def fields
       return @fields if fields?
       all_fields  = SugarCRM.connection.get_fields(@name)
       @fields     = all_fields["module_fields"]
-      @link_fields= all_fields["link_fields"] 
+      @link_fields= all_fields["link_fields"]
+      handle_empty_arrays
       @fields_registered = true
       @fields
     end
@@ -33,19 +35,20 @@ module SugarCRM
       @fields_registered
     end
     
+    # Returns the required fields
     def required_fields
       required_fields = []
-      ignore_fields = ["id", "date_entered", "date_modified"]
+      ignore_fields = [:id, :date_entered, :date_modified]
       self.fields.each_value do |field|
-        next if ignore_fields.include? field["name"]
-        required_fields << field["name"] if field["required"] == 1
+        next if ignore_fields.include? field["name"].to_sym
+        required_fields << field["name"].to_sym if field["required"] == 1
       end 
       required_fields
     end
     
     def link_fields
       self.fields unless link_fields?
-      handle_empty_array
+      handle_empty_arrays
       @link_fields
     end
     
@@ -53,10 +56,10 @@ module SugarCRM
       @fields_registered
     end  
   
-    def handle_empty_array
-      if @link_fields.class == Array && @link_fields.length == 0
-        @link_fields = {}
-      end
+    # TODO: Refactor this to be less repetitive
+    def handle_empty_arrays
+      @fields = {}.with_indifferent_access if @fields.length == 0
+      @link_fields = {}.with_indifferent_access if @link_fields.length == 0
     end
     
     # Registers a single module by name

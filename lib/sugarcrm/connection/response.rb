@@ -1,5 +1,4 @@
 module SugarCRM; class Response
-  
   class << self
     # This class handles the response from the server.
     # It tries to convert the response into an object such as User
@@ -41,7 +40,7 @@ module SugarCRM; class Response
         if attributes.length == 0
           raise AttributeParsingError, "response contains objects without attributes!"
         end
-        objects << SugarCRM.const_get(_module).new(id, attributes) 
+        objects << SugarCRM.const_get(_module).new(attributes, id) 
       else
         raise InvalidModule, "#{_module} does not exist, or is not accessible"
       end

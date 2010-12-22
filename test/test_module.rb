@@ -12,7 +12,7 @@ class TestModule < Test::Unit::TestCase
     end
     
     should "return required fields when #required_fields" do
-      assert SugarCRM::User._module.required_fields.include? "user_name"
+      assert SugarCRM::User._module.required_fields.include? :user_name
     end
   end
 end

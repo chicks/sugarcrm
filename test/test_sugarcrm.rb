@@ -48,9 +48,11 @@ class TestSugarCRM < Test::Unit::TestCase
     end
 
     should "not save a record that is missing required attributes" do
+      SugarCRM.connection.debug = false
       u = SugarCRM::User.new
       u.last_name = "Test"
       assert !u.save
+      SugarCRM.connection.debug = false
       assert_raise SugarCRM::InvalidRecord do
         u.save!
       end
@@ -83,11 +85,10 @@ class TestSugarCRM < Test::Unit::TestCase
     
     should "support searching based on conditions" do
       accounts = SugarCRM::Account.all({
-        :conditions => { :billing_address_postalcode => ["> '70000'", "< '72000'" ] },
+        :conditions => { :billing_address_postalcode => ["> '70000'", "< '79999'" ] },
         :limit => '10',
        	:order_by => 'billing_address_postalcode'
       })
-      assert_instance_of Array, accounts
       assert_instance_of SugarCRM::Account, accounts.first
     end
     
@@ -104,6 +105,18 @@ class TestSugarCRM < Test::Unit::TestCase
       u = SugarCRM::User.find("seed_sarah_id")
       assert_equal "sarah@example.com", u.email_addresses.first.email_address
     end
+    
+    should "permit adding an association to an association collection (such as #email_addresses << EmailAddress.new)" do
+      u = SugarCRM::User.find("seed_sarah_id")
+      e = SugarCRM::EmailAddress.new
+      e.email_address = "sarah@gmail.com"
+      e.email_address_caps = "SARAH@GMAIL.COM"
+      u.email_addresses << e
+      puts "Saving Association Collection"
+      assert u.save!
+      u = SugarCRM::User.find("seed_sarah_id")
+      assert u.email_addresses.delete(e)
+    end
 
     should "return an array of records when sent #find([id1, id2, id3])" do
       users = SugarCRM::User.find(["seed_sarah_id", 1])
@@ -114,7 +127,7 @@ class TestSugarCRM < Test::Unit::TestCase
       u = SugarCRM::User.find_by_user_name("sarah")
       assert_equal "sarah@example.com", u.email_addresses.first.email_address
     end
-
+    
   end
   
 end

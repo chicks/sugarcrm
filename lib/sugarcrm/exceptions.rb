@@ -25,4 +25,7 @@ module SugarCRM
   
   class InvalidRecord < RuntimeError
   end
+  
+  class AssociationFailed < RuntimeError
+  end
 end

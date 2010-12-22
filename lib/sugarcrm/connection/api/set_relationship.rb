@@ -19,6 +19,9 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{6}/,'')
+    # TODO:  Add a handler for the response.  By default it returns a hash like:
+    # {failed => 0, deleted => 0, created => 1}.  We should add this to the 
+    # Response.handle method and return true/false depending on the outcome.
     send!(:set_relationship, json)
   end
 end; end

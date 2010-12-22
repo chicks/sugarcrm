@@ -2,7 +2,7 @@ module SugarCRM; class Connection
 # Retrieve a list of SugarBeans.  This is the primary method for getting 
 # a list of SugarBeans using the REST API.
 def get_entry_list(module_name, query, opts={})
-  login! unless logged_in?  
+  login! unless logged_in?
   options = {
     :order_by => '', 
     :offset => '', 
