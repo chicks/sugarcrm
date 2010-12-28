@@ -12,23 +12,26 @@ module SugarCRM; module AttributeValidations
   
   # TODO: Add test cases for validations
   def valid_attribute?(attribute)
-    if attribute == :system_generated_password
-      puts "system_generated_password: #{@attributes[attribute].class} (#{attribute.class}), should be #{attr_type_for(attribute)}"
-    end
     case attr_type_for(attribute)
     when :bool
-      next if [TrueClass, FalseClass].include? @attributes[attribute]
-      @errors.add "#{attribute} must be true or false"
+      validate_class_for(attribute, [TrueClass, FalseClass])
     when :datetime, :datetimecombo
-      next if [DateTime].include? @attributes[attribute]  
-      @errors.add "#{attribute} must be a DateTime object"      
+      validate_class_for(attribute, [DateTime])
     when :int
-      next if [Fixnum, Float].include? @attributes[attribute]
-      @errors.add "#{attribute} must be a Fixnum or Float object"
+      validate_class_for(attribute, [Fixnum, Float])
     else 
       if @attributes[attribute].blank?
         @errors.add "#{attribute} cannot be blank"
       end
     end
   end
+  
+  # Compares the class of the attribute with the class or classes provided in the class array
+  # returns true if they match, otherwise adds an entry to the @errors collection, and returns false
+  def validate_class_for(attribute, class_array)
+    return true if class_array.include? @attributes[attribute].class
+    @errors.add "#{attribute} must be a #{class_array.join(" or ")} object (not #{@attributes[attribute].class})"
+    false  
+  end
+  
 end; end
