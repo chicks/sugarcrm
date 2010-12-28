@@ -15,6 +15,11 @@ module SugarCRM
     def each(&block)
       @collection.each(&block)
     end
+    
+    # we should probably delegate this
+    def length
+      @collection.length
+    end
         
     # return any added elements
     def added
@@ -28,8 +33,11 @@ module SugarCRM
     
     # Removes an object from the collection, uses the id of the object as a test for inclusion.
     def delete(object)
+      raise InvalidRecord, "#{object.class} does not have a valid :id!"
+      puts "Attempting to delete #{object._id}"
       @collection.each do |record|
         if record._id == object._id
+          puts "Found object to delete"
           @collection.delete(record)
           return true
         end
@@ -47,19 +55,30 @@ module SugarCRM
     
     # Add +records+ to this association.  Returns +self+ so method calls may be chained.
     def <<(object)
-      return false if include?(object)
+      result = true
+      result = false if include?(object)
       @collection << object
-      true
+      result && self
     end
     alias :add :<<
     
     def save
+      begin
+        save!
+      rescue
+        return false
+      end
+    end
+    
+    def save!
       added.each do |record|
         associate!(record)
       end
       removed.each do |record|
         disassociate!(record)
       end
+      @original = @collection
+      @original.freeze
       true
     end
     
@@ -71,11 +90,10 @@ module SugarCRM
     # i.e. user.email_addresses.associate!(EmailAddress.new(:email_address => "abc@abc.com"))
     # user would be the parent, and EmailAddress.new() is the target
     def associate!(target, opts={})
-      puts "Saving before associate!"
       target.save! if target.new?
       response = SugarCRM.connection.set_relationship(
         @parent.class._module.name, @parent._id, 
-        target.class._module.name, target._id,
+        target.class._module.name.downcase, [target._id],
         opts
       )
       raise AssociationFailed, 

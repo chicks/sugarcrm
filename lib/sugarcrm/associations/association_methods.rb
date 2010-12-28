@@ -42,6 +42,8 @@ module SugarCRM; module AssociationMethods
     SugarCRM.connection.get_relationships(self.class._module.name, self._id, association.to_s)
   end
   
+  # Returns the records from the associated module or returns the cached copy if we've already 
+  # loaded it.  Force a reload of the records with reload=true
   #
   #  {"email_addresses"=>
   #    {"name"=>"email_addresses",
@@ -50,8 +52,6 @@ module SugarCRM; module AssociationMethods
   #     "relationship"=>"users_email_addresses",
   #     "type"=>"link"},
   #
-  # Returns the records from the associated module or returns the cached copy if we've already 
-  # loaded it.  Force a reload of the records with reload=true
   def query_association(association, reload=false)
     return @association_cache[association] if association_cached?(association) && !reload
     # TODO: Some relationships aren't fetchable via get_relationship (i.e users.contacts)

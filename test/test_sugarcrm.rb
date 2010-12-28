@@ -116,9 +116,10 @@ class TestSugarCRM < Test::Unit::TestCase
       e.email_address = "admin@gmail.com"
       e.email_address_caps = "ADMIN@GMAIL.COM"
       u.email_addresses << e
-      puts "Saving Association Collection"
+      assert u.email_addresses.include?(e)
       assert u.save!
       u = SugarCRM::User.find(1)
+      assert u.email_addresses.include?(e)
       assert u.email_addresses.delete(e)
     end
 

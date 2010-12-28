@@ -150,7 +150,6 @@ module SugarCRM; class Base
     end
         
     def find_by_sql(options)
-      pp options
       query = query_from_options(options)
       SugarCRM.connection.get_entry_list(self._module.name, query, options)
     end
@@ -381,6 +380,13 @@ module SugarCRM; class Base
     params[:deleted]= {:name => "deleted", :value => "1"}
     (SugarCRM.connection.set_entry(self.class._module.name, params).class == Hash)       
   end
+  
+  # Delegates to id in order to allow two records of the same type and id to work with something like:
+  #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
+  def hash
+    @id.hash
+  end
+  
   
   # Wrapper around class attribute
   def attribute_methods_generated?
