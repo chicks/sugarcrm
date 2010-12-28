@@ -2,10 +2,12 @@ module SugarCRM; module AttributeMethods
 
   module ClassMethods
     # Returns a hash of the module fields from the module
-    def attributes_from_module_fields
+    # merges matching keys if another attributes hash is provided
+    def attributes_from_module_fields(attrs={})
       fields = {}.with_indifferent_access
       self._module.fields.keys.sort.each do |k|
-        fields[k.to_s] = nil
+        fields[k] = nil  
+        fields[k] = attrs[k] if attrs[k]
       end
       fields
     end
@@ -17,6 +19,7 @@ module SugarCRM; module AttributeMethods
     @id
   end
     
+  # TODO: Object.id is not being updated properly.  Figure out why...  
   alias :id :_id
   alias :pk :_id
   alias :primary_key :_id
@@ -38,10 +41,21 @@ module SugarCRM; module AttributeMethods
 
   protected
   
+  # Merges attributes provided as an argument to initialize
+  # with attributes from the module.fields array.  Skips any
+  # fields that aren't in the module.fields array
+  #
+  # BUG: SugarCRM likes to return fields you don't ask for, and
+  # aren't fields on a module (i.e. modified_user_name).  This 
+  # royally screws up our typecasting code, so we handle it here.
+  def merge_attributes(attrs={})
+    self.class.attributes_from_module_fields(attrs)
+  end
+  
   # Generates get/set methods for keys in the attributes hash
   def define_attribute_methods
     return if attribute_methods_generated?
-    @attributes.each_pair do |k,v|
+    @attributes.keys.sort.each do |k|
       self.class.module_eval %Q?
       def #{k}
         read_attribute :#{k}
@@ -81,7 +95,7 @@ module SugarCRM; module AttributeMethods
   # Wrapper for invoking save on modified_attributes
   # sets the id if it's a new record
   def save_modified_attributes
-    raise InvalidRecord, @errors.to_a.join(", ") if !valid?
+    raise InvalidRecord, errors.to_a.join(", ") if !valid?
     # If we get a Hash back, return true.  Otherwise return false.
     response = SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes)
     if response.is_a? Hash

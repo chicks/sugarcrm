@@ -17,6 +17,10 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal "Users", SugarCRM::User._module.name
     end
     
+    should "return the module fields" do
+      assert_instance_of ActiveSupport::HashWithIndifferentAccess, SugarCRM::Account._module.fields
+    end
+    
     should "responsd to self#methods" do
       assert_instance_of Array, SugarCRM::User.new.methods
     end
@@ -106,15 +110,15 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal "sarah@example.com", u.email_addresses.first.email_address
     end
     
-    should "permit adding an association to an association collection (such as #email_addresses << EmailAddress.new)" do
-      u = SugarCRM::User.find("seed_sarah_id")
+    should "permit adding a record to an association collection (such as #email_addresses << EmailAddress.new)" do
+      u = SugarCRM::User.find(1)
       e = SugarCRM::EmailAddress.new
-      e.email_address = "sarah@gmail.com"
-      e.email_address_caps = "SARAH@GMAIL.COM"
+      e.email_address = "admin@gmail.com"
+      e.email_address_caps = "ADMIN@GMAIL.COM"
       u.email_addresses << e
       puts "Saving Association Collection"
       assert u.save!
-      u = SugarCRM::User.find("seed_sarah_id")
+      u = SugarCRM::User.find(1)
       assert u.email_addresses.delete(e)
     end
 

@@ -22,18 +22,20 @@ module SugarCRM
     
     # Returns the fields associated with the module
     def fields
-      return @fields if fields?
+      return @fields if fields_registered?
       all_fields  = SugarCRM.connection.get_fields(@name)
-      @fields     = all_fields["module_fields"]
+      @fields     = all_fields["module_fields"].with_indifferent_access
       @link_fields= all_fields["link_fields"]
       handle_empty_arrays
       @fields_registered = true
       @fields
     end
     
-    def fields?
+    def fields_registered?
       @fields_registered
     end
+    
+    alias :link_fields_registered? :fields_registered?
     
     # Returns the required fields
     def required_fields
@@ -47,15 +49,11 @@ module SugarCRM
     end
     
     def link_fields
-      self.fields unless link_fields?
+      self.fields unless link_fields_registered?
       handle_empty_arrays
       @link_fields
     end
     
-    def link_fields?
-      @fields_registered
-    end  
-  
     # TODO: Refactor this to be less repetitive
     def handle_empty_arrays
       @fields = {}.with_indifferent_access if @fields.length == 0

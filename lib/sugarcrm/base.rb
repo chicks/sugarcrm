@@ -150,6 +150,7 @@ module SugarCRM; class Base
     end
         
     def find_by_sql(options)
+      pp options
       query = query_from_options(options)
       SugarCRM.connection.get_entry_list(self._module.name, query, options)
     end
@@ -329,7 +330,7 @@ module SugarCRM; class Base
   # a call to Module.register_all
   def initialize(attributes={}, id=nil)
     @id = id
-    @attributes = self.class.attributes_from_module_fields.merge(attributes)
+    @attributes = merge_attributes(attributes.with_indifferent_access)
     @modified_attributes = {}
     @associations = self.class.associations_from_module_link_fields
     @association_cache = {}
@@ -394,8 +395,8 @@ module SugarCRM; class Base
     include AttributeMethods
     extend  AttributeMethods::ClassMethods
     include AttributeValidations
+    include AttributeTypeCast
     include AttributeSerializers
-    include AttributeTypeCast        
     include AssociationMethods
     extend  AssociationMethods::ClassMethods
   end

@@ -1,6 +1,7 @@
 module SugarCRM; class Connection
 
   URL = "/service/v2/rest.php"
+  # Set this to filter out debug output on a certain method (i.e. get_modules, or get_fields)
   DONT_SHOW_DEBUG_FOR = []
   RESPONSE_IS_NOT_JSON = [:get_user_id, :get_user_team_id]
   
@@ -78,6 +79,9 @@ module SugarCRM; class Connection
     handle_response
   end
   
+  # Sometimes our connection just disappears but we still have a session.  
+  # This method forces a reconnect and relogin to update the session and resend 
+  # the request.
   def retry!(method, json)
     connect!
     login!

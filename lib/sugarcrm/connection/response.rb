@@ -7,11 +7,17 @@ module SugarCRM; class Response
       r = new(json)
       begin
         return r.to_obj
+      rescue UninitializedModule => e
+        raise e
+      rescue InvalidAttribute => e
+        raise e
+      rescue InvalidAttributeType => e
+        raise e
       rescue => e
         if SugarCRM.connection.debug?
           puts "Failed to process JSON:"
           pp json
-          puts e
+          raise e
         end
         return json
       end
@@ -21,7 +27,7 @@ module SugarCRM; class Response
   attr :response, false
   
   def initialize(json)
-    @response = json
+    @response = json.with_indifferent_access
   end
   
   # Tries to instantiate and return an object with the values
