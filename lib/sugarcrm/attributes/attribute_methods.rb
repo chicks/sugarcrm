@@ -3,11 +3,10 @@ module SugarCRM; module AttributeMethods
   module ClassMethods
     # Returns a hash of the module fields from the module
     # merges matching keys if another attributes hash is provided
-    def attributes_from_module_fields(attrs={})
+    def attributes_from_module_fields
       fields = {}.with_indifferent_access
       self._module.fields.keys.sort.each do |k|
-        fields[k] = nil  
-        fields[k] = attrs[k] if attrs[k]
+        fields[k] = nil
       end
       fields
     end
@@ -24,8 +23,14 @@ module SugarCRM; module AttributeMethods
   alias :pk :_id
   alias :primary_key :_id
   
-  # Determines if attributes have been changed
+  # Determines if attributes or associations have been changed
   def changed?
+    return true if attributes_changed?
+    return true if associations_changed?
+    false
+  end
+  
+  def attributes_changed?
     @modified_attributes.length > 0
   end
   
@@ -49,7 +54,14 @@ module SugarCRM; module AttributeMethods
   # aren't fields on a module (i.e. modified_user_name).  This 
   # royally screws up our typecasting code, so we handle it here.
   def merge_attributes(attrs={})
-    self.class.attributes_from_module_fields(attrs)
+    # copy attributes from the parent module fields array
+    @attributes = self.class.attributes_from_module_fields
+    # populate the attributes with values from the attrs provided to init.
+    @attributes.keys.each do |name|
+      write_attribute name, attrs[name] if attrs[name]
+    end
+    # If this is an existing record, blank out the modified_attributes hash
+    @modified_attributes = {} unless new?
   end
   
   # Generates get/set methods for keys in the attributes hash
@@ -95,16 +107,17 @@ module SugarCRM; module AttributeMethods
   # Wrapper for invoking save on modified_attributes
   # sets the id if it's a new record
   def save_modified_attributes
+    # Complain if we aren't valid
     raise InvalidRecord, errors.to_a.join(", ") if !valid?
-    # If we get a Hash back, return true.  Otherwise return false.
+    # Send the save request
     response = SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes)
-    if response.is_a? Hash
-      pp 
-      @id = response["id"] if new?
-    else
-      return false
-    end
-    # TODO: Write a test to confirm save and save! work properly
+    # Complain if we don't get a parseable response back
+    raise RecordsaveFailed, "Failed to save record: #{self}.  Response was not a Hash" unless response.is_a? Hash
+    # Complain if we don't get a valid id back
+    raise RecordSaveFailed, "Failed to save record: #{self}.  Response did not contain a valid 'id'." if response["id"].nil?
+    # Save the id to the record, if it's a new record
+    @id = response["id"] if new?
+    # Clear the modified attributes Hash
     @modified_attributes = {}
     true
   end

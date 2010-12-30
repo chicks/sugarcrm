@@ -1,63 +1,83 @@
 module SugarCRM
   # A class for handling association collections.  Basically just an extension of Array
+  # doesn't actually load the records from Sugar until you invoke one of the public methods
   class AssociationCollection
     include Enumerable
     
     # creates a new instance of an AssociationCollection
-    def initialize(parent, array)
-      @parent     = parent
-      # we use original to track the state of the collection at start
-      @collection = Array.wrap(array).dup
-      @original   = Array.wrap(array).freeze
+    # Owner is the parent object, and association is the target
+    def initialize(owner, association, preload=false)
+      @loaded     = false
+      @owner      = owner
+      @association= association
+      load if preload
       self
     end
     
+    def changed?
+      return false unless loaded?
+      return true if added.length > 0
+      return true if removed.length > 0
+      false
+    end
+    
+    def loaded?
+      @loaded
+    end
+    
+    def load
+      load_associated_records unless loaded?
+    end
+    
+    def reload
+      load_associated_records
+    end
+    
     def each(&block)
+      load
       @collection.each(&block)
     end
     
     # we should probably delegate this
     def length
+      load
       @collection.length
     end
         
     # return any added elements
     def added
+      load
       @collection - @original
     end
     
     # return any removed elements
     def removed
+      load
       @original - @collection
     end
     
-    # Removes an object from the collection, uses the id of the object as a test for inclusion.
-    def delete(object)
-      raise InvalidRecord, "#{object.class} does not have a valid :id!"
-      puts "Attempting to delete #{object._id}"
-      @collection.each do |record|
-        if record._id == object._id
-          puts "Found object to delete"
-          @collection.delete(record)
-          return true
-        end
-      end
-      false      
+    # Removes an record from the collection, uses the id of the record as a test for inclusion.
+    def delete(record)
+      load
+      raise InvalidRecord, "#{record.class} does not have a valid :id!" if record._id.empty?
+      @collection.delete record
     end
 
     # Checks if a record is included in the current collection.  Uses id's as comparison
-    def include?(object)
-      @collection.each do |record|
-        return true if record._id == object._id
-      end
-      false
+    def include?(record)
+      load
+      @collection.include? record
     end
     
-    # Add +records+ to this association.  Returns +self+ so method calls may be chained.
-    def <<(object)
+    # Add +records+ to this association, saving any unsaved records before adding them.  
+    # Returns +self+ so method calls may be chained.
+    # Be sure to call save on the association to commit any association changes
+    def <<(record)
+      load
+      record.save! if record.new?
       result = true
-      result = false if include?(object)
-      @collection << object
+      result = false if include?(record)
+      @collection << record
       result && self
     end
     alias :add :<<
@@ -70,34 +90,45 @@ module SugarCRM
       end
     end
     
+    # Pushes collection changes to SugarCRM, and updates the state of the collection
     def save!
+      load
       added.each do |record|
         associate!(record)
       end
       removed.each do |record|
         disassociate!(record)
       end
-      @original = @collection
+      @original = @collection.dup
       @original.freeze
       true
     end
     
     protected
     
+    # Loads related records for the given association
+    def load_associated_records
+      array = SugarCRM.connection.get_relationships(@owner.class._module.name, @owner._id, @association.to_s)
+      @loaded = true
+      # we use original to track the state of the collection at start
+      @collection = Array.wrap(array).dup
+      @original   = Array.wrap(array).freeze
+    end  
+    
     # Creates a relationship between the current object and the target
-    # Parent is the record the Collection is tied to
+    # Owner is the record the Collection is accessed from
     # Target is the record we are adding to the collection
     # i.e. user.email_addresses.associate!(EmailAddress.new(:email_address => "abc@abc.com"))
-    # user would be the parent, and EmailAddress.new() is the target
+    # user would be the owner, and EmailAddress.new() is the target
     def associate!(target, opts={})
-      target.save! if target.new?
+      #target.save! if target.new?
       response = SugarCRM.connection.set_relationship(
-        @parent.class._module.name, @parent._id, 
-        target.class._module.name.downcase, [target._id],
+        @owner.class._module.name, @owner._id, 
+        target.class._module.table_name, [target._id],
         opts
       )
       raise AssociationFailed, 
-        "Couldn't associate #{@parent.class._module.name}: #{@parent._id} -> #{target.class._module.name}:#{target._id}!" if response["failed"] > 0
+        "Couldn't associate #{@owner.class._module.name}: #{@owner._id} -> #{target.class._module.table_name}:#{target._id}!" if response["failed"] > 0
       true
     end
     

@@ -5,8 +5,7 @@ class TestAssociationCollection < Test::Unit::TestCase
     should "create a new instance when #new" do
       SugarCRM.connect!(URL, USER, PASS)
       u   = SugarCRM::User.find("seed_sarah_id")
-      c   = SugarCRM::Contact.find_by_assigned_user_id("seed_sarah_id")
-      ac  = SugarCRM::AssociationCollection.new(u,c)
+      ac  = SugarCRM::AssociationCollection.new(u,:email_addresses)
       assert_instance_of SugarCRM::AssociationCollection, ac
     end
   end

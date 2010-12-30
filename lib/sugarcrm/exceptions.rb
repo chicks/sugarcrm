@@ -8,6 +8,7 @@ module SugarCRM
   class AttributeParsingError < RuntimeError; end
   class RecordNotFound < RuntimeError; end
   class InvalidRecord < RuntimeError; end
+  class RecordSaveFailed < RuntimeError; end
   class AssociationFailed < RuntimeError; end
   class UninitializedModule < RuntimeError; end
   class InvalidAttribute < RuntimeError; end

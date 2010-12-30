@@ -105,24 +105,6 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal u.user_name, "admin"
     end
     
-    should "return an email address when sent #email_addresses" do
-      u = SugarCRM::User.find("seed_sarah_id")
-      assert_equal "sarah@example.com", u.email_addresses.first.email_address
-    end
-    
-    should "permit adding a record to an association collection (such as #email_addresses << EmailAddress.new)" do
-      u = SugarCRM::User.find(1)
-      e = SugarCRM::EmailAddress.new
-      e.email_address = "admin@gmail.com"
-      e.email_address_caps = "ADMIN@GMAIL.COM"
-      u.email_addresses << e
-      assert u.email_addresses.include?(e)
-      assert u.save!
-      u = SugarCRM::User.find(1)
-      assert u.email_addresses.include?(e)
-      assert u.email_addresses.delete(e)
-    end
-
     should "return an array of records when sent #find([id1, id2, id3])" do
       users = SugarCRM::User.find(["seed_sarah_id", 1])
       assert_equal "Administrator", users.last.title

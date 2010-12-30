@@ -27,7 +27,8 @@ module SugarCRM; class Response
   attr :response, false
   
   def initialize(json)
-    @response = json.with_indifferent_access
+    @response = json
+    @response = json.with_indifferent_access if json.is_a? Hash
   end
   
   # Tries to instantiate and return an object with the values

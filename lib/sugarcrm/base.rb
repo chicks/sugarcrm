@@ -329,11 +329,10 @@ module SugarCRM; class Base
   # a call to Module.register_all
   def initialize(attributes={}, id=nil)
     @id = id
-    @attributes = merge_attributes(attributes.with_indifferent_access)
     @modified_attributes = {}
+    merge_attributes(attributes.with_indifferent_access)
+    clear_association_cache
     @associations = self.class.associations_from_module_link_fields
-    @association_cache = {}
-    @modified_associations = {}
     define_attribute_methods
     define_association_methods
     typecast_attributes
@@ -380,6 +379,22 @@ module SugarCRM; class Base
     params[:deleted]= {:name => "deleted", :value => "1"}
     (SugarCRM.connection.set_entry(self.class._module.name, params).class == Hash)       
   end
+  
+  # Returns true if +comparison_object+ is the same exact object, or +comparison_object+ 
+  # is of the same type and +self+ has an ID and it is equal to +comparison_object.id+.
+  #
+  # Note that new records are different from any other record by definition, unless the
+  # other record is the receiver itself. Besides, if you fetch existing records with
+  # +select+ and leave the ID out, you're on your own, this predicate will return false.
+  #
+  # Note also that destroying a record preserves its ID in the model instance, so deleted
+  # models are still comparable.
+  def ==(comparison_object)
+      comparison_object.instance_of?(self.class) &&
+      _id.present? &&
+      comparison_object._id == _id
+  end
+  
   
   # Delegates to id in order to allow two records of the same type and id to work with something like:
   #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
