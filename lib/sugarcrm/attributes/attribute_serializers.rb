@@ -21,9 +21,9 @@ module SugarCRM; module AttributeSerializers
   end
 
   # Converts the modified_attributes hash into format recognizable by Sugar
-  # { :last_name => {:old => "Smit", :new => "Smith"}} 
+  # {:last_name => {:old => "Smit", :new => "Smith"}} 
   # becomes
-  # { :last_name => {:name => "last_name", :value => "Smith"}}  
+  # {:last_name => {:name => "last_name", :value => "Smith"}}  
   def serialize_modified_attributes
     attr_hash = {}
     @modified_attributes.each_pair do |name,hash|
@@ -33,7 +33,7 @@ module SugarCRM; module AttributeSerializers
     attr_hash
   end
   
-  # Un-typecasts the attribute - false becomes 0
+  # Un-typecasts the attribute - false becomes "0", 5234 becomes "5234", etc.
   def serialize_attribute(name,value)
     attr_value = value
     attr_type  = attr_type_for(name) 

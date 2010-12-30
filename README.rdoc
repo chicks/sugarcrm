@@ -12,7 +12,7 @@ RubyGem for interacting with SugarCRM via REST.
 
 A less clunky way to interact with SugarCRM via REST.
 
-Instead of SugarCRM.connection.get_entry("Users", "1"), you can use SugarCRM::User.find(1).  There is also support for collections à la SugarCRM::User.find(1).email_addresses, or SugarCRM::Contact.first.meetings << new_meeting.  ActiveRecord style finders are in place, with limited support for conditions and joins. 
+Instead of SugarCRM.connection.get_entry("Users", "1") you could use SugarCRM::User.find(1).  There is support for collections à la SugarCRM::User.find(1).email_addresses, or SugarCRM::Contact.first.meetings << new_meeting.  ActiveRecord style finders are in place, with limited support for conditions and joins. 
 
 == FEATURES/PROBLEMS:
 

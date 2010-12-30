@@ -44,14 +44,9 @@ module SugarCRM; module AssociationMethods
         query_association :#{k}
       end
       ?
-      #seed_association_cache(k.to_syn)
     end
     self.class.association_methods_generated = true
   end
-  
-#  def seed_association_cache(association)
-#    @association_cache[association] = AssociationCollection.new(self,association)
-#  end
   
   # Returns the records from the associated module or returns the cached copy if we've already 
   # loaded it.  Force a reload of the records with reload=true
@@ -76,17 +71,4 @@ module SugarCRM; module AssociationMethods
     collection
   end
 
-  # Loads related records for the given association
-#  def load_associations_for(association)
-#    SugarCRM.connection.get_relationships(self.class._module.name, self.id, association.to_s)
-#  end
-  
-  # pushes an element to the association collection
-  def append_to_association(association, record)
-    collection = query_association(association)
-    collection << record
-    collection
-  end
-    
-  
 end; end

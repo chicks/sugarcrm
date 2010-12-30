@@ -2,7 +2,6 @@ module SugarCRM; module AttributeMethods
 
   module ClassMethods
     # Returns a hash of the module fields from the module
-    # merges matching keys if another attributes hash is provided
     def attributes_from_module_fields
       fields = {}.with_indifferent_access
       self._module.fields.keys.sort.each do |k|
@@ -43,7 +42,7 @@ module SugarCRM; module AttributeMethods
   # with attributes from the module.fields array.  Skips any
   # fields that aren't in the module.fields array
   #
-  # BUG: SugarCRM likes to return fields you don't ask for, and
+  # BUG: SugarCRM likes to return fields you don't ask for and
   # aren't fields on a module (i.e. modified_user_name).  This 
   # royally screws up our typecasting code, so we handle it here.
   def merge_attributes(attrs={})

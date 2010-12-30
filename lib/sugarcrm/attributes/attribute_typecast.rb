@@ -4,13 +4,11 @@ module SugarCRM; module AttributeTypeCast
   
   # Returns the attribute type for a given attribute
   def attr_type_for(attribute)
-    # sometimes the module fields aren't loaded. Why?
     fields = self.class._module.fields
     field  = fields[attribute]
     raise UninitializedModule, "SugarCRM::Module #{self.class._module.name} was not initialized properly (fields.length == 0)" if fields.length == 0
     raise InvalidAttribute, "#{self.class}_module.fields does not contain an entry for #{attribute} (of type: #{attribute.class})\nValid fields: #{self.class._module.fields.keys.sort.join(", ")}" if field.nil?
     raise InvalidAttributeType, "#{self.class}._module.fields[#{attribute}] does not have a key for \'type\'" if field["type"].nil?
-    #return :string unless field.is_a? Hash
     field["type"].to_sym
   end
 

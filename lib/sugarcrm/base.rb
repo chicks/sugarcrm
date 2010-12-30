@@ -199,23 +199,6 @@ module SugarCRM; class Base
         if match.finder?
           finder = match.finder
           bang = match.bang?
-          # def self.find_by_login_and_activated(*args)
-          #   options = args.extract_options!
-          #   attributes = construct_attributes_from_arguments(
-          #     [:login,:activated],
-          #     args
-          #   )
-          #   finder_options = { :conditions => attributes }
-          #   validate_find_options(options)
-          #
-          #   if options[:conditions]
-          #     with_scope(:find => finder_options) do
-          #       find(:first, options)
-          #     end
-          #   else
-          #     find(:first, options.merge(finder_options))
-          #   end
-          # end
           self.class_eval <<-EOS, __FILE__, __LINE__ + 1
             def self.#{method_id}(*args)
               options = args.extract_options!
@@ -239,31 +222,6 @@ module SugarCRM; class Base
           send(method_id, *arguments)
         elsif match.instantiator?
           instantiator = match.instantiator
-          # def self.find_or_create_by_user_id(*args)
-          #   guard_protected_attributes = false
-          #
-          #   if args[0].is_a?(Hash)
-          #     guard_protected_attributes = true
-          #     attributes = args[0].with_indifferent_access
-          #     find_attributes = attributes.slice(*[:user_id])
-          #   else
-          #     find_attributes = attributes = construct_attributes_from_arguments([:user_id], args)
-          #   end
-          #
-          #   options = { :conditions => find_attributes }
-          #   set_readonly_option!(options)
-          #
-          #   record = find(:first, options)
-          #
-          #   if record.nil?
-          #     record = self.new { |r| r.send(:attributes=, attributes, guard_protected_attributes) }
-          #     yield(record) if block_given?
-          #     record.save
-          #     record
-          #   else
-          #     record
-          #   end
-          # end
           self.class_eval <<-EOS, __FILE__, __LINE__ + 1
             def self.#{method_id}(*args)
               attributes = [:#{attribute_names.join(',:')}]
@@ -322,10 +280,6 @@ module SugarCRM; class Base
   end
 
   # Creates an instance of a Module Class, i.e. Account, User, Contact, etc.
-  # This call depends upon SugarCRM.modules having actual data in it.  If you 
-  # are using Base.establish_connection, you should be fine.  But if you are 
-  # using the Connection class by itself, you may need to prime the pump with
-  # a call to Module.register_all
   def initialize(attributes={})
     @modified_attributes = {}
     merge_attributes(attributes.with_indifferent_access)
@@ -362,8 +316,8 @@ module SugarCRM; class Base
     true
   end
   
-  # Saves the current object, checks that required fields are present.
-  # raises an exception if a save fails
+  # Saves the current object, and any modified associations. 
+  # Raises an exceptions if save fails for any reason.
   def save!
     save_modified_attributes
     save_modified_associations
@@ -400,8 +354,6 @@ module SugarCRM; class Base
     id.hash
   end
   
-  
-  # Wrapper around class attribute
   def attribute_methods_generated?
     self.class.attribute_methods_generated
   end  
