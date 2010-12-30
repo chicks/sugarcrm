@@ -20,7 +20,6 @@ module SugarCRM; class Base
   attr :attributes, true
   attr :modified_attributes, true
   attr :associations, true
-  attr :id, true
   attr :debug, true
   attr :errors, true
 
@@ -327,8 +326,7 @@ module SugarCRM; class Base
   # are using Base.establish_connection, you should be fine.  But if you are 
   # using the Connection class by itself, you may need to prime the pump with
   # a call to Module.register_all
-  def initialize(attributes={}, id=nil)
-    @id = id
+  def initialize(attributes={})
     @modified_attributes = {}
     merge_attributes(attributes.with_indifferent_access)
     clear_association_cache
@@ -373,7 +371,7 @@ module SugarCRM; class Base
   end
   
   def delete
-    return false if @id.blank?
+    return false if id.blank?
     params          = {}
     params[:id]     = serialize_id
     params[:deleted]= {:name => "deleted", :value => "1"}
@@ -391,15 +389,15 @@ module SugarCRM; class Base
   # models are still comparable.
   def ==(comparison_object)
       comparison_object.instance_of?(self.class) &&
-      _id.present? &&
-      comparison_object._id == _id
+      id.present? &&
+      comparison_object.id == id
   end
   
   
   # Delegates to id in order to allow two records of the same type and id to work with something like:
   #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
   def hash
-    @id.hash
+    id.hash
   end
   
   

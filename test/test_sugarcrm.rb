@@ -73,6 +73,7 @@ class TestSugarCRM < Test::Unit::TestCase
       u.status = "Active"
       assert_equal "Test", u.modified_attributes[:first_name][:new]
       assert u.save!
+      assert !u.new?
       m = SugarCRM::User.find_by_first_name_and_last_name("Test", "User")
       m.title = "Test User"
       assert m.save!

@@ -78,7 +78,7 @@ module SugarCRM; module AssociationMethods
 
   # Loads related records for the given association
 #  def load_associations_for(association)
-#    SugarCRM.connection.get_relationships(self.class._module.name, self._id, association.to_s)
+#    SugarCRM.connection.get_relationships(self.class._module.name, self.id, association.to_s)
 #  end
   
   # pushes an element to the association collection

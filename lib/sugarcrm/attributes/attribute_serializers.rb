@@ -4,7 +4,7 @@ module SugarCRM; module AttributeSerializers
     
   # Serializes the id
   def serialize_id
-    {:name => "id", :value => @id.to_s}
+    {:name => "id", :value => id.to_s}
   end
 
   # Converts the attributes hash into format recognizable by Sugar

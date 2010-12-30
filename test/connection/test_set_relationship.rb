@@ -9,9 +9,9 @@ class TestSetRelationship < Test::Unit::TestCase
       meeting.duration_hours = 0.5
       meeting.name = "Stupid Meeting"
       assert meeting.save!
-      response = SugarCRM.connection.set_relationship("Users","1","meetings", [meeting._id])
+      response = SugarCRM.connection.set_relationship("Users","1","meetings", [meeting.id])
       assert response["created"] == 1
-      response = SugarCRM.connection.set_relationship("Users","1","meetings", [meeting._id], {:delete => 1})
+      response = SugarCRM.connection.set_relationship("Users","1","meetings", [meeting.id], {:delete => 1})
       assert response["deleted"] == 1
       assert meeting.delete
     end

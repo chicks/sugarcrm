@@ -12,16 +12,9 @@ module SugarCRM; module AttributeMethods
     end
   end
     
-  # Returns the primary_key
-  # TODO: Write a test to assert ID's are handled properly
-  def _id
-    @id
-  end
-    
   # TODO: Object.id is not being updated properly.  Figure out why...  
-  alias :id :_id
-  alias :pk :_id
-  alias :primary_key :_id
+  alias :pk :id
+  alias :primary_key :id
   
   # Determines if attributes or associations have been changed
   def changed?
@@ -36,7 +29,7 @@ module SugarCRM; module AttributeMethods
   
   # Is this a new record?
   def new?
-    @id.blank?
+    @attributes[:id].blank?
   end
   
   # List the required attributes for save
@@ -116,7 +109,8 @@ module SugarCRM; module AttributeMethods
     # Complain if we don't get a valid id back
     raise RecordSaveFailed, "Failed to save record: #{self}.  Response did not contain a valid 'id'." if response["id"].nil?
     # Save the id to the record, if it's a new record
-    @id = response["id"] if new?
+    @attributes[:id] = response["id"] if new?
+    raise InvalidRecord, "Failed to update id for: #{self}." if id.nil?
     # Clear the modified attributes Hash
     @modified_attributes = {}
     true

@@ -59,7 +59,7 @@ module SugarCRM
     # Removes an record from the collection, uses the id of the record as a test for inclusion.
     def delete(record)
       load
-      raise InvalidRecord, "#{record.class} does not have a valid :id!" if record._id.empty?
+      raise InvalidRecord, "#{record.class} does not have a valid :id!" if record.id.empty?
       @collection.delete record
     end
 
@@ -108,7 +108,7 @@ module SugarCRM
     
     # Loads related records for the given association
     def load_associated_records
-      array = SugarCRM.connection.get_relationships(@owner.class._module.name, @owner._id, @association.to_s)
+      array = SugarCRM.connection.get_relationships(@owner.class._module.name, @owner.id, @association.to_s)
       @loaded = true
       # we use original to track the state of the collection at start
       @collection = Array.wrap(array).dup
@@ -123,12 +123,12 @@ module SugarCRM
     def associate!(target, opts={})
       #target.save! if target.new?
       response = SugarCRM.connection.set_relationship(
-        @owner.class._module.name, @owner._id, 
-        target.class._module.table_name, [target._id],
+        @owner.class._module.name, @owner.id, 
+        target.class._module.table_name, [target.id],
         opts
       )
       raise AssociationFailed, 
-        "Couldn't associate #{@owner.class._module.name}: #{@owner._id} -> #{target.class._module.table_name}:#{target._id}!" if response["failed"] > 0
+        "Couldn't associate #{@owner.class._module.name}: #{@owner.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
       true
     end
     

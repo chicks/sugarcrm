@@ -13,18 +13,21 @@ class TestAssociations < Test::Unit::TestCase
       assert u.association_cached? :email_addresses
     end
     
-    should "permit adding a record to an association collection (such as #email_addresses << EmailAddress.new)" do
+    should "permit adding a record to an association collection (such as #meetings << Meeting.new)" do
       u = SugarCRM::User.find(1)
-      e = SugarCRM::EmailAddress.new
-      e.email_address = "admin@gmail.com"
-      e.email_address_caps = "ADMIN@GMAIL.COM"
-      u.email_addresses << e
-      assert u.email_addresses.include?(e)
-      assert_equal [e], u.email_addresses.added
+      m = SugarCRM::Meeting.new
+      m.date_start = DateTime.now
+      m.duration_hours = 0.5
+      m.name = "Yet Another Stupid Meeting"
+      u.meetings << m
+      assert u.meetings.include?(m)
+      assert_equal [m], u.meetings.added
       assert u.save!
       u = SugarCRM::User.find(1)
-      assert u.email_addresses.include?(e)
-      assert u.email_addresses.delete(e)
+      assert u.meetings.include?(m)
+      assert u.meetings.delete(m)
+      assert u.meetings.save!
+      assert !u.meetings.include?(m)
     end
   end
 end
