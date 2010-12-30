@@ -12,17 +12,17 @@ RubyGem for interacting with SugarCRM via REST.
 
 A less clunky way to interact with SugarCRM via REST.
 
-I've built an abstraction layer on top of the SugarCRM REST API, instead of get_entry("Users", "1") you can 
-call SugarCRM::User.find(1).  There is also support for collections à la SugarCRM::User.find(1).email_addresses.  
-ActiveRecord style finders are in place, with limited support for conditions and joins 
-e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Contacts.find_by_title("VP of Sales", {:conditions => {:deleted => 0}}) will not.  
+Instead of SugarCRM.connection.get_entry("Users", "1"), you can use SugarCRM::User.find(1).  There is also support for collections à la SugarCRM::User.find(1).email_addresses, or SugarCRM::Contact.first.meetings << new_meeting.  ActiveRecord style finders are in place, with limited support for conditions and joins. 
 
 == FEATURES/PROBLEMS:
 
-* Supports all v2 API calls
-* Supports saving of Module specific objects.
-* Auto-generation of Module specific objects.  When a connection is established, get_available_modules is called and the resultant modules are turned into SugarCRM::Module classes.  
-* If you just want to use the vanilla API, you can access the methods directly on the SugarCRM.connection object.
+* Works with all v2 API calls
+* Supports creation, saving, and deletion of SugarCRM specific objects.
+* Validations, typecasting, and serialization of boolean, date, and integer fields
+* Query, update and delete records from collections! 
+* ActiveRecord style finders!
+* Auto-generation of SugarCRM specific objects.  When a connection is established, get_available_modules is called and the resultant modules are turned into SugarCRM::Module classes.  
+* If you want to use the vanilla API, you can access the methods directly on the SugarCRM.connection object.
 
 == SYNOPSIS:
 
@@ -50,32 +50,53 @@ e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Co
   
   # Check if an object is valid (i.e. if it has the required fields to save)
   u.valid?
-  
+    
   # Access the errors collection
   u.errors
+  
+  # Show the fields required to save
+  u.required_attributes
   
   # Delete an Account
   a = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
   a.delete
 
-  # Retrieve all Email Addresses assigned to a particular user.
+  # Retrieve all Email Addresses assigned to a particular User.
   SugarCRM::User.find_by_user_name('sarah').email_addresses
   
-  # Retrieve all email addresses on an Account
+  # Retrieve all Email Addresses on an Account
   SugarCRM::Account.find_by_name("JAB Funds Ltd.").contacts.each do |contact|
     contact.email_addresses.each do |email|
-      puts "#{email.email_address}" unless email.opt_out == "1"
+      puts "#{email.email_address}" unless email.opt_out == true
     end
   end
   
-  # Look up the fields for a given module
-  SugarCRM::Module.find("Accounts").fields
+  # Add a Meeting to a Contact
+  c = SugarCRM::Contact.first
+  c.meetings << SugarCRM::Meeting.new({
+    :name => "Product Introduction", 
+    :date_start => DateTime.now,
+    :duration_hours => 1
+  })
+  c.save!
   
-  # Look up the relationships for a given module
-  SugarCRM::Module.find("Accounts").link_fields
+  # Add a Contact to an Account
+  a = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
+  c = SugarCRM::Contact.new
+  c.last_name = 'Doe'
+  a.contacts << c
+  a.save # or a.contacts.save
   
-  # Use the HTTP Connection and SugarCRM API to load the Admin user
-  SugarCRM.connection.get_entry("Users", 1)
+  # Check if an Account has a specific Contact associated with it
+  c = SugarCRM::Contact.find_by_last_name("Doe")
+  a = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
+  a.contacts.include?(c)
+  
+  # Remove a Contact from an Account
+  c = SugarCRM::Contact.find_by_last_name("Doe")
+  a = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
+  a.contacts.delete(c)
+  a.save # or a.contacts.save
   
   # Look up the Case with the smallest case number
   SugarCRM::Case.first({
@@ -94,13 +115,14 @@ e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Co
     :conditions => { :billing_address_postalcode => "<> NULL" }
   })
   
-  # Link module instances dynamically
-  my_account = SugarCRM::Account.find_by_name("JAB Funds Ltd.")
-  my_contact = SugarCRM::Contact.new
-  my_contact.last_name = 'Doe'
-  my_contact.save
-  my_account.add_contact(my_contact) # add_contact is a dynamic instance method
-  # By extension, you can also do something like my_contact.add_case(my_case)
+  # Look up the fields for a given module
+  SugarCRM::Module.find("Accounts").fields
+  
+  # Look up the relationships for a given module
+  SugarCRM::Module.find("Accounts").link_fields
+  
+  # Use the HTTP Connection and SugarCRM API to load the Admin user
+  SugarCRM.connection.get_entry("Users", 1)
 
   # Retrieve all Accounts by user name (direct API method)
   SugarCRM.connection.get_entry_list(
@@ -119,7 +141,6 @@ e.g. SugarCRM::Contacts.find_by_title("VP of Sales") will work, but SugarCRM::Co
 == REQUIREMENTS:
 
 * >= activesupport 3.0.0 gem
-* json gem
 
 == INSTALL:
 
