@@ -11,10 +11,6 @@ module SugarCRM; module AttributeMethods
     end
   end
     
-  # TODO: Object.id is not being updated properly.  Figure out why...  
-  alias :pk :id
-  alias :primary_key :id
-  
   # Determines if attributes or associations have been changed
   def changed?
     return true if attributes_changed?

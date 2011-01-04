@@ -32,7 +32,7 @@ module SugarCRM; class Base
       @debug  = options[:debug]
       @@connection = SugarCRM::Connection.new(url, user, pass, options)
     end
-  
+    
     def find(*args)
       options = args.extract_options!
       validate_find_options(options)
