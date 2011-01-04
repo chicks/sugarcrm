@@ -6,7 +6,7 @@ class TestLogin < Test::Unit::TestCase
       SugarCRM::Connection.new(URL, USER, PASS, {:register_modules => false})
     end
     should "login and set session id" do
-      assert_not_nil SugarCRM.connection.session    
+      assert (SugarCRM.connection.session.class == String)
     end
   end
 end

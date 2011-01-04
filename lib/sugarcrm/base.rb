@@ -1,7 +1,7 @@
 module SugarCRM; class Base 
 
   # Unset all of the instance methods we don't need.
-  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^nil.$|^methods$|^instance_of.$|^respond_to.$)/ }
+  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^nil.$|^methods$|^instance_of.$|^respond_to)/ }
 
   # This holds our connection
   cattr_accessor :connection, :instance_writer => false

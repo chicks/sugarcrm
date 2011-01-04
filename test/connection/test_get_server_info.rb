@@ -6,7 +6,7 @@ class TestGetServerInfo < Test::Unit::TestCase
       SugarCRM::Connection.new(URL, USER, PASS, {:register_modules => false})
     end
     should "get server info" do
-      assert true, SugarCRM.connection.get_server_info    
+      assert_instance_of String, SugarCRM.connection.get_server_info["version"]
     end
   end
 end

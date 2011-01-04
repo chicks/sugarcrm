@@ -122,7 +122,7 @@ module SugarCRM; class Connection
     # Some methods are dumb and don't return a JSON Response
     return @response.body if RESPONSE_IS_NOT_JSON.include? @request.method
     # Push it through the old meat grinder.
-    response_json = JSON.parse @response.body
+    response_json = ActiveSupport::JSON.decode(@response.body)
     # Empty result.  Is this wise?
     return false if response_json["result_count"] == 0
     # Filter debugging on REALLY BIG responses
