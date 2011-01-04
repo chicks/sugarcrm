@@ -56,7 +56,7 @@ module SugarCRM
       @original - @collection
     end
     
-    # Removes an record from the collection, uses the id of the record as a test for inclusion.
+    # Removes a record from the collection, uses the id of the record as a test for inclusion.
     def delete(record)
       load
       raise InvalidRecord, "#{record.class} does not have a valid :id!" if record.id.empty?
