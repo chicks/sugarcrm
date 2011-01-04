@@ -62,6 +62,7 @@ module SugarCRM
       raise InvalidRecord, "#{record.class} does not have a valid :id!" if record.id.empty?
       @collection.delete record
     end
+    alias :remove :delete
 
     # Checks if a record is included in the current collection.  Uses id's as comparison
     def include?(record)
