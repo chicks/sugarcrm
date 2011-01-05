@@ -121,8 +121,12 @@ module SugarCRM; class Connection
     raise SugarCRM::EmptyResponse unless @response.body
     # Some methods are dumb and don't return a JSON Response
     return @response.body if RESPONSE_IS_NOT_JSON.include? @request.method
-    # Push it through the old meat grinder.
-    response_json = ActiveSupport::JSON.decode(@response.body)
+    begin
+      # Push it through the old meat grinder.
+      response_json = ActiveSupport::JSON.decode(@response.body)
+    rescue StandardError => e
+      raise UnhandledResponse, @response.body
+    end
     # Empty result.  Is this wise?
     return false if response_json["result_count"] == 0
     # Filter debugging on REALLY BIG responses

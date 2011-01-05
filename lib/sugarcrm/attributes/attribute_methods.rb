@@ -9,6 +9,14 @@ module SugarCRM; module AttributeMethods
       end
       fields
     end
+    # Returns the table name for a given attribute
+    def table_name_for(attribute)
+      table_name = self._module.table_name
+      if attribute.to_s =~ /_c$/
+        table_name = self._module.custom_table_name
+      end
+      table_name
+    end
   end
     
   # Determines if attributes or associations have been changed

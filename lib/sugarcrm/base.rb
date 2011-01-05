@@ -167,7 +167,7 @@ module SugarCRM; class Base
           
           value = $2 # strip the operator from value passed to query
           value = value.strip[/'?([^']*)'?/,1]
-          conditions << "#{column} #{operator} \'#{value}\'"
+          conditions << "#{table_name_for(column)}.#{column} #{operator} \'#{value}\'"
         }
       end
       conditions.join(" AND ")

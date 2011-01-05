@@ -1,11 +1,12 @@
 module SugarCRM
   # A class for handling SugarCRM Modules
   class Module
-    attr :name, false
-    attr :table_name, false
-    attr :klass, false
-    attr :fields, false
-    attr :link_fields, false
+    attr :name, true
+    attr :table_name, true
+    attr :custom_table_name, true
+    attr :klass, true
+    attr :fields, true
+    attr :link_fields, true
 
     # Dynamically register objects based on Module name
     # I.e. a SugarCRM Module named Users will generate
@@ -14,6 +15,7 @@ module SugarCRM
       @name   = name
       @klass  = name.classify
       @table_name = name.tableize
+      @custom_table_name = @table_name + "_cstm"
       @fields = {}
       @link_fields = {}
       @fields_registered = false
