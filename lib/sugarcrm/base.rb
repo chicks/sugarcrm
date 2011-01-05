@@ -167,12 +167,7 @@ module SugarCRM; class Base
           
           value = $2 # strip the operator from value passed to query
           value = value.strip[/'?([^']*)'?/,1]
-          unless column =~ /_c$/ # attribute name ending with _c implies a custom attribute
-            condition_attribute = "#{self._module.table_name}.#{column}"
-          else
-            condition_attribute = column # if setting a condition on a custom attribute (i.e. created by user in Studio), don't add model table name (or query breaks)
-          end
-          conditions << "#{condition_attribute} #{operator} \'#{value}\'"
+          conditions << "#{column} #{operator} \'#{value}\'"
         }
       end
       conditions.join(" AND ")
