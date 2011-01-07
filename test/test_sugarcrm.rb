@@ -97,6 +97,13 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_instance_of SugarCRM::Account, accounts.first
     end
     
+    should "support searching based on SQL operators" do
+      accounts = SugarCRM::Account.all({
+        :conditions => { :name => "LIKE '%Fund%'" }
+      })
+      assert_instance_of SugarCRM::Account, accounts.first
+    end
+    
     should "return an an instance of itself when sent #find(id)" do
       assert_instance_of SugarCRM::User, SugarCRM::User.find(1)
     end
