@@ -15,7 +15,17 @@ module SugarCRM
       @name   = name
       @klass  = name.classify
       @table_name = name.tableize
-      @custom_table_name = @table_name + "_cstm"
+      
+      # set table name for custom attibutes
+      # custom attributes are contained in a table named after the module, with a '_cstm' suffix
+      # the module's table name must be tableized for the modules that ship with SugarCRM
+      # for custom modules (created in the Studio), table name don't need to be tableized: the name passed to the constructor is already tableized
+      unless name.downcase == name # this module is a custom module (custom module names are all lower_case, whereas SugarCRM modules are CamelCase
+        @custom_table_name = @table_name + "_cstm"
+      else
+        @custom_table_name = name + "_cstm"
+      end
+      
       @fields = {}
       @link_fields = {}
       @fields_registered = false
