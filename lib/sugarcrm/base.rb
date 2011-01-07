@@ -161,12 +161,13 @@ module SugarCRM; class Base
         v = [] << v unless v.class == Array
         
         v.each{|value|
-          # parse operator in cases where (e.g.) :attribute => '>= some_value', fallback to '=' operator as default
-          operator = value.to_s[/^([<>=]*)(.*)$/,1]
-          operator = '=' if operator.nil? || operator.strip == ''
+          # parse operator in cases where (e.g.) :attribute => '>= some_value', :attribute => "LIKE '%value%'", fallback to '=' operator as default
+          operator = value.to_s[/^([!<>=]*(LIKE|IS|NOT|\s)*)(.*)$/,1]
+          operator.strip! if operator
+          operator = '=' if operator.nil? || operator == ''
           
-          value = $2 # strip the operator from value passed to query
-          value = value.strip[/'?([^']*)'?/,1]
+          value = $3 # extract value from query
+          value = value.strip[/'?([^']*)'?/,1] # strip single quotes around value, if present
           conditions << "#{table_name_for(column)}.#{column} #{operator} \'#{value}\'"
         }
       end
