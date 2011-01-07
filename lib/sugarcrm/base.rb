@@ -152,24 +152,14 @@ module SugarCRM; class Base
       query = query_from_options(options)
       SugarCRM.connection.get_entry_list(self._module.name, query, options)
     end
-    
+
     def query_from_options(options)
       # If we dont have conditions, just return an empty query
       return "" unless options[:conditions]
       conditions = []
-      options[:conditions].each_pair do |column, v| 
-        v = [] << v unless v.class == Array
-        
-        v.each{|value|
-          # parse operator in cases where (e.g.) :attribute => '>= some_value', :attribute => "LIKE '%value%'", fallback to '=' operator as default
-          operator = value.to_s[/^([!<>=]*(LIKE|IS|NOT|\s)*)(.*)$/,1]
-          operator.strip! if operator
-          operator = '=' if operator.nil? || operator == ''
-          
-          value = $3 # extract value from query
-          value = value.strip[/'?([^']*)'?/,1] # strip single quotes around value, if present
-          conditions << "#{table_name_for(column)}.#{column} #{operator} \'#{value}\'"
-        }
+      options[:conditions].each do |condition|
+        # Merge the result into the conditions array
+        conditions |= flatten_conditions_for(condition)
       end
       conditions.join(" AND ")
     end

@@ -17,6 +17,29 @@ module SugarCRM; module AttributeMethods
       end
       table_name
     end
+    # Takes a condition like: [:zip, ["> 75000", "< 80000"]]
+    # and flattens it to: ["accounts.zip > 75000", "accounts.zip < 80000"]
+    def flatten_conditions_for(condition)
+      conditions = []
+      attribute, attribute_conditions = condition
+      # Make sure we wrap the attribute condition in an array for EZ handling...
+      Array.wrap(attribute_conditions).each do |attribute_condition| 
+        # parse operator in cases where: 
+        #   :attribute => '>= some_value', 
+        #   :attribute => "LIKE '%value%'", 
+        # fallback to '=' operator as default]
+        operator = attribute_condition.to_s[/^([!<>=]*(LIKE|IS|NOT|\s)*)(.*)$/,1].strip!
+        # Default to = if we can't resolve the condition.
+        operator ||= '=' 
+        # Extract value from query
+        value = $3 
+        # TODO: Write a test for sending invalid attribute names.  
+        # strip single quotes
+        value = value.strip[/'?([^']*)'?/,1] 
+        conditions << "#{table_name_for(attribute)}.#{attribute} #{operator} \'#{value}\'"
+      end
+      conditions
+    end
   end
     
   # Determines if attributes or associations have been changed

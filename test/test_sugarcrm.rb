@@ -99,8 +99,9 @@ class TestSugarCRM < Test::Unit::TestCase
     
     should "support searching based on SQL operators" do
       accounts = SugarCRM::Account.all({
-        :conditions => { :name => "LIKE '%Fund%'" }
+        :conditions => { :name => "LIKE '%Inc%'" }
       })
+      assert accounts
       assert_instance_of SugarCRM::Account, accounts.first
     end
     
