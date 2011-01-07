@@ -115,6 +115,11 @@ Instead of SugarCRM.connection.get_entry("Users", "1") you could use SugarCRM::U
     :conditions => { :billing_address_postalcode => "<> NULL" }
   })
   
+  # Retrieve all Accounts with 'Fund' in their name
+  SugarCRM::Account.all({
+    :conditions => { :name => "LIKE '%Fund%'" } # note that SQL operators must be uppercase
+  })
+  
   # Look up the fields for a given module
   SugarCRM::Module.find("Accounts").fields
   
