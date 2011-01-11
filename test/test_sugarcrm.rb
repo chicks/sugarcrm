@@ -62,6 +62,13 @@ class TestSugarCRM < Test::Unit::TestCase
       end
     end
 
+    should "always return an Array when :all" do
+      users = SugarCRM::User.all
+      assert_instance_of Array, users
+      users = SugarCRM::User.find(:all, :conditions => {:user_name => '= admin'})
+      assert_instance_of Array, users
+    end
+
     should "create, modify, and delete a record" do
       #SugarCRM.connection.debug = true
       u = SugarCRM::User.new
