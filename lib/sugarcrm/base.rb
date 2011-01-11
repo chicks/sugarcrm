@@ -158,7 +158,7 @@ module SugarCRM; class Base
         
     def find_by_sql(options)
       query = query_from_options(options)
-      SugarCRM.connection.get_entry_list(self._module.name, query, options)
+      SugarCRM.connection.get_entry_list(self._module.name, query, options) || nil # return nil instead of false if no results are found
     end
 
     def query_from_options(options)
