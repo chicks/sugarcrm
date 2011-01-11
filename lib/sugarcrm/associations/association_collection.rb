@@ -32,18 +32,7 @@ module SugarCRM
     def reload
       load_associated_records
     end
-    
-    def each(&block)
-      load
-      @collection.each(&block)
-    end
-    
-    # we should probably delegate this
-    def length
-      load
-      @collection.length
-    end
-        
+     
     # return any added elements
     def added
       load
@@ -82,6 +71,13 @@ module SugarCRM
       result && self
     end
     alias :add :<<
+    
+    # delegate undefined methods to the @collection array
+    # E.g. contact.cases should behave like an array and allow `length`, `size`, `each`, etc.
+    def method_missing(method_name, *args, &block)
+      load
+      @collection.send(method_name.to_sym, *args, &block)
+    end
     
     def save
       begin
