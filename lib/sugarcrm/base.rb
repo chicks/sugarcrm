@@ -41,12 +41,7 @@ module SugarCRM; class Base
         when :first
           find_initial(options)
         when :all
-          results = find_every(options)
-          if results
-            Array.wrap(results)
-          else
-            []
-          end
+          Array.wrap(find_every(options)).compact
         else
           find_from_ids(args, options)
       end
