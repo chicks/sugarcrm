@@ -39,7 +39,7 @@ module SugarCRM; class Base
 
       case args.first
         when :first then find_initial(options)
-        when :all   then find_every(options)
+        when :all   then Array.wrap(find_every(options))
         else             find_from_ids(args, options)
       end
     end
