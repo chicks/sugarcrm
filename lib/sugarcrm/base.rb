@@ -38,9 +38,17 @@ module SugarCRM; class Base
       validate_find_options(options)
 
       case args.first
-        when :first then find_initial(options)
-        when :all   then Array.wrap(find_every(options))
-        else             find_from_ids(args, options)
+        when :first
+          find_initial(options)
+        when :all
+          results = find_every(options)
+          if results
+            Array.wrap(results)
+          else
+            []
+          end
+        else
+          find_from_ids(args, options)
       end
     end
 
