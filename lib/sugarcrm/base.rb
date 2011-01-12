@@ -337,6 +337,18 @@ module SugarCRM; class Base
   end
   alias :eql? :==
   
+  def update_attribute(name, value)
+    self.send("#{name}=".to_sym, value)
+    self.save
+  end
+  
+  def update_attributes(attributes)
+    attributes.each do |name, value|
+      self.send("#{name}=".to_sym, value)
+    end
+    self.save
+  end
+  
   # Delegates to id in order to allow two records of the same type and id to work with something like:
   #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
   def hash
