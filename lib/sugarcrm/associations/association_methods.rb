@@ -35,7 +35,7 @@ module SugarCRM; module AssociationMethods
       opts
     )
     raise AssociationFailed, 
-      "Couldn't associate #{@owner.class._module.name}: #{@owner.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
+      "Couldn't associate #{self.class._module.name}: #{self.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
     true
   end
   
