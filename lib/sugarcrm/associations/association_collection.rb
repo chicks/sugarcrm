@@ -119,14 +119,7 @@ module SugarCRM
     # user would be the owner, and EmailAddress.new() is the target
     def associate!(target, opts={})
       #target.save! if target.new?
-      response = SugarCRM.connection.set_relationship(
-        @owner.class._module.name, @owner.id, 
-        target.class._module.table_name, [target.id],
-        opts
-      )
-      raise AssociationFailed, 
-        "Couldn't associate #{@owner.class._module.name}: #{@owner.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
-      true
+      @owner.associate!(target, [target.id], opts)
     end
     
     # Removes a relationship between the current object and the target    
