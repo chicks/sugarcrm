@@ -20,6 +20,25 @@ module SugarCRM; module AssociationMethods
     false
   end
   
+  # Creates a relationship between the current object and the target
+  # The current instance and target records will have a relationship set
+  # i.e. account.associate!(contact) wyould link account and contact
+  # In contrast to using account.contacts << contact, this method doesn't load the relationships
+  # before setting the new relationship.
+  # This method is useful when certain modules have many links to other modules: not loading the
+  # relationships allows one ot avoid a Timeout::Error
+  def associate!(target, target_ids=[], opts={})
+    target_ids = [target.id] if target_ids.size < 1
+    response = SugarCRM.connection.set_relationship(
+      self.class._module.name, self.id, 
+      target.class._module.table_name, target_ids,
+      opts
+    )
+    raise AssociationFailed, 
+      "Couldn't associate #{@owner.class._module.name}: #{@owner.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
+    true
+  end
+  
   protected
   
   def save_modified_associations
@@ -69,25 +88,6 @@ module SugarCRM; module AssociationMethods
     # add it to the cache
     @association_cache[association] = collection
     collection
-  end
-  
-  # Creates a relationship between the current object and the target
-  # The current instance and target records will have a relationship set
-  # i.e. account.associate!(contact) wyould link account and contact
-  # In contrast to using account.contacts << contact in AssociationCollection, this method doesn't load the relationships
-  # before setting the new relationship.
-  # This method is useful when certain modules have many links to other modules: not loading the
-  # relationships allows one ot avoid a Timeout::Error or a 'stack level too deep' when aprsing JSON
-  def associate!(target, target_ids=[], opts={})
-    target_ids = [target.id] if target_ids.size < 1
-    response = SugarCRM.connection.set_relationship(
-      self.class._module.name, self.id, 
-      target.class._module.table_name, target_ids,
-      opts
-    )
-    raise AssociationFailed, 
-      "Couldn't associate #{@owner.class._module.name}: #{@owner.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
-    true
   end
 
 end; end
