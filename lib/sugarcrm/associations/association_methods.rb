@@ -28,10 +28,15 @@ module SugarCRM; module AssociationMethods
   # This method is useful when certain modules have many links to other modules: not loading the
   # relationships allows one ot avoid a Timeout::Error
   def associate!(target, target_ids=[], opts={})
+    if self.class._module.custom_module? || target.class._module.custom_module?
+      link_field = get_link_field(target)
+    else
+      link_field = target.class._module.table_name
+    end
     target_ids = [target.id] if target_ids.size < 1
     response = SugarCRM.connection.set_relationship(
       self.class._module.name, self.id, 
-      target.class._module.table_name, target_ids,
+      link_field, target_ids,
       opts
     )
     raise AssociationFailed, 
@@ -88,6 +93,16 @@ module SugarCRM; module AssociationMethods
     # add it to the cache
     @association_cache[association] = collection
     collection
+  end
+  
+  # return the link field involving a relationship with a custom module
+  def get_link_field(other)
+    this_table_name = self.class._module.custom_module? ? self.class._module.name : self.class._module.table_name
+    that_table_name = other.class._module.custom_module? ? other.class._module.name : other.class._module.table_name
+    # the link field will contain the name of both modules
+    link_field = self.associations.detect{|a| a == [this_table_name, that_table_name].join('_') || a == [that_table_name, this_table_name].join('_')}
+    raise "Unable to determine link field between #{self.class._module.name}: #{self.id} and #{other.class._module.table_name}:#{other.id}" unless link_field
+    link_field
   end
 
 end; end
