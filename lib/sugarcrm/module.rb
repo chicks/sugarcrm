@@ -20,7 +20,7 @@ module SugarCRM
       # custom attributes are contained in a table named after the module, with a '_cstm' suffix
       # the module's table name must be tableized for the modules that ship with SugarCRM
       # for custom modules (created in the Studio), table name don't need to be tableized: the name passed to the constructor is already tableized
-      unless name.downcase == name # this module is a custom module (custom module names are all lower_case, whereas SugarCRM modules are CamelCase
+      unless self.custom_module?
         @custom_table_name = @table_name + "_cstm"
       else
         @custom_table_name = name + "_cstm"
@@ -30,6 +30,12 @@ module SugarCRM
       @link_fields = {}
       @fields_registered = false
       self
+    end
+    
+    # return true if this module was created in the SugarCRM Studio (i.e. it is not part of the modules that
+    # ship in the dfault SugarCRM configuration
+    def custom_module?
+      name.downcase == name # custom module names are all lower_case, whereas SugarCRM modules are CamelCase
     end
     
     # Returns the fields associated with the module
