@@ -4,6 +4,8 @@ class TestAssociations < Test::Unit::TestCase
   context "A SugarCRM::Base instance" do
     should "return an email address when sent #email_addresses" do
       u = SugarCRM::User.find("seed_sarah_id")
+      assert_instance_of SugarCRM::AssociationCollection, u.email_addresses
+      assert_instance_of SugarCRM::EmailAddress, u.email_addresses.first
       assert_equal "sarah@example.com", u.email_addresses.first.email_address
     end
     
