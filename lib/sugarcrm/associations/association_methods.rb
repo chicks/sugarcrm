@@ -33,6 +33,12 @@ module SugarCRM; module AssociationMethods
     else
       link_field = target.class._module.table_name
     end
+    
+    # get the correct link_field if we dealing with a custom relationship (created in Studio) between 2 standard modules
+    if link_field == target.class._module.table_name
+      link_field = get_link_field(target)
+    end
+    
     target_ids = [target.id] if target_ids.size < 1
     response = SugarCRM.connection.set_relationship(
       self.class._module.name, self.id, 
