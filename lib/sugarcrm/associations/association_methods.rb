@@ -47,7 +47,7 @@ module SugarCRM; module AssociationMethods
     )
     raise AssociationFailed, 
       "Couldn't associate #{self.class._module.name}: #{self.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
-    @association_cache[link_field.to_sym] << target
+    @association_cache[link_field.to_sym] << target if @association_cache[link_field.to_sym] # only add to the cache if the relationship has been queried
     true
   end
   
