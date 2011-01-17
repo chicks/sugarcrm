@@ -63,13 +63,23 @@ module SugarCRM; module AssociationMethods
   def define_association_methods
     return if association_methods_generated?
     @associations.each do |k|
-      self.class.module_eval %Q?
-      def #{k}
-        query_association :#{k}
-      end
-      ?
+      define_association_method(k) # register method with original link_field name
+      
+      # if a human would call the association differently, register that name, too
+      humanized_link_name = get_humanized_link_name(k)
+      define_association_method(k, humanized_link_name) unless k == humanized_link_name
     end
     self.class.association_methods_generated = true
+  end
+  
+  # Generates the association proxy method for related module
+  def define_association_method(link_field, pretty_name=nil)
+    pretty_name ||= link_field
+    self.class.module_eval %Q?
+      def #{pretty_name}
+        query_association :#{link_field}
+      end
+    ?
   end
   
   # Returns the records from the associated module or returns the cached copy if we've already 
@@ -96,6 +106,7 @@ module SugarCRM; module AssociationMethods
   end
   
   # return the link field involving a relationship with a custom module
+  # (does the opposite of get_humanized_link_name)
   def get_link_field(other)
     this_table_name = self.class._module.custom_module? ? self.class._module.name : self.class._module.table_name
     that_table_name = other.class._module.custom_module? ? other.class._module.name : other.class._module.table_name
@@ -103,6 +114,15 @@ module SugarCRM; module AssociationMethods
     link_field = self.associations.detect{|a| a == [this_table_name, that_table_name].join('_') || a == [that_table_name, this_table_name].join('_')}
     raise "Unable to determine link field between #{self.class._module.name}: #{self.id} and #{other.class._module.table_name}:#{other.id}" unless link_field
     link_field
+  end
+  
+  # return the name of the relationship as a human would call it
+  # e.g. if a custom relationship is defined in Studio between Tasks and Documents,
+  # the link_field will be `tasks_documents` but a human would call the relationship `documents`
+  # (does the opposite of get_link_field)
+  def get_humanized_link_name(link_field)
+    return link_field unless link_field.to_s =~ /((.*)_)?#{Regexp.quote(self.class._module.name.downcase)}(_(.*))?/
+    $2 || $4
   end
 
 end; end
