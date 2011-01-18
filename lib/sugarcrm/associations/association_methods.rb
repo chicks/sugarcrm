@@ -1,33 +1,53 @@
 module SugarCRM; module AssociationMethods
-  
+
   module ClassMethods
-    # Returns an array of the module link fields
-    def associations_from_module_link_fields
-      self._module.link_fields.keys
-    end
   end
-  
-  attr :association_cache, false
-  
-  def association_cached?(association)
-    @association_cache.keys.include? association.to_sym
-  end
-  
-  def associations_changed?
-    @association_cache.values.each do |collection|
-      return true if collection.changed?
-    end
-    false
+
+  # Returns the module link fields hash
+  def link_fields
+    self.class._module.link_fields
   end
   
   # Creates a relationship between the current object and the target
   # The current instance and target records will have a relationship set
-  # i.e. account.associate!(contact) wyould link account and contact
+  # i.e. account.associate!(contact) would link account and contact
   # In contrast to using account.contacts << contact, this method doesn't load the relationships
   # before setting the new relationship.
   # This method is useful when certain modules have many links to other modules: not loading the
   # relationships allows one ot avoid a Timeout::Error
-  def associate!(target, target_ids=[], opts={})
+  def associate!(*targets)    
+    targets.each do |target|
+      link_field = link_field_for(target)
+      response = SugarCRM.connection.set_relationship(
+        self.class._module.name, self.id, 
+        link_field, [target]
+      )
+      if response["failed"] > 0
+        raise AssociationFailed, 
+        "Couldn't associate #{self.class._module.name}: #{self.id} -> #{target.class._module.table_name}: #{target.id}!" 
+      end
+      update_association_cache_for(link_field, target)
+    end
+    true
+  end
+  
+  # Returns the link_field name for an object.  Uses the following heuristics to determine the link_field name
+  # for a set_relationship or get_relationship query:
+  #
+  # Assuming we want to add a new Contact to an Account, where Account is the parent and Contact is the child.
+  #
+  # 1. Module Name Match
+  #    Check the parent record's Module.link_fields hash for a key that matches the child module table_name
+  #
+  # 2. Module Name Fuzzy Match
+  #    Check the parent record's Module.link_fields hash for a key that includes the child module table_name
+  #
+  # 3. Module Relationship Fuzzy Match
+  #    Check the parent record's Module.link_fields hash for a sub-key (aptly named "relationship") that includes  
+  #    part of the child module table_name 
+  #
+  def link_field_for(target)
+    
     if self.class._module.custom_module? || target.class._module.custom_module?
       link_field = get_link_field(target)
     else
@@ -39,54 +59,15 @@ module SugarCRM; module AssociationMethods
       link_field = get_link_field(target)
     end
     
-    target_ids = [target.id] if target_ids.size < 1
-    response = SugarCRM.connection.set_relationship(
-      self.class._module.name, self.id, 
-      link_field, target_ids,
-      opts
-    )
-    raise AssociationFailed, 
-      "Couldn't associate #{self.class._module.name}: #{self.id} -> #{target.class._module.table_name}:#{target.id}!" if response["failed"] > 0
-    @association_cache[link_field.to_sym] << target if @association_cache[link_field.to_sym] # only add to the cache if the relationship has been queried
-    true
   end
   
   protected
-  
-  def save_modified_associations
-    @association_cache.values.each do |collection|
-      if collection.changed?
-        return false unless collection.save
-      end
-    end
-    true
-  end
-  
-  def clear_association_cache
-    @association_cache = {}
-  end
-  
+
   # Generates the association proxy methods for related modules
   def define_association_methods
     return if association_methods_generated?
-    @associations.each do |k|
-      define_association_method(k) # register method with original link_field name
-      
-      # if a human would call the association differently, register that name, too
-      humanized_link_name = get_humanized_link_name(k)
-      define_association_method(k, humanized_link_name) unless k == humanized_link_name
-    end
+    @associations = Association.register(self)
     self.class.association_methods_generated = true
-  end
-  
-  # Generates the association proxy method for related module
-  def define_association_method(link_field, pretty_name=nil)
-    pretty_name ||= link_field
-    self.class.module_eval %Q?
-      def #{pretty_name}
-        query_association :#{link_field}
-      end
-    ?
   end
   
   # Returns the records from the associated module or returns the cached copy if we've already 
@@ -123,13 +104,6 @@ module SugarCRM; module AssociationMethods
     link_field
   end
   
-  # return the name of the relationship as a human would call it
-  # e.g. if a custom relationship is defined in Studio between Tasks and Documents,
-  # the link_field will be `tasks_documents` but a human would call the relationship `documents`
-  # (does the opposite of get_link_field)
-  def get_humanized_link_name(link_field)
-    return link_field unless link_field.to_s =~ /((.*)_)?#{Regexp.quote(self.class._module.name.downcase)}(_(.*))?/
-    $2 || $4
-  end
+
 
 end; end

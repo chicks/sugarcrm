@@ -39,7 +39,7 @@ class TestSugarCRM < Test::Unit::TestCase
     end
   
     should "respond to self.attributes_from_modules_fields" do
-      assert_instance_of ActiveSupport::HashWithIndifferentAccess, SugarCRM::User.attributes_from_module_fields
+      assert_instance_of ActiveSupport::HashWithIndifferentAccess, SugarCRM::User.attributes_from_module
     end
   
     should "return an instance of itself when #new" do

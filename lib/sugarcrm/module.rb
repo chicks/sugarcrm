@@ -7,6 +7,7 @@ module SugarCRM
     attr :klass, true
     attr :fields, true
     attr :link_fields, true
+    alias :bean :klass
 
     # Dynamically register objects based on Module name
     # I.e. a SugarCRM Module named Users will generate
@@ -15,27 +16,28 @@ module SugarCRM
       @name   = name
       @klass  = name.classify
       @table_name = name.tableize
-      
-      # set table name for custom attibutes
-      # custom attributes are contained in a table named after the module, with a '_cstm' suffix
-      # the module's table name must be tableized for the modules that ship with SugarCRM
-      # for custom modules (created in the Studio), table name don't need to be tableized: the name passed to the constructor is already tableized
-      unless self.custom_module?
-        @custom_table_name = @table_name + "_cstm"
-      else
-        @custom_table_name = name + "_cstm"
-      end
-      
+      @custom_table_name = resolve_custom_table_name      
       @fields = {}
       @link_fields = {}
       @fields_registered = false
       self
     end
     
-    # return true if this module was created in the SugarCRM Studio (i.e. it is not part of the modules that
-    # ship in the dfault SugarCRM configuration
+    # Return true if this module was created in the SugarCRM Studio (i.e. it is not part of the modules that
+    # ship in the default SugarCRM configuration)
     def custom_module?
-      name.downcase == name # custom module names are all lower_case, whereas SugarCRM modules are CamelCase
+      # custom module names are all lower_case, whereas SugarCRM modules are CamelCase
+      @name.downcase == @name 
+    end
+
+    # Set table name for custom attibutes
+    # Custom attributes are contained in a table named after the module, with a '_cstm' suffix.
+    # The module's table name must be tableized for the modules that ship with SugarCRM.
+    # For custom modules (created in the Studio), table name don't need to be tableized since
+    # the name passed to the constructor is already tableized    
+    def resolve_custom_table_name
+      @custom_table_name = @table_name + "_cstm"
+      @custom_table_name = @name + "_cstm" if custom_module?
     end
     
     # Returns the fields associated with the module

@@ -250,7 +250,7 @@ module SugarCRM; class Base
     end
     
     def all_attributes_exists?(attribute_names)
-      attribute_names.all? { |name| attributes_from_module_fields.include?(name) }
+      attribute_names.all? { |name| attributes_from_module.include?(name) }
     end
     
     def construct_attributes_from_arguments(attribute_names, arguments)
@@ -273,7 +273,6 @@ module SugarCRM; class Base
     @modified_attributes = {}
     merge_attributes(attributes.with_indifferent_access)
     clear_association_cache
-    @associations = self.class.associations_from_module_link_fields
     define_attribute_methods
     define_association_methods
     typecast_attributes
@@ -371,6 +370,7 @@ module SugarCRM; class Base
     include AttributeSerializers
     include AssociationMethods
     extend  AssociationMethods::ClassMethods
+    include AssociationCache
   end
 
 end; end 

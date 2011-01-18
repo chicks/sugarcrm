@@ -2,7 +2,7 @@ module SugarCRM; module AttributeMethods
 
   module ClassMethods
     # Returns a hash of the module fields from the module
-    def attributes_from_module_fields
+    def attributes_from_module
       fields = {}.with_indifferent_access
       self._module.fields.keys.sort.each do |k|
         fields[k] = nil
@@ -74,7 +74,7 @@ module SugarCRM; module AttributeMethods
   # royally screws up our typecasting code, so we handle it here.
   def merge_attributes(attrs={})
     # copy attributes from the parent module fields array
-    @attributes = self.class.attributes_from_module_fields
+    @attributes = self.class.attributes_from_module
     # populate the attributes with values from the attrs provided to init.
     @attributes.keys.each do |name|
       write_attribute name, attrs[name] if attrs[name]
