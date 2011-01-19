@@ -25,6 +25,7 @@ module SugarCRM; module AssociationMethods
   # before setting the new relationship.
   # This method is useful when certain modules have many links to other modules: not loading the
   # relationships allows one ot avoid a Timeout::Error
+  # TODO: Write a test for this.
   def associate!(target,opts={})
     targets = Array.wrap(target)
     targets.each do |t|
@@ -37,11 +38,25 @@ module SugarCRM; module AssociationMethods
         raise AssociationFailed, 
         "Couldn't associate #{self.class._module.name}: #{self.id} -> #{t}: #{t.id}!" 
       end
-      update_association_cache_for(association.link_field, t)
-      t.update_association_cache_for(association.link_field, self)
+      # We need to update the association cache for any changes we make.
+      if opts[:delete]
+        update_association_cache_for(association.link_field, t, :delete)
+        t.update_association_cache_for(association.link_field, self, :delete)
+      else
+        update_association_cache_for(association.link_field, t, :add)
+        t.update_association_cache_for(association.link_field, self, :add)
+      end
     end
     true
   end
+  alias :relate! :associate!
+    
+  # Removes a relationship between the current object and the target object
+  # TODO: Write a test for this.
+  def disassociate!(target)
+    associate!(target,{:delete => 1})
+  end
+  alias :unrelate! :disassociate!
     
   protected
 

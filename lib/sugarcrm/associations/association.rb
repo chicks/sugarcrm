@@ -1,12 +1,13 @@
 module SugarCRM
   # Represents an association and it's metadata
   class Association    
-    attr :owner
-    attr :target
-    attr :link_field
-    attr :attributes
-    attr :methods
+    attr :owner, true
+    attr :target, true
+    attr :link_field, true
+    attr :attributes, true 
+    attr :methods, true 
     
+    # TODO: Describe this.
     def initialize(owner,link_field,opts={})
       @options = { :define_methods? => true }.merge! opts
       @owner = owner
@@ -35,11 +36,11 @@ module SugarCRM
     end
     
     # Attempts to determine the class of the target in the association
+    # TODO: Write tests for this.
     def resolve_target
       # Use the link_field name first
       klass = @link_field.singularize.camelize
       return "SugarCRM::#{klass}".constantize if SugarCRM.const_defined? klass
-
       # Use the link_field attribute "module"
       if @attributes["module"].length > 0
         module_name = SugarCRM::Module.find(@attributes["module"])
@@ -60,7 +61,6 @@ module SugarCRM
           query_association :#{link_field}
         end
       ?
-      pretty_name
     end
     
     # Defines methods for accessing the association target on the owner class.

@@ -8,14 +8,16 @@ module SugarCRM; module AssociationCache
   end
 
   # Updates an association cache entry if it's been initialized
-  def update_association_cache_for(association, target)
+  def update_association_cache_for(association, target, action=:add)
     return unless association_cached? association
-    return if @association_cache[association].collection.include? target
-    # only add to the cache if the relationship has been queried
-    @association_cache[association] << target
+    case action
+    when :add
+      return if @association_cache[association].collection.include? target
+      @association_cache[association] << target
+    when :delete      
+      @association_cache[association].delete target
+    end
   end
-
-  protected
 
   # Returns true if an association collection has changed
   def associations_changed?
@@ -24,6 +26,8 @@ module SugarCRM; module AssociationCache
     end
     false
   end
+
+  protected
   
   # Resets the association cache
   def clear_association_cache
