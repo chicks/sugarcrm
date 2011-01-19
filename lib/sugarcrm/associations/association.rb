@@ -54,10 +54,9 @@ module SugarCRM
     end
     
     # Generates the association proxy method for related module
-    def define_method(link_field, pretty_name=nil)
-      pretty_name ||= link_field
+    def define_method(link_field)
       @owner.class.module_eval %Q?
-        def #{pretty_name}
+        def #{link_field}
           query_association :#{link_field}
         end
       ?
@@ -71,10 +70,10 @@ module SugarCRM
     def define_methods
       methods = []
       pretty_name = humanized_link_name(@link_field)
-      methods << define_method(pretty_name)
+      methods << define_method(@link_field)
       if pretty_name != @link_field
         @owner.class.module_eval %Q?
-          alias :#{@link_field} #{pretty_name}
+          alias :#{pretty_name} #{@link_field}
         ?
         methods << @link_field
       end
