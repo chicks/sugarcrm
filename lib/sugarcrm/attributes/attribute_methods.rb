@@ -125,7 +125,7 @@ module SugarCRM; module AttributeMethods
   
   # Wrapper for invoking save on modified_attributes
   # sets the id if it's a new record
-  def save_modified_attributes
+  def save_modified_attributes!
     # Complain if we aren't valid
     raise InvalidRecord, errors.to_a.join(", ") if !valid?
     # Send the save request

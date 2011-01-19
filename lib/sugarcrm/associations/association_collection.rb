@@ -118,12 +118,12 @@ module SugarCRM
     # user would be the owner, and EmailAddress.new() is the target
     def associate!(target, opts={})
       #target.save! if target.new?
-      @owner.associate!(target, [target.id], opts)
+      @owner.associate!(target, opts)
     end
     
     # Removes a relationship between the current object and the target    
     def disassociate!(target)
-      associate!(target,{:delete => 1})
+      @owner.associate!(target,{:delete => 1})
     end
 
     alias :relate! :associate!

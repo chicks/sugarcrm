@@ -15,7 +15,7 @@ module SugarCRM; class Request
     @request << '&rest_data=' << @json
     if debug
       puts "#{method}: Request:"
-      pp @request 
+      puts @request 
       puts "\n"
     end
     self

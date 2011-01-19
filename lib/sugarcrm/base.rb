@@ -5,7 +5,7 @@ module SugarCRM; class Base
 
   # This holds our connection
   cattr_accessor :connection, :instance_writer => false
-    
+
   # Tracks if we have extended our class with attribute methods yet.
   class_attribute :attribute_methods_generated
   self.attribute_methods_generated = false
@@ -307,8 +307,8 @@ module SugarCRM; class Base
   # Saves the current object, and any modified associations. 
   # Raises an exceptions if save fails for any reason.
   def save!
-    save_modified_attributes
-    save_modified_associations
+    save_modified_attributes!
+    save_modified_associations!
     true
   end
   

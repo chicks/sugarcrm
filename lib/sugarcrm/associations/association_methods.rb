@@ -3,70 +3,51 @@ module SugarCRM; module AssociationMethods
   module ClassMethods
   end
 
+  # Saves all modified associations.
+  def save_modified_associations!
+    @association_cache.values.each do |collection|
+      if collection.changed?
+        collection.save!
+      end
+    end
+    true
+  end
+  
   # Returns the module link fields hash
   def link_fields
     self.class._module.link_fields
   end
   
-  # Creates a relationship between the current object and the target
-  # The current instance and target records will have a relationship set
+  # Creates a relationship between the current object and the target object
+  # The current and target records will have a relationship set
   # i.e. account.associate!(contact) would link account and contact
   # In contrast to using account.contacts << contact, this method doesn't load the relationships
   # before setting the new relationship.
   # This method is useful when certain modules have many links to other modules: not loading the
   # relationships allows one ot avoid a Timeout::Error
-  def associate!(*targets)    
-    targets.each do |target|
-      link_field = link_field_for(target)
+  def associate!(target,opts)
+    targets = Array.wrap(target)
+    targets.each do |t|
+      association = @associations.find!(t)
       response = SugarCRM.connection.set_relationship(
         self.class._module.name, self.id, 
-        link_field, [target]
+        association.link_field, [t.id], opts
       )
       if response["failed"] > 0
         raise AssociationFailed, 
-        "Couldn't associate #{self.class._module.name}: #{self.id} -> #{target.class._module.table_name}: #{target.id}!" 
+        "Couldn't associate #{self.class._module.name}: #{self.id} -> #{t}: #{t.id}!" 
       end
-      update_association_cache_for(link_field, target)
+      update_association_cache_for(association.link_field, t)
     end
     true
   end
-  
-  # Returns the link_field name for an object.  Uses the following heuristics to determine the link_field name
-  # for a set_relationship or get_relationship query:
-  #
-  # Assuming we want to add a new Contact to an Account, where Account is the parent and Contact is the child.
-  #
-  # 1. Module Name Match
-  #    Check the parent record's Module.link_fields hash for a key that matches the child module table_name
-  #
-  # 2. Module Name Fuzzy Match
-  #    Check the parent record's Module.link_fields hash for a key that includes the child module table_name
-  #
-  # 3. Module Relationship Fuzzy Match
-  #    Check the parent record's Module.link_fields hash for a sub-key (aptly named "relationship") that includes  
-  #    part of the child module table_name 
-  #
-  def link_field_for(target)
     
-    if self.class._module.custom_module? || target.class._module.custom_module?
-      link_field = get_link_field(target)
-    else
-      link_field = target.class._module.table_name
-    end
-    
-    # get the correct link_field if we dealing with a custom relationship (created in Studio) between 2 standard modules
-    if link_field == target.class._module.table_name
-      link_field = get_link_field(target)
-    end
-    
-  end
-  
   protected
 
   # Generates the association proxy methods for related modules
   def define_association_methods
     return if association_methods_generated?
-    @associations = Association.register(self)
+    @associations = Associations.register(self)
     self.class.association_methods_generated = true
   end
   
@@ -92,18 +73,5 @@ module SugarCRM; module AssociationMethods
     @association_cache[association] = collection
     collection
   end
-  
-  # return the link field involving a relationship with a custom module
-  # (does the opposite of get_humanized_link_name)
-  def get_link_field(other)
-    this_table_name = self.class._module.custom_module? ? self.class._module.name : self.class._module.table_name
-    that_table_name = other.class._module.custom_module? ? other.class._module.name : other.class._module.table_name
-    # the link field will contain the name of both modules
-    link_field = self.associations.detect{|a| a == [this_table_name, that_table_name].join('_') || a == [that_table_name, this_table_name].join('_')}
-    raise "Unable to determine link field between #{self.class._module.name}: #{self.id} and #{other.class._module.table_name}:#{other.id}" unless link_field
-    link_field
-  end
-  
-
 
 end; end

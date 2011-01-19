@@ -13,4 +13,5 @@ module SugarCRM
   class UninitializedModule < RuntimeError; end
   class InvalidAttribute < RuntimeError; end
   class InvalidAttributeType < RuntimeError; end
+  class InvalidAssociation < RuntimeError; end
 end

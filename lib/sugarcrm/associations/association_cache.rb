@@ -1,12 +1,10 @@
 module SugarCRM; module AssociationCache
 
   attr :association_cache, false
-  
-
-  
+    
   # Returns true if an association is cached
   def association_cached?(association)
-    @association_cache.keys.include? association
+    @association_cache.symbolize_keys.include? association.to_sym
   end
 
   protected
@@ -19,6 +17,7 @@ module SugarCRM; module AssociationCache
     false
   end
 
+  # Saves all modified associations.
   def save_modified_associations
     @association_cache.values.each do |collection|
       if collection.changed?

@@ -7,7 +7,7 @@ module SugarCRM; class Connection
         \"session\": \"#{@session}\"
       }
     EOF
-    json.gsub!(/^\s{8}/,'')
+    json.gsub!(/^\s{6}/,'')
     response = send!(:seamless_login, json)
   end
 end; end

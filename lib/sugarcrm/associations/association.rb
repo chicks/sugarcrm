@@ -1,37 +1,42 @@
 module SugarCRM
   # Represents an association and it's metadata
-  class Association
-    # Returns an array of Association objects
-    class << self
-      def register(owner)
-        associations = []
-        owner.link_fields.each_pair do |link_field,attributes|
-          associations << Association.new(owner,link_field,attributes)
-        end
-        associations
-      end
-    end
-    
+  class Association    
     attr :owner
     attr :target
     attr :link_field
     attr :attributes
     attr :methods
     
-    def initialize(owner,link_field,attributes)
+    def initialize(owner,link_field,opts={})
+      @options = { :define_methods? => true }.merge! opts
       @owner = owner
+      check_valid_owner
       @link_field = link_field
-      @attributes = attributes
+      @attributes = owner.link_fields[link_field]
       @target = resolve_target
-      @methods = define_methods
+      @methods = define_methods if @options[:define_methods?]
       self
     end
     
+    # Returns true if the association includes an attribute that matches
+    # the provided string
+    def include?(attribute)
+      return true if attribute.class == @target
+      return true if attribute == link_field
+      return true if methods.include? attribute
+      false
+    end
+        
     def to_s
       "#{@link_field} => [#{@methods.join ","}] "
     end
     
     protected
+
+    def check_valid_owner
+      valid = @owner.class.ancestors.include? SugarCRM::Base
+      raise InvalidModule, "#{@owner} is not registered, or is not a descendant of SugarCRM::Base" unless valid
+    end
     
     # Attempts to determine the class of the target in the association
     def resolve_target
@@ -49,6 +54,7 @@ module SugarCRM
         klass = humanized_link_name(@attributes["relationship"]).singularize.camelize
         return "SugarCRM::#{klass}".constantize if SugarCRM.const_defined? klass
       end
+      false
     end
     
     # Generates the association proxy method for related module
