@@ -28,6 +28,7 @@ module SugarCRM; class Connection
     return fields.to_json
   end
   
+  # Returns an instance of class for the provided module name
   def class_for(module_name)
     begin
       klass = "SugarCRM::#{module_name.classify}".constantize.new

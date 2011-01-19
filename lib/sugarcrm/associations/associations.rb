@@ -21,11 +21,11 @@ module SugarCRM
     
     # Looks up an association by object, link_field, or method.
     # Raises an exception if not found
-    def find!(association)
+    def find!(target)
       @associations.each do |a|
-        return a if a.include? association
+        return a if a.include? target
       end
-      raise InvalidAssociation, "Could not lookup association for: #{association}"
+      raise InvalidAssociation, "Could not lookup association for: #{target}"
     end
 
     # Looks up an association by object, link_field, or method.
@@ -38,6 +38,20 @@ module SugarCRM
       end
     end
     
+    def inspect
+      self
+    end
+    
+    def to_s
+      methods = []
+      @associations.each do |a|
+        a.methods.each do |m|
+          methods << m
+        end
+      end
+      "[#{methods.join(', ')}]"
+    end
+      
     # delegate undefined methods to the @collection array
     # E.g. contact.cases should behave like an array and allow `length`, `size`, `each`, etc.
     def method_missing(method_name, *args, &block)

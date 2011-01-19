@@ -230,11 +230,7 @@ module SugarCRM; class Base
               record = find(:first, options)
 
               if record.nil?
-                record = self.new do |r|
-                  r.send(:attributes=, protected_attributes_for_create, true) unless protected_attributes_for_create.empty?
-                  r.send(:attributes=, unprotected_attributes_for_create, false) unless unprotected_attributes_for_create.empty?
-                end
-                #{'yield(record) if block_given?'}
+                record = self.new(unprotected_attributes_for_create)
                 #{'record.save' if instantiator == :create}
                 record
               else
@@ -269,7 +265,7 @@ module SugarCRM; class Base
   end
 
   # Creates an instance of a Module Class, i.e. Account, User, Contact, etc.
-  def initialize(attributes={})
+  def initialize(attributes={}, &block)
     @modified_attributes = {}
     merge_attributes(attributes.with_indifferent_access)
     clear_association_cache

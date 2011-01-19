@@ -134,6 +134,21 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal "sarah@example.com", u.email_addresses.first.email_address
     end
     
+    should "create or retrieve a record when #find_or_create_by_name" do
+      a = SugarCRM::Account.find_or_create_by_name("Really Important Co. Name")
+      assert_instance_of SugarCRM::Account, a
+      assert !a.new?
+      b = SugarCRM::Account.find_or_create_by_name("Really Important Co. Name")
+      assert a == b
+      assert a.delete
+    end
+    
+#    should "support saving of records with special characters in them" do
+#      a = SugarCRM::Account.new
+#      a.name = "COHEN, WEISS & SIMON LLP"
+#      assert a.save!
+#    end
+    
   end
   
 end

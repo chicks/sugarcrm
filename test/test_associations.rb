@@ -31,5 +31,11 @@ class TestAssociations < Test::Unit::TestCase
       assert u.meetings.save!
       assert !u.meetings.include?(m)
     end
+    
+    # TODO: Fix created_by_link to only return a single result
+    should "return a user when sent #created_by_link" do
+      a = SugarCRM::Account.first
+      assert_instance_of SugarCRM::User, a.created_by_link.first
+    end
   end
 end

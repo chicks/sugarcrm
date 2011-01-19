@@ -17,16 +17,6 @@ module SugarCRM; module AssociationCache
     false
   end
 
-  # Saves all modified associations.
-  def save_modified_associations
-    @association_cache.values.each do |collection|
-      if collection.changed?
-        return false unless collection.save
-      end
-    end
-    true
-  end
-  
   # Updates an association cache entry if it's been initialized
   def update_association_cache_for(association, target)
     # only add to the cache if the relationship has been queried

@@ -26,10 +26,6 @@ module SugarCRM
       return true if methods.include? attribute
       false
     end
-        
-    def to_s
-      "#{@link_field} => [#{@methods.join ","}] "
-    end
     
     protected
 

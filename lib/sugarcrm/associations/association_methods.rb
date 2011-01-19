@@ -46,8 +46,8 @@ module SugarCRM; module AssociationMethods
 
   # Generates the association proxy methods for related modules
   def define_association_methods
-    return if association_methods_generated?
     @associations = Associations.register(self)
+    return if association_methods_generated?
     self.class.association_methods_generated = true
   end
   

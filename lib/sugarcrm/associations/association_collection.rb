@@ -12,7 +12,7 @@ module SugarCRM
       load if preload
       self
     end
-    
+        
     def changed?
       return false unless loaded?
       return true if added.length > 0
@@ -95,8 +95,7 @@ module SugarCRM
       removed.each do |record|
         disassociate!(record)
       end
-      @original = @collection.dup
-      @original.freeze
+      reload
       true
     end
     
