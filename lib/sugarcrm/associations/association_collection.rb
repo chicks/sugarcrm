@@ -2,6 +2,8 @@ module SugarCRM
   # A class for handling association collections.  Basically just an extension of Array
   # doesn't actually load the records from Sugar until you invoke one of the public methods
   class AssociationCollection
+  
+    attr_reader :collection
     
     # creates a new instance of an AssociationCollection
     # Owner is the parent object, and association is the target
