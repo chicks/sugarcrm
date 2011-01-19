@@ -38,6 +38,7 @@ module SugarCRM; module AssociationMethods
         "Couldn't associate #{self.class._module.name}: #{self.id} -> #{t}: #{t.id}!" 
       end
       update_association_cache_for(association.link_field, t)
+      t.update_association_cache_for(association.link_field, self)
     end
     true
   end
