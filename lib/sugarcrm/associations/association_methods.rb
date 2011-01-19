@@ -25,7 +25,7 @@ module SugarCRM; module AssociationMethods
   # before setting the new relationship.
   # This method is useful when certain modules have many links to other modules: not loading the
   # relationships allows one ot avoid a Timeout::Error
-  def associate!(target,opts)
+  def associate!(target,opts={})
     targets = Array.wrap(target)
     targets.each do |t|
       association = @associations.find!(t)

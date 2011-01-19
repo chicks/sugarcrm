@@ -26,7 +26,8 @@ module SugarCRM; class Response
 
   attr :response, false
   
-  def initialize(json)
+  def initialize(json,opts={})
+    @options  = { :always_return_array => false }.merge! opts
     @response = json
     @response = json.with_indifferent_access if json.is_a? Hash
   end
@@ -52,7 +53,7 @@ module SugarCRM; class Response
       end
     end
     # If we only have one result, just return the object
-    if objects.length == 1
+    if objects.length == 1 && !@options[:always_return_array]
       return objects[0]
     else
       return objects
