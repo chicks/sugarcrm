@@ -168,7 +168,7 @@ module SugarCRM; class Base
       return nil unless first_result_slice
       
       results = Array.wrap(first_result_slice)
-      return results if results.size <= nb_to_fetch # all results matching users' query (incl. :limit option) were found
+      return results if nb_to_fetch && results.size <= nb_to_fetch # all results matching users' query (incl. :limit option) were found
       
       limit_value = 5 # arbitrary value, must be smaller than :offset used (see comment above)
       limit_value.freeze
@@ -179,9 +179,10 @@ module SugarCRM; class Base
       while result_slice = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options)
         results.concat(result_slice)
         # make sure we don't return more results than the user requested (via original :limit option)
-        if results.size >= nb_to_fetch
+        if nb_to_fetch && results.size >= nb_to_fetch
           return results.slice(0, nb_to_fetch)
         end
+        options[:offset] += options[:limit]
       end
       results
     end
