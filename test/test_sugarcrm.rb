@@ -130,8 +130,8 @@ class TestSugarCRM < Test::Unit::TestCase
     end
     
     # test Base#find_by_sql edge case
-    should "return an array of records with small limit" do
-      accounts = SugarCRM::Account.all(:limit => 3)
+    should "return an array of records with small limit and an offset of 0" do
+      accounts = SugarCRM::Account.all(:limit => 3, :offset => 0)
       assert_equal 3, users.size
     end
     
@@ -145,6 +145,23 @@ class TestSugarCRM < Test::Unit::TestCase
       accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 3, :offset => 10)
       accounts_api = SugarCRM.connection.get_entry_list('Accounts', '1=1', :order_by => 'name', :limit => 3, :offset => 10)
       assert_equal accounts_api, accounts
+    end
+    
+    should "return an array of records working around a SugarCRM bug when :limit > :offset" do
+      accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 10, :offset => 2)
+      assert_equal 10, accounts.size
+    end
+    
+    should "return an array of 1 record with :limit => 1, :offset => 1" do
+      accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 1, :offset => 1)
+      assert_equal 1, accounts.size
+    end
+    
+    should "compute offsets correctly" do
+      accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 10, :offset => 3)
+      accounts_first_slice = SugarCRM::Account.all(:order_by => 'name', :limit => 5, :offset => 3)
+      accounts_second_slice = SugarCRM::Account.all(:order_by => 'name', :limit => 5, :offset => 8)
+      assert_equal accounts, accounts_first_slice.concat(accounts_second_slice)
     end
     
     should "return an instance of User when sent User#find_by_username" do
