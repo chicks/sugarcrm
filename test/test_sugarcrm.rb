@@ -129,6 +129,24 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal "Administrator", users.last.title
     end
     
+    # test Base#find_by_sql edge case
+    should "return an array of records with small limit" do
+      accounts = SugarCRM::Account.all(:limit => 3)
+      assert_equal 3, users.size
+    end
+    
+    # test Base#find_by_sql standard case
+    should "return an array of records with high limit" do
+      accounts = SugarCRM::Account.all(:limit => 12)
+      assert_equal 12, users.size
+    end
+    
+    should "return an array of records when using :order_by, :limit, and :offset options" do
+      accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 3, :offset => 10)
+      accounts_api = SugarCRM.connection.get_entry_list('Accounts', '1=1', :order_by => 'name', :limit => 3, :offset => 10)
+      assert_equal accounts_api, accounts
+    end
+    
     should "return an instance of User when sent User#find_by_username" do
       u = SugarCRM::User.find_by_user_name("sarah")
       assert_equal "sarah@example.com", u.email_addresses.first.email_address

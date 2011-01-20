@@ -96,7 +96,7 @@ module SugarCRM; class Base
     
     def find_initial(options)
       options.update(:limit => 1)
-      find_every(options)
+      find_by_sql(options).first # find_by_sql will return an array of size 1
     end
   
     def find_from_ids(ids, options)
@@ -152,8 +152,38 @@ module SugarCRM; class Base
     end
         
     def find_by_sql(options)
-      query = query_from_options(options)
-      SugarCRM.connection.get_entry_list(self._module.name, query, options) || nil # return nil instead of false if no results are found
+      # store the number of records wanted by user, as we'll overwrite :limit option to obtain several slices of records (to avoid timeout issues)
+      nb_to_fetch = options[:limit]
+      offset_value = 10 # arbitrary value, must be bigger than :limit used (see comment below)
+      offset_value.freeze
+      initial_limit = nb_to_fetch.nil?  ? offset_value : [offset_value, nb_to_fetch].min
+      # ensure results are ordered so :limit and :offset option behave in a deterministic fashion
+      options = { :order_by => :id, :limit => initial_limit }.merge(options)
+      
+      # get first slice of results
+      # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
+      # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
+      # with :limit always smaller than :offset
+      first_result_slice = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options)
+      return nil unless first_result_slice
+      
+      results = Array.wrap(first_result_slice)
+      return results if results.size <= nb_to_fetch # all results matching users' query (incl. :limit option) were found
+      
+      limit_value = 5 # arbitrary value, must be smaller than :offset used (see comment above)
+      limit_value.freeze
+      options = { :order_by => :id, :limit => limit_value, :offset => offset_value }.merge(options)
+      # continue fetching results until we either
+      # a) have as many results as the user wants (specified via the original :limit option)
+      # b) there are no more results matching the criteria
+      while result_slice = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options)
+        results.concat(result_slice)
+        # make sure we don't return more results than the user requested (via original :limit option)
+        if results.size >= nb_to_fetch
+          return results.slice(0, nb_to_fetch)
+        end
+      end
+      results
     end
 
     def query_from_options(options)
