@@ -96,7 +96,9 @@ module SugarCRM; class Base
     
     def find_initial(options)
       options.update(:limit => 1)
-      find_by_sql(options).first # find_by_sql will return an array of size 1
+      result = find_by_sql(options)
+      return result.first if result.instance_of? Array # find_by_sql will return an Array if result are found
+      result
     end
   
     def find_from_ids(ids, options)
