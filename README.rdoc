@@ -151,6 +151,10 @@ Instead of SugarCRM.connection.get_entry("Users", "1") you could use SugarCRM::U
 
 * sudo gem install sugarcrm
 
+== TEST:
+
+Set the values in `test/helper.rb` to point to a SugarCRM instance with demo data
+
 == Note on Patches/Pull Requests
  
 * Fork the project.
