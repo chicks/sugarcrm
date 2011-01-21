@@ -132,13 +132,13 @@ class TestSugarCRM < Test::Unit::TestCase
     # test Base#find_by_sql edge case
     should "return an array of records with small limit and an offset of 0" do
       accounts = SugarCRM::Account.all(:limit => 3, :offset => 0)
-      assert_equal 3, users.size
+      assert_equal 3, accounts.size
     end
     
     # test Base#find_by_sql standard case
     should "return an array of records with high limit" do
       accounts = SugarCRM::Account.all(:limit => 12)
-      assert_equal 12, users.size
+      assert_equal 12, accounts.size
     end
     
     should "return an array of records when using :order_by, :limit, and :offset options" do
