@@ -68,7 +68,7 @@ module SugarCRM
       record.save! if record.new?
       result = true
       result = false if include?(record)
-      @collection << record
+      @collection << record unless @collection.include? record
       result && self
     end
     alias :add :<<
