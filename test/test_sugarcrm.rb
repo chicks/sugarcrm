@@ -63,7 +63,7 @@ class TestSugarCRM < Test::Unit::TestCase
     end
 
     should "always return an Array when :all" do
-      users = SugarCRM::User.all
+      users = SugarCRM::User.all(:limit => 10)
       assert_instance_of Array, users
       users = SugarCRM::User.find(:all, :conditions => {:user_name => '= admin'})
       assert_instance_of Array, users
