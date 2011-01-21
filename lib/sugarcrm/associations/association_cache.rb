@@ -13,7 +13,7 @@ module SugarCRM; module AssociationCache
     case action
     when :add
       return if @association_cache[association].collection.include? target
-      @association_cache[association] << target
+      @association_cache[association].push(target) # don't use `<<` because overriden method in AssociationCollection gets called instead
     when :delete      
       @association_cache[association].delete target
     end

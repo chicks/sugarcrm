@@ -68,7 +68,8 @@ module SugarCRM
       record.save! if record.new?
       result = true
       result = false if include?(record)
-      @collection << record unless @collection.include? record
+      @owner.update_association_cache_for(@association, record, :add)
+      record.update_association_cache_for(record.associations.find!(@owner).link_field, @owner, :add)
       result && self
     end
     alias :add :<<

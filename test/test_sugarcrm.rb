@@ -204,13 +204,26 @@ class TestSugarCRM < Test::Unit::TestCase
       c.delete
     end
     
-    should "update association cache for both sides of the relationship" do
+    should "update association cache for both sides of the relationship when calling associate!" do
       a = SugarCRM::Account.first
       c = SugarCRM::Contact.create(:last_name => 'Doe')
       
       nb_contacts = a.contacts.size
       nb_accounts = c.accounts.size
       a.associate!(c)
+      assert_equal nb_contacts + 1, a.contacts.size
+      assert_equal nb_accounts + 1, c.accounts.size
+      
+      c.delete
+    end
+    
+    should "update association cache for both sides of the relationship when calling <<" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      nb_contacts = a.contacts.size
+      nb_accounts = c.accounts.size
+      a.contacts  << c
       assert_equal nb_contacts + 1, a.contacts.size
       assert_equal nb_accounts + 1, c.accounts.size
       
