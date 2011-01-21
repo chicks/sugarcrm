@@ -166,7 +166,7 @@ module SugarCRM; class Base
       initial_limit = nb_to_fetch.nil?  ? offset_value : [offset_value, nb_to_fetch].min # how many records should be fetched on first pass
       # ensure results are ordered so :limit and :offset option behave in a deterministic fashion
       options = { :order_by => :id }.merge(options)
-      options[:limit] = initial_limit # override original argument
+      options.update(:limit => initial_limit) # override original argument
       
       # get first slice of results
       # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
@@ -178,7 +178,8 @@ module SugarCRM; class Base
       
       limit_value = [5, offset_value].min # arbitrary value, must be smaller than :offset used (see comment above)
       limit_value.freeze
-      options = { :order_by => :id, :limit => limit_value }.merge(options)
+      options = { :order_by => :id }.merge(options)
+      options.update(:limit => limit_value)
       
       # a portion of the results has already been queried
       # update or set the :offset value to reflect this
