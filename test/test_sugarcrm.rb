@@ -157,6 +157,12 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal 1, accounts.size
     end
     
+    should "ignore :offset => 0" do
+      accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 3)
+      accounts_offset = SugarCRM::Account.all(:order_by => 'name', :limit => 3, :offset => 0)
+      assert_equal accounts, accounts_offset
+    end
+    
     should "compute offsets correctly" do
       accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 10, :offset => 3)
       accounts_first_slice = SugarCRM::Account.all(:order_by => 'name', :limit => 5, :offset => 3)
