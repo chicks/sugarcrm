@@ -157,7 +157,8 @@ module SugarCRM; class Base
       # this implementation fixes the :limit - :offset bug so that it behaves correctly
       
       # store the number of records wanted by user, as we'll overwrite :limit option to obtain several slices of records (to avoid timeout issues)
-      nb_to_fetch = options[:limit].to_i
+      nb_to_fetch = options[:limit]
+      nb_to_fetch = nb_to_fetch.to_i if nb_to_fetch
       offset_value = options[:offset].to_i || 10 # arbitrary value, must be bigger than :limit used (see comment above)
       offset_value.freeze
       initial_limit = nb_to_fetch.nil?  ? offset_value : [offset_value, nb_to_fetch].min # how many records should be fetched on first pass
@@ -170,7 +171,7 @@ module SugarCRM; class Base
       # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
       # with :limit always smaller than :offset
       results = Array.wrap(SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options))
-      return nil unless results
+      return nil unless results.size > 0
       
       limit_value = [5, offset_value].min # arbitrary value, must be smaller than :offset used (see comment above)
       limit_value.freeze
@@ -178,7 +179,7 @@ module SugarCRM; class Base
       
       # a portion of the results has already been queried
       # update or set the :offset value to reflect this
-      options[:offset] ||= 0
+      options[:offset] ||= results.size
       options[:offset] += offset_value
       
       # continue fetching results until we either
