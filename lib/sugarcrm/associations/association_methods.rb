@@ -44,7 +44,7 @@ module SugarCRM; module AssociationMethods
         t.update_association_cache_for(association.link_field, self, :delete)
       else
         update_association_cache_for(association.link_field, t, :add)
-        t.update_association_cache_for(association.link_field, self, :add)
+        t.update_association_cache_for(t.associations.find!(self).link_field, self, :add)
       end
     end
     true
