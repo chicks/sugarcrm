@@ -170,8 +170,9 @@ module SugarCRM; class Base
       # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
       # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
       # with :limit always smaller than :offset
-      results = Array.wrap(SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options))
-      return nil unless results.size > 0
+      results = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options)
+      return nil unless results
+      results = Array.wrap(results)
       
       limit_value = [5, offset_value].min # arbitrary value, must be smaller than :offset used (see comment above)
       limit_value.freeze
