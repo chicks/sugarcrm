@@ -84,18 +84,9 @@ module SugarCRM
     # e.g. if a custom relationship is defined in Studio between Tasks and Documents,
     # the link_field will be `tasks_documents` but a human would call the relationship `documents`
     def humanized_link_name(link_field)
-      # Split the relationship name into parts
-      # "contact_accounts" => ["contact","accounts"]
-      m = link_field.split(/_/)
-      # Determine the parts we don't want
-      # SugarCRM::Contact => ["contacts", "contact"]
-      o = @owner.class._module.table_name
-      # Use array subtraction to remove parts representing the owner side of the relationship
-      # ["contact", "accounts"] - ["contacts", "contact"] => ["accounts"]
-      t = m - [o, o.singularize]
-      # Reassemble whatever's left
-      # "accounts"
-      t.join('_')
+      # the module name is used to function properly with modules containing '_' (e.g. a custom module abc_sale : custom modules need a prefix (abc here) so they will always have a '_' in their table name)
+      return link_field unless link_field.to_s =~ /((.*)_)?#{Regexp.quote(@owner.class._module.name.downcase)}(_(.*))?/
+      [$2, $4].compact.join('_')
     end
     
   end
