@@ -24,8 +24,7 @@ module SugarCRM; module AssociationMethods
   # In contrast to using account.contacts << contact, this method doesn't load the relationships
   # before setting the new relationship.
   # This method is useful when certain modules have many links to other modules: not loading the
-  # relationships allows one ot avoid a Timeout::Error
-  # TODO: Write a test for this.
+  # relationships allows one to avoid a Timeout::Error
   def associate!(target,opts={})
     targets = Array.wrap(target)
     targets.each do |t|
