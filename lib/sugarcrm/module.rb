@@ -15,7 +15,11 @@ module SugarCRM
     def initialize(name)
       @name   = name
       @klass  = name.classify
-      @table_name = name.tableize
+      unless custom_module?
+        @table_name = name.tableize
+      else
+        @table_name = @name
+      end
       @custom_table_name = resolve_custom_table_name      
       @fields = {}
       @link_fields = {}
