@@ -130,7 +130,7 @@ module SugarCRM; class Connection
       raise UnhandledResponse, @response.body
     end
     # Empty result.  Is this wise?
-    return false if response_json["result_count"] == 0
+    return nil if response_json["result_count"] == 0
     # Filter debugging on REALLY BIG responses
     if @options[:debug] && !(DONT_SHOW_DEBUG_FOR.include? @request.method)
       puts "#{@request.method}: JSON Response:"
