@@ -23,3 +23,5 @@ Gemfile.lock
 *.gemspec
 
 .bundle
+
+lib/sugarcrm/monkey_patches/*.rb

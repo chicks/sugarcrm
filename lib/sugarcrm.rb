@@ -5,6 +5,7 @@ require 'uri'
 require 'rubygems'
 require 'active_support/core_ext'
 
+require 'sugarcrm/environment'
 require 'sugarcrm/module_methods'
 require 'sugarcrm/connection'
 require 'sugarcrm/exceptions'
