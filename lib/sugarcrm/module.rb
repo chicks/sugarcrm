@@ -42,6 +42,7 @@ module SugarCRM
     def resolve_custom_table_name
       @custom_table_name = @table_name + "_cstm"
       @custom_table_name = @name + "_cstm" if custom_module?
+      @custom_table_name
     end
     
     # Returns the fields associated with the module
