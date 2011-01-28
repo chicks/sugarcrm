@@ -40,9 +40,11 @@ module SugarCRM
     # For custom modules (created in the Studio), table name don't need to be tableized since
     # the name passed to the constructor is already tableized    
     def resolve_custom_table_name
-      @custom_table_name = @table_name + "_cstm"
-      @custom_table_name = @name + "_cstm" if custom_module?
-      @custom_table_name
+      if custom_module?
+        @custom_table_name = @name + "_cstm"
+      else
+        @custom_table_name = @table_name + "_cstm"
+      end
     end
     
     # Returns the fields associated with the module
