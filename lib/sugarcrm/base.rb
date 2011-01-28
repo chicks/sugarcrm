@@ -157,48 +157,51 @@ module SugarCRM; class Base
       # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously, :limit is considered to be the smallest of the two, and :offset is the larger
       # in addition to allowing querying of large datasets while avoiding timeouts,
       # this implementation fixes the :limit - :offset bug so that it behaves correctly
-      
-      options.delete(:offset) if options[:offset] == 0
+      local_options = {}
+      [:offset, :limit, :order_by].each{|o|
+        local_options[o] = options[o] if options[o]
+      }
+      local_options.delete(:offset) if local_options[:offset] == 0
       
       # store the number of records wanted by user, as we'll overwrite :limit option to obtain several slices of records (to avoid timeout issues)
-      nb_to_fetch = options[:limit]
+      nb_to_fetch = local_options[:limit]
       nb_to_fetch = nb_to_fetch.to_i if nb_to_fetch
-      offset_value = options[:offset] || 10 # arbitrary value, must be bigger than :limit used (see comment above)
+      offset_value = local_options[:offset] || 10 # arbitrary value, must be bigger than :limit used (see comment above)
       offset_value = offset_value.to_i
       offset_value.freeze
       initial_limit = nb_to_fetch.nil?  ? offset_value : [offset_value, nb_to_fetch].min # how many records should be fetched on first pass
       # ensure results are ordered so :limit and :offset option behave in a deterministic fashion
-      options = { :order_by => :id }.merge(options)
-      options.update(:limit => initial_limit) # override original argument
+      local_options = { :order_by => :id }.merge(local_options)
+      local_options.update(:limit => initial_limit) # override original argument
       
       # get first slice of results
       # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
       # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
       # with :limit always smaller than :offset
-      results = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options)
+      results = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
       return nil unless results
       results = Array.wrap(results)
       
       limit_value = [5, offset_value].min # arbitrary value, must be smaller than :offset used (see comment above)
       limit_value.freeze
-      options = { :order_by => :id }.merge(options)
-      options.update(:limit => limit_value)
+      local_options = { :order_by => :id }.merge(local_options)
+      local_options.update(:limit => limit_value)
       
       # a portion of the results has already been queried
       # update or set the :offset value to reflect this
-      options[:offset] ||= results.size
-      options[:offset] += offset_value
+      local_options[:offset] ||= results.size
+      local_options[:offset] += offset_value
       
       # continue fetching results until we either
       # a) have as many results as the user wants (specified via the original :limit option)
       # b) there are no more results matching the criteria
-      while result_slice = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(options), options)
+      while result_slice = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
         results.concat(Array.wrap(result_slice))
         # make sure we don't return more results than the user requested (via original :limit option)
         if nb_to_fetch && results.size >= nb_to_fetch
           return results.slice(0, nb_to_fetch)
         end
-        options[:offset] += options[:limit] # update :offset as we get more records
+        local_options[:offset] += local_options[:limit] # update :offset as we get more records
       end
       results
     end
