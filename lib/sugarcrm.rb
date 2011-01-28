@@ -4,6 +4,7 @@ require 'set'
 require 'uri'
 require 'rubygems'
 require 'active_support/core_ext'
+require 'json'
 
 require 'sugarcrm/environment'
 require 'sugarcrm/module_methods'

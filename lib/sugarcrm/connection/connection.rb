@@ -125,7 +125,7 @@ module SugarCRM; class Connection
     return @response.body if RESPONSE_IS_NOT_JSON.include? @request.method
     begin
       # Push it through the old meat grinder.
-      response_json = ActiveSupport::JSON.decode(@response.body)
+      response_json = JSON.parse(@response.body)
     rescue StandardError => e
       raise UnhandledResponse, @response.body
     end

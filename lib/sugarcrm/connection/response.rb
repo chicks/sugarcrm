@@ -17,9 +17,8 @@ module SugarCRM; class Response
         if SugarCRM.connection.debug?
           puts "Failed to process JSON:"
           pp json
-          raise e
         end
-        return json
+        raise e
       end
     end
   end
@@ -36,7 +35,7 @@ module SugarCRM; class Response
   # populated from the response
   def to_obj
     # If this is not a "entry_list" response, just return
-    return @response unless @response["entry_list"]
+    return @response unless @response && @response["entry_list"]
     
     objects = []
     @response["entry_list"].each do |object|
