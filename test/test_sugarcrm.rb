@@ -67,6 +67,7 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_instance_of Array, users
       users = SugarCRM::User.find(:all, :conditions => {:user_name => '= admin'})
       assert_instance_of Array, users
+      assert users.length == 1
       users = SugarCRM::User.find(:all, :conditions => {:user_name => '= invalid_user_123'})
       assert_instance_of Array, users
       assert users.length == 0
