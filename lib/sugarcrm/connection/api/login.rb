@@ -7,7 +7,7 @@ module SugarCRM; class Connection
         \"user_auth\": {
           \"user_name\": \"#{@user}\"\,
           \"password\": \"#{OpenSSL::Digest::MD5.new(@pass)}\"\,
-          \"version\": \"2\"\,
+          \"version\": \"2\"\
         },
         \"application\": \"\"
       }
