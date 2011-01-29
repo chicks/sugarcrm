@@ -158,8 +158,8 @@ module SugarCRM; class Base
       # in addition to allowing querying of large datasets while avoiding timeouts,
       # this implementation fixes the :limit - :offset bug so that it behaves correctly
       local_options = {}
-      [:offset, :limit, :order_by].each{|o|
-        local_options[o] = options[o] if options[o]
+      options.keys.each{|k|
+        local_options[k] = options[k]
       }
       local_options.delete(:offset) if local_options[:offset] == 0
       
