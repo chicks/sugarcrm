@@ -7,6 +7,9 @@ module SugarCRM; class Environment
   
   def initialize
     @config = {}
+    
+    default_config_path = File.join(File.dirname(__FILE__), 'config', 'config.yaml')
+    load_config default_config_path if File.exists? default_config_path
   end
   
   def load_config(path)
