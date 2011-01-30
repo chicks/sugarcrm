@@ -166,11 +166,11 @@ An example, accompanied by instructions, can be found in the `config/config.yaml
 
 2.  Require the gem with `require 'sugarcrm'`
 
-3.  * if your login credentials are stored in the `config/config.yaml` file, you can connect with `SugarCRM.connect!`
-    * if your login credentials are stored in a different config file, just call `SugarCRM::Environment.load_config` followed by the absolute path to your config file. This will log you in automatically
-    * if you don't have a configuration file, you can always call the basic `SugarCRM.connect` and give it the proper arguments (see documentation above)
+3.  * if your login credentials are stored in the `config/config.yaml` file, you have been automagically logged in already ;
+    * if your login credentials are stored in a different config file, just call `SugarCRM::Environment.load_config` followed by the absolute path to your config file. This will log you in automatically ;
+    * if you don't have a configuration file, you can still call the basic `SugarCRM.connect` and give it the proper arguments (see documentation above)
 
-4. Once connected, you have full access to the gem's funcitonality, e.g. `puts SugarCRM::Account.first.name`
+4. You now have full access to the gem's functionality, e.g. `puts SugarCRM::Account.first.name`
   
 == EXPANDING THE GEM
 
