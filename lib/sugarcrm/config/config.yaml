@@ -1,0 +1,10 @@
+# below is an example configuration file
+#
+# to create you own configuration file, simply copy and adapt the text below, removing the '#' in front of the key-value pairs
+#
+# you'll find an example of a configuration file (used for tests) in test/config_test.yaml
+#
+# config:
+#   base_url: http://127.0.0.1/sugarcrm # where your SugarCRM instance is located
+#   username: admin
+#   password: letmein
