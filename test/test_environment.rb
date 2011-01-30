@@ -28,6 +28,11 @@ class TestEnvironment < Test::Unit::TestCase
         assert_equal v, SugarCRM::Environment.config[k]
       }
     end
+    
+    should "log in to Sugar automatically if credentials are present in config file" do
+      SugarCRM::Environment.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
+      assert SugarCRM.connection.logged_in?
+    end
   end
   
 end

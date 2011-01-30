@@ -20,6 +20,7 @@ module SugarCRM; class Environment
         @config[k.to_sym] = v
       }
     end
+    SugarCRM::Base.establish_connection(@config[:base_url], @config[:username], @config[:password], {:load_environment => false}) if SugarCRM.connection.nil? && connection_info_loaded?
   end
   
   # load all the monkey patch files in the provided folder
@@ -34,6 +35,10 @@ module SugarCRM; class Environment
   end
   
   private
+  def connection_info_loaded?
+    @config[:base_url] && @config[:username] && @config[:password]
+  end
+  
   def validate_path(path)
     raise "Invalid path: #{path}" unless File.exists? path
   end

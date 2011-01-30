@@ -18,7 +18,8 @@ module SugarCRM; class Connection
   def initialize(url, user, pass, options={})
     @options  = {
       :debug => false,
-      :register_modules => true      
+      :register_modules => true,
+      :load_environment => true
     }.merge(options)
     @url      = URI.parse(url)
     @user     = user
@@ -28,7 +29,7 @@ module SugarCRM; class Connection
     resolve_url
     login!
     # make sure the environment singleton gets loaded
-    SugarCRM::Environment.instance
+    SugarCRM::Environment.instance if @options[:load_environment]
     self
   end
   
