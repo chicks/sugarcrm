@@ -27,7 +27,7 @@ module SugarCRM; class Base
     def establish_connection(url, user, pass, opts={})
       options = { 
         :debug  => false,
-        :register_modules => true,
+        :register_modules => true
       }.merge(opts)
       @debug  = options[:debug]
       @@connection = SugarCRM::Connection.new(url, user, pass, options)
