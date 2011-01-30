@@ -9,6 +9,13 @@ module SugarCRM; class Environment
     @config = {}
   end
   
+  def load_config(path)
+    config = YAML.load_file(path)
+    config["config"].each{|k,v|
+      @config[k.to_sym] = v
+    }
+  end
+  
   # load all the monkey patch files in the provided folder
   def monkey_patch_folder=(folder, dirstring=nil)
     path = File.expand_path(folder, dirstring)
