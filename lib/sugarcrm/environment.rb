@@ -9,6 +9,7 @@ module SugarCRM; class Environment
     @config = {}
     
     load_config File.join(File.dirname(__FILE__), 'config', 'config.yaml')
+    monkey_patch_folder = File.join(File.dirname(__FILE__), 'monkey_patches')
   end
   
   def load_config(path)

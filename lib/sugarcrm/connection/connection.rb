@@ -27,8 +27,8 @@ module SugarCRM; class Connection
     @response = ""
     resolve_url
     login!
-    # load the monkey patches in the predetermined folder
-    SugarCRM::Environment.monkey_patch_folder = File.join(File.dirname(__FILE__), '..', 'monkey_patches')
+    # make sure the environment singleton gets loaded
+    SugarCRM::Environment.instance
     self
   end
   
