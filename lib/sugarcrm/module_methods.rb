@@ -7,7 +7,7 @@ module SugarCRM
   def self.connection=(connection)
     @@connection = connection
   end
-  def self.connect(url, user, pass, options={})
+  def self.connect(url=SugarCRM::Environment.config[:base_url], user=SugarCRM::Environment.config[:username], pass=SugarCRM::Environment.config[:password], options={})
     SugarCRM::Base.establish_connection(url, user, pass, options)
   end
   class << self
