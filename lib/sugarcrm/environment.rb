@@ -3,7 +3,10 @@ require 'singleton'
 module SugarCRM; class Environment
   include Singleton
   
+  attr_reader :config
+  
   def initialize
+    @config = {}
   end
   
   # load all the monkey patch files in the provided folder
