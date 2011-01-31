@@ -12,6 +12,10 @@ module SugarCRM; class Environment
     extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
   end
   
+  def connection_info_loaded?
+    @config[:base_url] && @config[:username] && @config[:password]
+  end
+  
   def load_config(path)
     validate_path path
     config = YAML.load_file(path)
@@ -35,10 +39,6 @@ module SugarCRM; class Environment
   end
   
   private
-  def connection_info_loaded?
-    @config[:base_url] && @config[:username] && @config[:password]
-  end
-  
   def validate_path(path)
     raise "Invalid path: #{path}" unless File.exists? path
   end
