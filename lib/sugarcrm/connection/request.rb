@@ -8,14 +8,14 @@ module SugarCRM; class Request
   def initialize(url, method, json, debug=false)
     @url      = url
     @method   = method
-    @json     = json
+    @json     = CGI.escape(json)
     @request  = 'method=' << @method.to_s
     @request << '&input_type=JSON'
     @request << '&response_type=JSON'
     @request << '&rest_data=' << @json
     if debug
       puts "#{method}: Request:"
-      puts @request 
+      puts json 
       puts "\n"
     end
     self
@@ -26,6 +26,6 @@ module SugarCRM; class Request
   end
   
   def to_s
-    URI.escape(@request)
+    @request
   end
 end; end

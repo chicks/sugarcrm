@@ -1,6 +1,7 @@
 require 'net/https'
 require 'pp'
 require 'set'
+require 'cgi'
 require 'uri'
 require 'rubygems'
 require 'active_support/core_ext'

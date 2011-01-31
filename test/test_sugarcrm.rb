@@ -52,11 +52,9 @@ class TestSugarCRM < Test::Unit::TestCase
     end
 
     should "not save a record that is missing required attributes" do
-      SugarCRM.connection.debug = false
       u = SugarCRM::User.new
       u.last_name = "Test"
       assert !u.save
-      SugarCRM.connection.debug = false
       assert_raise SugarCRM::InvalidRecord do
         u.save!
       end
@@ -73,7 +71,6 @@ class TestSugarCRM < Test::Unit::TestCase
     end
 
     should "create, modify, and delete a record" do
-      #SugarCRM.connection.debug = true
       u = SugarCRM::User.new
       u.email1 = "abc@abc.com"
       u.first_name = "Test"
@@ -85,10 +82,10 @@ class TestSugarCRM < Test::Unit::TestCase
       assert u.save!
       assert !u.new?
       m = SugarCRM::User.find_by_first_name_and_last_name("Test", "User")
+      assert m.user_name != "admin"
       m.title = "Test User"
       assert m.save!
-      assert m.delete
-      #SugarCRM.connection.debug = false
+      #assert m.delete
     end
     
     should "support finding first instance (sorted by attribute)" do
@@ -236,11 +233,11 @@ class TestSugarCRM < Test::Unit::TestCase
       c.delete
     end
     
-#    should "support saving of records with special characters in them" do
-#      a = SugarCRM::Account.new
-#      a.name = "COHEN, WEISS & SIMON LLP"
-#      assert a.save!
-#    end
+    should "support saving of records with special characters in them" do
+      a = SugarCRM::Account.new
+      a.name = "COHEN, WEISS & SIMON LLP"
+      assert a.save!
+    end
 
     should "load monkey patches" do
       SugarCRM::Environment.monkey_patch_folder = File.join(File.dirname(__FILE__), 'monkey_patch_test')
