@@ -1,15 +1,15 @@
 module SugarCRM; class Connection
   # Logs the user into the Sugar application.
   def login
-    connect! unless connected?
+    connect! unless connected?    
     json = <<-EOF
       {
-        \"user_auth\": {
-          \"user_name\": \"#{@user}\"\,
-          \"password\": \"#{OpenSSL::Digest::MD5.new(@pass)}\"\,
-          \"version\": \"2\"\
+        "user_auth": {
+          "user_name": "#{@user}",
+           "password": "#{OpenSSL::Digest::MD5.new(@pass)}",
+            "version": 2
         },
-        \"application\": \"\"
+        "application": "sugarcrm_rubygem"
       }
     EOF
     json.gsub!(/^\s{6}/,'')
