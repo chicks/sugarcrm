@@ -29,7 +29,9 @@ module SugarCRM; class Connection
     resolve_url
     login!
     # make sure the environment singleton gets loaded
-    SugarCRM::Environment.instance if @options[:load_environment]
+    if @options[:load_environment] # prevent loops when Environment tries to log in automatically
+      SugarCRM::Environment.update_config({:base_url => url, :username => user, :password => pass}) 
+    end
     self
   end
   

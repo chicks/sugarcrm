@@ -28,6 +28,14 @@ module SugarCRM; class Environment
         @config[k.to_sym] = v
       }
     end
+    @config
+  end
+  
+  def update_config(params)
+    params.each{|k,v|
+      @config[k.to_sym] = v
+    }
+    @config
   end
   
   # load all the monkey patch extension files in the provided folder

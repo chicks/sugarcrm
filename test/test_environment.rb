@@ -33,6 +33,13 @@ class TestEnvironment < Test::Unit::TestCase
       SugarCRM::Environment.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
       assert SugarCRM.connection.logged_in?
     end
+    
+    should "update the login credentials on connection" do
+      SugarCRM.connect!(URL, USER, PASS)
+      {:base_url => URL, :username => USER, :password => PASS}.each{|k,v|
+        assert_equal v, SugarCRM::Environment.config[k]
+      }
+    end
   end
   
 end
