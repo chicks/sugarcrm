@@ -9,7 +9,7 @@ module SugarCRM; class Environment
     @config = {}
     
     # see README for reasoning behind the priorization
-    ['/etc/sugarcrm.yaml', File.expand_path('~/.sugarcrm.yaml'), File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')].each{|path|
+    ['/etc/sugarcrm.yaml', File.join(ENV['USERPROFILE'], 'sugarcrm.yaml'), File.expand_path('~/.sugarcrm.yaml'), File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')].each{|path|
       load_config path if File.exists? path
     }
     extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
