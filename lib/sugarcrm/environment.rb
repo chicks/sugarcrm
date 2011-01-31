@@ -9,7 +9,7 @@ module SugarCRM; class Environment
     @config = {}
     
     load_config File.join(File.dirname(__FILE__), 'config', 'config.yaml')
-    monkey_patch_folder = File.join(File.dirname(__FILE__), 'monkey_patches')
+    extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
   end
   
   def load_config(path)
@@ -23,8 +23,8 @@ module SugarCRM; class Environment
     SugarCRM::Base.establish_connection(@config[:base_url], @config[:username], @config[:password], {:load_environment => false}) if SugarCRM.connection.nil? && connection_info_loaded?
   end
   
-  # load all the monkey patch files in the provided folder
-  def monkey_patch_folder=(folder, dirstring=nil)
+  # load all the monkey patch extension files in the provided folder
+  def extensions_folder=(folder, dirstring=nil)
     validate_path folder
     path = File.expand_path(folder, dirstring)
     Dir[File.join(path, '**', '*.rb').to_s].each { |f| load(f) }

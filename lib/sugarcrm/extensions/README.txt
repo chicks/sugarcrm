@@ -1,4 +1,4 @@
-# Include your monkey patch files here, as simple *.rb files. Here is an example of a monkey patch:
+# Include your extension files here, as simple *.rb files. Here is an example of an extension:
 
 SugarCRM::Contact.class_eval do
   def self.ten_oldest

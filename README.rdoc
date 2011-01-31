@@ -174,11 +174,11 @@ An example, accompanied by instructions, can be found in the `config/config.yaml
   
 == EXPANDING THE GEM
 
-If you want to expand the gem's capabilities with monkey patches (e.g. to add methods specific to your environment), you can either
+If you want to expand the gem's capabilities (e.g. to add methods specific to your environment), you can either
 
-* drop your `*.rb` files in `lib/sugarcrm/monkey_patches/` (see the README in that folder)
+* drop your `*.rb` files in `lib/sugarcrm/extensions/` (see the README in that folder)
 
-* drop your `*.rb` files in any other folder and call `SugarCRM::Environment.monkey_patch_folder = ` followed by the absolute path to the folder containing your monkey patches
+* drop your `*.rb` files in any other folder and call `SugarCRM::Environment.extensions_folder = ` followed by the absolute path to the folder containing your extensions
 
 == REQUIREMENTS:
 

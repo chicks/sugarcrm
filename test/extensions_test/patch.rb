@@ -1,9 +1,9 @@
 SugarCRM::Contact.class_eval do
-  def self.is_monkey_patched?
+  def self.is_extended?
     true
   end
   
-  def is_monkey_patched?
+  def is_extended?
     true
   end
 end
