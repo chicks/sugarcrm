@@ -8,7 +8,7 @@ module SugarCRM; class Environment
   def initialize
     @config = {}
     
-    load_config File.join(File.dirname(__FILE__), 'config', 'config.yaml')
+    load_config File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')
     extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
   end
   

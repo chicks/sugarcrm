@@ -147,7 +147,7 @@ Instead of SugarCRM.connection.get_entry("Users", "1") you could use SugarCRM::U
 
 If you want to use a configuration file instead of always specifying the url, username, and password to connect to SugarCRM, you can either
 
-* add your credentials to `config/config.yaml` (will need to be copied each time you upgrade or reinstall the gem)
+* add your credentials to `config/sugarcrm.yaml` (will need to be copied each time you upgrade or reinstall the gem)
 
 * add your credentials to a YAML file and call `SugarCRM::Environment.load_config` followed by the absolute path to your configuration file
 
@@ -158,7 +158,7 @@ Your configuration should be in YAML format:
       username: admin
       password: letmein
 
-An example, accompanied by instructions, can be found in the `config/config.yaml` file. In addition, a working example used for testing can be found in `test/config_test.yaml`
+An example, accompanied by instructions, can be found in the `config/sugarcrm.yaml` file. In addition, a working example used for testing can be found in `test/config_test.yaml`
 
 == USING THE GEM IN A CONSOLE
 
@@ -166,7 +166,7 @@ An example, accompanied by instructions, can be found in the `config/config.yaml
 
 2.  Require the gem with `require 'sugarcrm'`
 
-3.  * if your login credentials are stored in the `config/config.yaml` file, you have been automagically logged in already ;
+3.  * if your login credentials are stored in the `config/sugarcrm.yaml` file, you have been automagically logged in already ;
     * if your login credentials are stored in a different config file, just call `SugarCRM::Environment.load_config` followed by the absolute path to your config file. This will log you in automatically ;
     * if you don't have a configuration file, you can still call the basic `SugarCRM.connect` and give it the proper arguments (see documentation above)
 
