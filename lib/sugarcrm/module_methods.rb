@@ -31,9 +31,16 @@ module SugarCRM
   # This will trigger module loading,
   # and we can then attempt to return the requested class automagically
   def self.const_missing(sym)
-    # initialize environment (will log user in if credentials present in config file)
-    SugarCRM::Environment.instance
-    # try and return the requested module
-    SugarCRM.const_get(sym)
+    # if we're logged in, modules should be loaded and available
+    if SugarCRM.connection && SugarCRM.connection.logged_in?
+      super
+    else
+      # here, we initialize the environment (which happens on any method call, if singleton hasn't already been initialized)
+      # initializing the environment will log user in if credentials present in config file
+      # if it isn't possible to log in and access modules, pass the exception on
+      super unless SugarCRM::Environment.connection_info_loaded?
+      # try and return the requested module
+      SugarCRM.const_get(sym)
+    end
   end
 end
