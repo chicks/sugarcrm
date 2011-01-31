@@ -86,7 +86,7 @@ class TestSugarCRM < Test::Unit::TestCase
       assert m.user_name != "admin"
       m.title = "Test User"
       assert m.save!
-      #assert m.delete
+      assert m.delete
     end
     
     should "support finding first instance (sorted by attribute)" do
@@ -124,7 +124,7 @@ class TestSugarCRM < Test::Unit::TestCase
     
     should "return an array of records when sent #find([id1, id2, id3])" do
       users = SugarCRM::User.find(["seed_sarah_id", 1])
-      assert_equal "Administrator", users.last.title
+      assert_equal "admin", users.last.user_name
     end
     
     # test Base#find_by_sql edge case
@@ -238,6 +238,7 @@ class TestSugarCRM < Test::Unit::TestCase
       a = SugarCRM::Account.new
       a.name = "COHEN, WEISS & SIMON LLP"
       assert a.save!
+      assert a.delete
     end
 
     should "load monkey patches" do
