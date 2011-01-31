@@ -147,9 +147,12 @@ Instead of SugarCRM.connection.get_entry("Users", "1") you could use SugarCRM::U
 
 If you want to use a configuration file instead of always specifying the url, username, and password to connect to SugarCRM, you can either
 
+* add your credentials to `/etc/sugarcrm.yaml`
+* add your credentials to `~/.sugarcrm.yaml`
 * add your credentials to `config/sugarcrm.yaml` (will need to be copied each time you upgrade or reinstall the gem)
-
 * add your credentials to a YAML file and call `SugarCRM::Environment.load_config` followed by the absolute path to your configuration file
+
+If there are several configuration files, they are loaded sequentially in the order above and will overwrite previous values (if present). This allows you to (e.g.) have a config file in `/etc/sugarcrm.yaml` with system-wide configuration information (such as the url where SugarCRM is located) and/or defaults. Each developer/user can then have his personal configuration file in `~/.sugarcrm.yaml` with his own username and password. A developer could also specify a different location for the SugarCRM instance (e.g. a local testing instance) in his configuration file, which will take precedence over the value in `/etc/sugarcrm.yaml`.
 
 Your configuration should be in YAML format:
 

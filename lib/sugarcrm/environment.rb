@@ -8,8 +8,12 @@ module SugarCRM; class Environment
   def initialize
     @config = {}
     
-    load_config File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')
+    # see README for reasoning behind the priorization
+    ['/etc/sugarcrm.yaml', File.expand_path('~/.sugarcrm.yaml'), File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')].each{|path|
+      load_config path if File.exists? path
+    }
     extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
+    SugarCRM::Base.establish_connection(@config[:base_url], @config[:username], @config[:password], {:load_environment => false}) if SugarCRM.connection.nil? && connection_info_loaded?
   end
   
   def connection_info_loaded?
@@ -24,7 +28,6 @@ module SugarCRM; class Environment
         @config[k.to_sym] = v
       }
     end
-    SugarCRM::Base.establish_connection(@config[:base_url], @config[:username], @config[:password], {:load_environment => false}) if SugarCRM.connection.nil? && connection_info_loaded?
   end
   
   # load all the monkey patch extension files in the provided folder
