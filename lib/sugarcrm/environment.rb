@@ -9,7 +9,7 @@ module SugarCRM; class Environment
     @config = {}
     
     # see README for reasoning behind the priorization
-    ['/etc/sugarcrm.yaml', File.join(ENV['USERPROFILE'], 'sugarcrm.yaml'), File.expand_path('~/.sugarcrm.yaml'), File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')].each{|path|
+    config_file_paths.each{|path|
       load_config path if File.exists? path
     }
     extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
@@ -50,6 +50,13 @@ module SugarCRM; class Environment
   end
   
   private
+  def config_file_paths
+    # see README for reasoning behind the priorization
+    paths = ['/etc/sugarcrm.yaml', File.expand_path('~/.sugarcrm.yaml'), File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')]
+    pathc.insert(1, File.join(ENV['USERPROFILE'], 'sugarcrm.yaml')) if ENV['USERPROFILE']
+    paths
+  end
+  
   def validate_path(path)
     raise "Invalid path: #{path}" unless File.exists? path
   end
