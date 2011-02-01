@@ -53,7 +53,7 @@ module SugarCRM; class Environment
   def config_file_paths
     # see README for reasoning behind the priorization
     paths = ['/etc/sugarcrm.yaml', File.expand_path('~/.sugarcrm.yaml'), File.join(File.dirname(__FILE__), 'config', 'sugarcrm.yaml')]
-    pathc.insert(1, File.join(ENV['USERPROFILE'], 'sugarcrm.yaml')) if ENV['USERPROFILE']
+    paths.insert(1, File.join(ENV['USERPROFILE'], 'sugarcrm.yaml')) if ENV['USERPROFILE']
     paths
   end
   
