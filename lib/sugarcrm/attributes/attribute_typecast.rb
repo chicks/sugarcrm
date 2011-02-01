@@ -23,12 +23,20 @@ module SugarCRM; module AttributeTypeCast
         @attributes[name] = (value == "1")
       when :datetime, :datetimecombo
         begin
-          @attributes[name] = DateTime.parse(value)
+          unless value.nil? || value == ''
+            @attributes[name] = DateTime.parse(value)
+          else
+            @attributes[name] = nil
+          end
         rescue
           @attributes[name] = value
         end
       when :int
-        @attributes[name] = value.to_i
+        unless value.nil? || value == ''
+          @attributes[name] = value.to_i
+        else
+          @attributes[name] = nil
+        end
       end
     end
     @attributes
