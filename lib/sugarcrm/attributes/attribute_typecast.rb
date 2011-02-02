@@ -18,25 +18,24 @@ module SugarCRM; module AttributeTypeCast
       # skip primary key columns
       next if name == "id"
       attr_type = attr_type_for(name)
+      
+      # empty attributes should stay empty (e.g. an empty int field shouldn't be typecast as 0)
+      if [:datetime, :datetimecombo, :int].include? attr_type && (value.nil? || value == '')
+        @attributes[name] = nil
+        next
+      end
+      
       case attr_type
       when :bool
         @attributes[name] = (value == "1")
       when :datetime, :datetimecombo
         begin
-          unless value.nil? || value == ''
-            @attributes[name] = DateTime.parse(value)
-          else
-            @attributes[name] = nil
-          end
+          @attributes[name] = DateTime.parse(value)
         rescue
           @attributes[name] = value
         end
       when :int
-        unless value.nil? || value == ''
-          @attributes[name] = value.to_i
-        else
-          @attributes[name] = nil
-        end
+        @attributes[name] = value.to_i
       end
     end
     @attributes
