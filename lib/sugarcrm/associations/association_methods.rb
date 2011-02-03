@@ -51,7 +51,6 @@ module SugarCRM; module AssociationMethods
   alias :relate! :associate!
     
   # Removes a relationship between the current object and the target object
-  # TODO: Write a test for this.
   def disassociate!(target)
     associate!(target,{:delete => 1})
   end

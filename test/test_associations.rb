@@ -49,6 +49,18 @@ class TestAssociations < Test::Unit::TestCase
       c.delete
     end
     
+    should "destroy relationships with disassociate!" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      a.associate!(c)
+      nb_contacts = a.contacts.size
+      a.disassociate!(c)
+      assert_equal nb_contacts - 1, a.contacts.size
+      
+      c.delete
+    end
+    
     should "update association cache on associate! only if association changes" do
       a = SugarCRM::Account.first
       c = SugarCRM::Contact.create(:last_name => 'Doe')
