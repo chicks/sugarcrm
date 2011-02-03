@@ -37,5 +37,57 @@ class TestAssociations < Test::Unit::TestCase
       a = SugarCRM::Account.first
       assert_instance_of SugarCRM::User, a.created_by_link.first
     end
+    
+    should "update association cache on associate! only if association changes" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      nb_contacts = a.contacts.size
+      a.associate!(c)
+      assert_equal nb_contacts + 1, a.contacts.size
+      a.associate!(c)
+      assert_equal nb_contacts + 1, a.contacts.size # should not change: already associated
+      
+      c.delete
+    end
+    
+    should "update association cache on << only if association changes" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      nb_contacts = a.contacts.size
+      a.contacts  << c
+      assert_equal nb_contacts + 1, a.contacts.size
+      a.contacts  << c
+      assert_equal nb_contacts + 1, a.contacts.size # should not change: already associated
+      
+      c.delete
+    end
+    
+    should "update association cache for both sides of the relationship when calling associate!" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      nb_contacts = a.contacts.size
+      nb_accounts = c.accounts.size
+      a.associate!(c)
+      assert_equal nb_contacts + 1, a.contacts.size
+      assert_equal nb_accounts + 1, c.accounts.size
+      
+      c.delete
+    end
+    
+    should "update association cache for both sides of the relationship when calling <<" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      nb_contacts = a.contacts.size
+      nb_accounts = c.accounts.size
+      a.contacts  << c
+      assert_equal nb_contacts + 1, a.contacts.size
+      assert_equal nb_accounts + 1, c.accounts.size
+      
+      c.delete
+    end
   end
 end
