@@ -38,6 +38,17 @@ class TestAssociations < Test::Unit::TestCase
       assert_instance_of SugarCRM::User, a.created_by_link.first
     end
     
+    should "create relationships with associate!" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      nb_contacts = a.contacts.size
+      a.associate!(c)
+      assert_equal nb_contacts + 1, a.contacts.size
+      
+      c.delete
+    end
+    
     should "update association cache on associate! only if association changes" do
       a = SugarCRM::Account.first
       c = SugarCRM::Contact.create(:last_name => 'Doe')
