@@ -65,6 +65,18 @@ class TestAssociations < Test::Unit::TestCase
       c.delete
     end
     
+    should "not destroy a relationship if associate! is called with {:delete => 0}" do
+      a = SugarCRM::Account.first
+      c = SugarCRM::Contact.create(:last_name => 'Doe')
+      
+      a.associate!(c)
+      nb_contacts = a.contacts.size
+      a.associate!(c, {:delete => 0})
+      assert_equal nb_contacts, a.contacts.size
+      
+      c.delete
+    end
+    
     should "update association cache on associate! only if association changes" do
       a = SugarCRM::Account.first
       c = SugarCRM::Contact.create(:last_name => 'Doe')
