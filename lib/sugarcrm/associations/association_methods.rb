@@ -38,7 +38,7 @@ module SugarCRM; module AssociationMethods
         "Couldn't associate #{self.class._module.name}: #{self.id} -> #{t}: #{t.id}!" 
       end
       # We need to update the association cache for any changes we make.
-      if opts[:delete]
+      if opts[:delete] == 1
         update_association_cache_for(association.link_field, t, :delete)
         t.update_association_cache_for(association.link_field, self, :delete)
       else
