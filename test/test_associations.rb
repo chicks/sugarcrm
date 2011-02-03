@@ -44,7 +44,9 @@ class TestAssociations < Test::Unit::TestCase
       
       nb_contacts = a.contacts.size
       a.associate!(c)
-      assert_equal nb_contacts + 1, a.contacts.size
+      assert_equal nb_contacts + 1, a.contacts.size # test association_cache is updated
+      
+      assert_equal nb_contacts + 1, SugarCRM::Account.first.contacts.size # test relationship is created in Sugar
       
       c.delete
     end
@@ -56,7 +58,9 @@ class TestAssociations < Test::Unit::TestCase
       a.associate!(c)
       nb_contacts = a.contacts.size
       a.disassociate!(c)
-      assert_equal nb_contacts - 1, a.contacts.size
+      assert_equal nb_contacts - 1, a.contacts.size # test association_cache is updated
+      
+      assert_equal nb_contacts - 1, SugarCRM::Account.first.contacts.size # test relationship is destroyed in Sugar
       
       c.delete
     end
