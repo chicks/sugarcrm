@@ -9,6 +9,6 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{6}/,'')
-    send!(:get_note_attachment, json)
+    send!(:get_note_attachment, json)["note_attachment"]
   end
 end; end

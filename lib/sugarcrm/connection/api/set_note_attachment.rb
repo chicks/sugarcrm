@@ -1,3 +1,25 @@
 module SugarCRM; class Connection
-  # to be implemented
+  # Creates or updates an attachment on a note
+  def set_note_attachment(id, filename, file, opts={})
+    options = { 
+      :module_id => '', 
+      :module_name => '' 
+    }.merge! opts
+    
+    login! unless logged_in?
+    json = <<-EOF
+      {
+        "session": "#{@session}",
+           "note": {
+              "id": "#{id}",
+              "filename": "#{filename}",
+              "file": "#{Base64.encode64(file)}",
+              "related_module_id": "#{options[:module_id]}",
+              "related_module_name": "#{options[:module_name]}" 
+           }
+      }
+    EOF
+    json.gsub!(/^\s{6}/,'')
+    send!(:set_note_attachment, json)
+  end
 end; end
