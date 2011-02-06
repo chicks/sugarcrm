@@ -55,7 +55,7 @@ class TestAssociations < Test::Unit::TestCase
       
       assert_equal nb_contacts + 1, SugarCRM::Account.first.contacts.size # test relationship is created in Sugar
       
-      c.delete
+      assert c.delete
     end
     
     should "destroy relationships with disassociate!" do
@@ -69,7 +69,7 @@ class TestAssociations < Test::Unit::TestCase
       
       assert_equal nb_contacts - 1, SugarCRM::Account.first.contacts.size # test relationship is destroyed in Sugar
       
-      c.delete
+      assert c.delete
     end
     
     should "not destroy a relationship if associate! is called with {:delete => 0}" do
@@ -81,7 +81,7 @@ class TestAssociations < Test::Unit::TestCase
       a.associate!(c, {:delete => 0})
       assert_equal nb_contacts, a.contacts.size
       
-      c.delete
+      assert c.delete
     end
     
     should "update association cache on associate! only if association changes" do
@@ -94,7 +94,7 @@ class TestAssociations < Test::Unit::TestCase
       a.associate!(c)
       assert_equal nb_contacts + 1, a.contacts.size # should not change: already associated
       
-      c.delete
+      assert c.delete
     end
     
     should "update association cache on << only if association changes" do
@@ -107,7 +107,7 @@ class TestAssociations < Test::Unit::TestCase
       a.contacts  << c
       assert_equal nb_contacts + 1, a.contacts.size # should not change: already associated
       
-      c.delete
+      assert c.delete
     end
     
     should "update association cache for both sides of the relationship when calling associate!" do
@@ -120,7 +120,7 @@ class TestAssociations < Test::Unit::TestCase
       assert_equal nb_contacts + 1, a.contacts.size
       assert_equal nb_accounts + 1, c.accounts.size
       
-      c.delete
+      assert c.delete
     end
     
     should "update association cache for both sides of the relationship when calling <<" do
@@ -133,7 +133,7 @@ class TestAssociations < Test::Unit::TestCase
       assert_equal nb_contacts + 1, a.contacts.size
       assert_equal nb_accounts + 1, c.accounts.size
       
-      c.delete
+      assert c.delete
     end
   end
 end

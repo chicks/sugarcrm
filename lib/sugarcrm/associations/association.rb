@@ -1,21 +1,28 @@
 module SugarCRM
-  # Represents an association and it's metadata
+  
+  # Associations are middlemen between the object that holds the association, known as the @owner, 
+  # and the actual associated object, known as the @target. The cardinality of the association is 
+  # available in @cardinality
   class Association    
     attr :owner, true
     attr :target, true
     attr :link_field, true
+    attr :relationship, true
     attr :attributes, true 
-    attr :proxy_methods, true 
+    attr :proxy_methods, true
+    attr :cardinality, true
     
-    # TODO: Describe this.
+    # Creates a new instance of an Association
     def initialize(owner,link_field,opts={})
       @options = { :define_methods? => true }.merge! opts
       @owner = owner
       check_valid_owner
       @link_field = link_field
       @attributes = owner.link_fields[link_field]
+      @relationship = relationship_for(@attributes["relationship"])
       @target = resolve_target
       @proxy_methods = define_methods if @options[:define_methods?]
+      @cardinality = resolve_cardinality
       self
     end
     
@@ -44,7 +51,9 @@ module SugarCRM
     end
     
     def to_s
-      "#<SugarCRM::Association @proxy_methods=[#{@proxy_methods.join(", ")}], @link_field=\"#{@link_field}\", @target=#{@target}, @owner=#{@owner.class}>"
+      "#<SugarCRM::Association @proxy_methods=[#{@proxy_methods.join(", ")}], " +
+      "@link_field=\"#{@link_field}\", @target=#{@target}, @owner=#{@owner.class}, " +
+      "@cardinality=#{@cardinality}>"
     end
     
     protected
@@ -55,7 +64,6 @@ module SugarCRM
     end
     
     # Attempts to determine the class of the target in the association
-    # TODO: Write tests for this.
     def resolve_target
       # Use the link_field name first
       klass = @link_field.singularize.camelize
@@ -65,9 +73,9 @@ module SugarCRM
         module_name = SugarCRM::Module.find(@attributes["module"])
         return "SugarCRM::#{module_name.klass}".constantize if SugarCRM.const_defined? module_name.klass
       end
-      # Use the link_field attribute "relationship"
+      # Use the "relationship" target
       if @attributes["relationship"].length > 0
-        klass = humanized_link_name(@attributes["relationship"]).singularize.camelize
+        klass = @relationship[:target][:name].singularize.camelize
         return "SugarCRM::#{klass}".constantize if SugarCRM.const_defined? klass
       end
       false
@@ -79,19 +87,18 @@ module SugarCRM
     # method using the full link_field name.
     def define_methods
       methods = []
-      pretty_name = humanized_link_name(@link_field)
+      pretty_name = @relationship[:target][:name]
       methods << define_method(@link_field)
-      if pretty_name != @link_field
-        @owner.class.module_eval %Q?
-          alias :#{pretty_name} #{@link_field}
-        ?
-        methods << @link_field
-      end
+      methods << define_alias(pretty_name, @link_field) if pretty_name != @link_field
       methods
     end
     
     # Generates the association proxy method for related module
     def define_method(link_field)
+      raise ArgumentException, "argument cannot be nil" if link_field.nil?
+      if (@owner.respond_to? link_field.to_sym) && @owner.debug
+        warn "Warning: Overriding method: #{@owner.class}##{link_field}"
+      end
       @owner.class.module_eval %Q?
         def #{link_field}
           query_association :#{link_field}
@@ -100,14 +107,48 @@ module SugarCRM
       link_field
     end
     
-    # Return the name of the relationship excluding the owner part of the name.
-    # e.g. if a custom relationship is defined in Studio between Tasks and Documents,
-    # the link_field will be `tasks_documents` but a human would call the relationship `documents`
-    def humanized_link_name(link_field)
-      # the module name is used to function properly with modules containing '_' (e.g. a custom module abc_sale : custom modules need a prefix (abc here) so they will always have a '_' in their table name)
-      return link_field unless link_field.to_s =~ /((.*)_)?#{Regexp.quote(@owner.class._module.name.downcase)}(_(.*))?/
-      [$2, $4].compact.join('_')
+    # Defines a method alias.  Checks to see if a method is already defined.
+    def define_alias(alias_name, method_name)
+      @owner.class.module_eval %Q?
+        alias :#{alias_name} :#{method_name}
+      ?
+      alias_name
     end
+    
+    # This method breaks the relationship into parts and returns them
+    def relationship_for(relationship)
+      # We need to run both regexes, because the plurality of the @owner module name is 
+      # important
+      plural_regex   = /((.*)_)?(#{Regexp.quote(@owner.class._module.name.downcase)})(_(.*))?/
+      singular_regex = /((.*)_)?(#{Regexp.quote(@owner.class._module.name.downcase.singularize)})(_(.*))?/
+      # Break the loop if we match
+      [plural_regex, singular_regex].each {|r| break if relationship.match(r)}
+      # Assign sane values to things if we didnt match
+      o   = $3
+      o   = @owner.class._module.name.downcase if o.nil? || o.empty?
+      t   = [$2, $5].compact.join('_')
+      t   = @link_field if t.nil? || t.empty?
+      # Look up the cardinality
+      o_c, t_c = cardinality_for(o,t)
+      {:owner   => {:name => o, :cardinality => o_c},
+       :target  => {:name => t, :cardinality => t_c}}
+    end
+    
+    # Determines if the provided string is plural or singular
+    # Plurality == Cardinality
+    def cardinality_for(*args)
+      args.inject([]) {|results,arg|
+        result = :many 
+        result = :one if arg.singularize == arg
+        results << result        
+      }
+    end
+    
+    # TODO: Add Tests for This
+    def resolve_cardinality
+      "#{@relationship[:owner][:cardinality]}_to_#{@relationship[:target][:cardinality]}".to_sym
+    end
+    
   end
 end
 
