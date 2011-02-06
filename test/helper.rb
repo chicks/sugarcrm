@@ -13,6 +13,6 @@ class Test::Unit::TestCase
   PASS  = 'letmein' 
 
   def setup_connection
-    SugarCRM::Base.establish_connection(URL, USER, PASS, {:debug => false})
+    SugarCRM.connect(URL, USER, PASS, {:debug => false})
   end
 end
