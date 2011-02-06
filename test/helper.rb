@@ -8,7 +8,7 @@ require 'sugarcrm'
 
 class Test::Unit::TestCase
   # Replace these with your test instance
-  URL   = "http://localhost:8080/sugarcrm"
+  URL   = "http://127.0.0.1/sugarcrm"
   USER  = "admin"
   PASS  = 'letmein' 
 

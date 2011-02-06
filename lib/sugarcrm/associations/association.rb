@@ -146,7 +146,6 @@ module SugarCRM
       }
     end
     
-    # TODO: Add Tests for This
     def resolve_cardinality
       "#{@relationship[:owner][:cardinality]}_to_#{@relationship[:target][:cardinality]}".to_sym
     end

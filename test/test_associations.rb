@@ -8,6 +8,19 @@ class TestAssociations < Test::Unit::TestCase
       assert associations.proxy_methods.include? "email_addresses"
     end
   end
+  
+  context "A SugarCRM::Association class" do
+    should "compute relationship cardinality correctly" do
+      c = SugarCRM::Case.first
+      link_fields_hash = c.associations.classify{|i| i.link_field}
+      # TODO: test one_to_one cardinality by creating custom module with custom relationship
+      # (no "official" one-to-one relationship exists in Sugar out of the box)
+      assert_equal :one_to_many, link_fields_hash['calls'].first.cardinality
+      assert_equal :many_to_one, link_fields_hash['accounts'].first.cardinality
+      assert_equal :many_to_many, link_fields_hash['contacts'].first.cardinality
+    end
+  end
+  
   context "A SugarCRM::Base instance" do
     should "return an email address when sent #email_addresses" do
       u = SugarCRM::User.find("seed_sarah_id")
