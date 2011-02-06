@@ -6,13 +6,7 @@ REST Bindings for SugarCRM!
 
 == SUMMARY: 
 
-RubyGem for interacting with SugarCRM via REST.  
-
-== Description:
-
-A less clunky way to interact with SugarCRM via REST.
-
-Instead of SugarCRM.connection.get_entry("Users", "1") you could use SugarCRM::User.find(1).  There is support for collections à la SugarCRM::User.find(1).email_addresses, or SugarCRM::Contact.first.meetings << new_meeting.  ActiveRecord style finders are in place, with limited support for conditions and joins. 
+A less clunky way to interact with SugarCRM via REST. 
 
 == FEATURES/PROBLEMS:
 
@@ -176,9 +170,9 @@ An example, accompanied by instructions, can be found in the `config/sugarcrm.ya
 
 4. You now have full access to the gem's functionality, e.g. `puts SugarCRM::Account.first.name`
   
-== EXPANDING THE GEM
+== EXTENDING THE GEM
 
-If you want to expand the gem's capabilities (e.g. to add methods specific to your environment), you can either
+If you want to extend the gem's capabilities (e.g. to add methods specific to your environment), you can either
 
 * drop your `*.rb` files in `lib/sugarcrm/extensions/` (see the README in that folder)
 

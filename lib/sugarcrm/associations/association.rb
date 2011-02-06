@@ -1,8 +1,10 @@
 module SugarCRM
   
   # Associations are middlemen between the object that holds the association, known as the @owner, 
-  # and the actual associated object, known as the @target. The cardinality of the association is 
-  # available in @cardinality
+  # and the actual associated object, known as the @target.  Methods are added to the @owner that 
+  # allow access to the association collection, and are held in @proxy_methods.  The cardinality 
+  # of the association is available in @cardinality, and the actual relationship details are held
+  # in @relationship.
   class Association    
     attr :owner, true
     attr :target, true
