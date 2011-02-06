@@ -41,6 +41,13 @@ module SugarCRM; class Base
       case args.first
         when :first
           find_initial(options)
+        when :last
+          begin
+            options[:order_by] = reverse_order_clause(options[:order_by])
+          rescue Exception => e
+            raise
+          end
+          find_initial(options)
         when :all
           Array.wrap(find_every(options)).compact
         else
@@ -52,6 +59,12 @@ module SugarCRM; class Base
     # same arguments to this method as you can to <tt>find(:first)</tt>.
     def first(*args)
       find(:first, *args)
+    end
+
+    # A convenience wrapper for <tt>find(:last, *args)</tt>. You can pass in all the
+    # same arguments to this method as you can to <tt>find(:last)</tt>.
+    def last(*args)
+      find(:last, *args)
     end
 
     # This is an alias for find(:all).  You can pass in all the same arguments to this method as you can
@@ -216,6 +229,18 @@ module SugarCRM; class Base
         conditions |= flatten_conditions_for(condition)
       end
       conditions.join(" AND ")
+    end
+    
+    # return the opposite of the provided order clause
+    # this is used for the :last find option
+    # in other words SugarCRM::Account.last(:order_by => "name")
+    # is equivalent to SugarCRM::Account.first(:order_by => "name DESC")
+    def reverse_order_clause(order)
+      raise "reversing multiple order clauses not supported" if order.split(',').size > 1
+      raise "order clause format not understood; expected 'column_name (ASC|DESC)?'" unless order =~ /^\s*(\S+)\s*(ASC|DESC)?\s*$/
+      column_name = $1
+      reversed_order = {'ASC' => 'DESC', 'DESC' => 'ASC'}[$2 || 'ASC']
+      return "#{column_name} #{reversed_order}"
     end
     
     # Enables dynamic finders like <tt>find_by_user_name(user_name)</tt> and <tt>find_by_user_name_and_password(user_name, password)</tt>

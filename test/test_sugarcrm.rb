@@ -96,6 +96,35 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_instance_of SugarCRM::Account, account
     end
     
+    should "support finding last instance (sorted by attribute)" do
+      expected_account = SugarCRM::Account.first({:order_by => 'name DESC'})
+      account = SugarCRM::Account.last({:order_by => 'name'})
+      assert_equal expected_account.id, account.id
+      
+      expected_account = SugarCRM::Account.first({:order_by => 'name DESC'})
+      account = SugarCRM::Account.last({:order_by => 'name ASC'})
+      assert_equal expected_account.id, account.id
+      
+      expected_account = SugarCRM::Account.first({:order_by => 'name ASC'})
+      account = SugarCRM::Account.last({:order_by => 'name DESC'})
+      assert_equal expected_account.id, account.id
+    end
+    
+    should "support finding last instance (most recently modified)" do
+      expected_account = SugarCRM::Account.first({:order_by => 'date_modified DESC'})
+      account = SugarCRM::Account.last
+      assert_equal expected_account.id, account.id
+    end
+    
+    should "raise a RuntimeError when searching for last instance with multiple order clauses" do
+      assert_raise(RuntimeError){ SugarCRM::Account.last({:order_by => 'name, id DESC'}) }
+    end
+    
+    should "raise a RuntimeError when searching for last instance if order clause has weird format" do
+      assert_raise(RuntimeError){ SugarCRM::Account.last({:order_by => 'name id DESC'}) }
+      assert_raise(RuntimeError){ SugarCRM::Account.last({:order_by => 'name DESC id'}) }
+    end
+    
     should "support searching based on conditions" do
       accounts = SugarCRM::Account.all({
         :conditions => { :billing_address_postalcode => ["> '70000'", "< '79999'" ] },
