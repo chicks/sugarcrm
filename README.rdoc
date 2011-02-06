@@ -180,7 +180,9 @@ If you want to extend the gem's capabilities (e.g. to add methods specific to yo
 
 == REQUIREMENTS:
 
-* >= activesupport 3.0.0 gem
+* activesupport >= 3.0.0
+* i18n
+* json
 
 == INSTALL:
 
