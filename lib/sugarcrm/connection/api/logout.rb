@@ -4,8 +4,8 @@ module SugarCRM; class Connection
     login! unless logged_in?
     json = <<-EOF
       {
-        \"user_auth\": {
-          \"session\": \"#{@session}\"
+        "user_auth": {
+          "session": "#{@session}"
         }
       }
     EOF

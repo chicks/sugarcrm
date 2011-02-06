@@ -12,11 +12,11 @@ module SugarCRM; class Connection
     
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"search_string\": \"#{search_string}\"\,
-        \"modules\": \"#{modules}\"\,
-        \"offset\": #{options[:offset]}\,
-        \"max_results\": #{options[:limit]}
+        "session": "#{@session}",
+        "search_string": "#{search_string}",
+        "modules": "#{modules}",
+        "offset": #{options[:offset]},
+        "max_results": #{options[:limit]}
       }
     EOF
     json.gsub!(/^\s{6}/,'')

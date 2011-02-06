@@ -9,11 +9,11 @@ module SugarCRM; class Connection
     
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"module_name\": \"#{module_name}\"\,
-        \"id\": \"#{id}\"\,
-        \"select_fields\": #{resolve_fields(module_name, options[:fields])}\,
-        \"link_name_to_fields_array\": #{options[:link_fields]}
+        "session": "#{@session}",
+        "module_name": "#{module_name}",
+        "id": "#{id}",
+        "select_fields": #{resolve_fields(module_name, options[:fields])},
+        "link_name_to_fields_array": #{options[:link_fields]}
       }
     EOF
         

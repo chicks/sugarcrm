@@ -9,11 +9,11 @@ module SugarCRM; class Connection
     
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"module_names\": \"#{module_names.to_json}\"\,
-        \"module_ids\": #{module_ids.to_json}\,
-        \"link_field_names\": #{link_field_names.to_json}\,
-        \"related_ids\": #{related_ids.to_json}   
+        "session": "#{@session}",
+        "module_names": "#{module_names.to_json}",
+        "module_ids": #{module_ids.to_json},
+        "link_field_names": #{link_field_names.to_json},
+        "related_ids": #{related_ids.to_json}   
       }
     EOF
     json.gsub!(/^\s{6}/,'')

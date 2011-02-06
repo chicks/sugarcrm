@@ -9,13 +9,13 @@ module SugarCRM; class Connection
     raise ArgumentError, "related_ids must be an Array" unless related_ids.class == Array
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"module_name\": \"#{module_name}\"\,
-        \"module_id\": \"#{module_id}\"\,
-        \"link_field_name\": \"#{link_field_name}\"\,
-        \"related_ids\": #{related_ids.to_json}\,
-        \"name_value_list\": #{options[:name_value_list].to_json}\,
-        \"delete\": #{options[:delete]}  
+        "session": "#{@session}",
+        "module_name": "#{module_name}",
+        "module_id": "#{module_id}",
+        "link_field_name": "#{link_field_name}",
+        "related_ids": #{related_ids.to_json},
+        "name_value_list": #{options[:name_value_list].to_json},
+        "delete": #{options[:delete]}  
       }
     EOF
     json.gsub!(/^\s{6}/,'')

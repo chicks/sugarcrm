@@ -6,9 +6,9 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"ids\": #{ids.to_json}\,
-        \"select_fields\": \"#{options[:select_fields].to_json}\"
+        "session": "#{@session}",
+        "ids": #{ids.to_json},
+        "select_fields": "#{options[:select_fields].to_json}"
       }
     EOF
     json.gsub!(/^\s{6}/,'')

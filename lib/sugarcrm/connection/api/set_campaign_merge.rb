@@ -4,9 +4,9 @@ module SugarCRM; class Connection
     login! unless logged_in?
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"targets\": #{targets.to_json}\,
-        \"campaign-id\": \"#{campaign_id}\"
+        "session": "#{@session}",
+        "targets": #{targets.to_json},
+        "campaign-id": "#{campaign_id}"
       }
     EOF
     json.gsub!(/^\s{6}/,'')

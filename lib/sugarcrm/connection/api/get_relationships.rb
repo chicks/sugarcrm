@@ -13,14 +13,14 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"module_name\": \"#{module_name}\"\,
-        \"module_id\": \"#{id}\"\,
-        \"link_field_name\": \"#{related_to.downcase}\"\,
-        \"related_module_query\": \"#{options[:query]}\"\,
-        \"related_fields\": #{resolve_related_fields(module_name, related_to)}\,
-        \"related_module_link_name_to_fields_array\": #{options[:link_fields].to_json}\,
-        \"deleted\": #{options[:deleted]}
+        "session": "#{@session}",
+        "module_name": "#{module_name}",
+        "module_id": "#{id}",
+        "link_field_name": "#{related_to.downcase}",
+        "related_module_query": "#{options[:query]}",
+        "related_fields": #{resolve_related_fields(module_name, related_to)},
+        "related_module_link_name_to_fields_array": #{options[:link_fields].to_json},
+        "deleted": #{options[:deleted]}
       }
     EOF
     json.gsub!(/^\s{6}/,'')

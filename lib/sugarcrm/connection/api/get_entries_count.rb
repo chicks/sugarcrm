@@ -8,10 +8,10 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        \"session\": \"#{@session}\"\,
-        \"module_name\": \"#{module_name}\"\,
-        \"query\": \"#{query}\"\,
-        \"deleted\": #{options[:deleted]}
+        "session": "#{@session}",
+        "module_name": "#{module_name}",
+        "query": "#{query}",
+        "deleted": #{options[:deleted]}
       }
     EOF
     json.gsub!(/^\s{6}/,'')
