@@ -5,7 +5,7 @@ module SugarCRM
     attr :target, true
     attr :link_field, true
     attr :attributes, true 
-    attr :methods, true 
+    attr :proxy_methods, true 
     
     # TODO: Describe this.
     def initialize(owner,link_field,opts={})
@@ -15,7 +15,7 @@ module SugarCRM
       @link_field = link_field
       @attributes = owner.link_fields[link_field]
       @target = resolve_target
-      @methods = define_methods if @options[:define_methods?]
+      @proxy_methods = define_methods if @options[:define_methods?]
       self
     end
     
@@ -26,6 +26,25 @@ module SugarCRM
       return true if attribute == link_field
       return true if methods.include? attribute
       false
+    end
+    
+    def ==(comparison_object)
+      comparison_object.instance_of?(self.class) &&
+      @target.class == comparison_object.class &&
+      @link_field == comparison_object.link_field
+    end
+    alias :eql? :==
+        
+    def hash
+      "#{@target.class}##{@link_field}".hash
+    end
+    
+    def inspect
+      self
+    end
+    
+    def to_s
+      "#<SugarCRM::Association @proxy_methods=[#{@proxy_methods.join(", ")}], @link_field=\"#{@link_field}\", @target=#{@target}, @owner=#{@owner.class}>"
     end
     
     protected
@@ -54,15 +73,6 @@ module SugarCRM
       false
     end
     
-    # Generates the association proxy method for related module
-    def define_method(link_field)
-      @owner.class.module_eval %Q?
-        def #{link_field}
-          query_association :#{link_field}
-        end
-      ?
-    end
-    
     # Defines methods for accessing the association target on the owner class.
     # If the link_field name includes the owner class name, it is stripped before 
     # creating the method.  If this occurs, we also create an alias to the stripped
@@ -80,6 +90,16 @@ module SugarCRM
       methods
     end
     
+    # Generates the association proxy method for related module
+    def define_method(link_field)
+      @owner.class.module_eval %Q?
+        def #{link_field}
+          query_association :#{link_field}
+        end
+      ?
+      link_field
+    end
+    
     # Return the name of the relationship excluding the owner part of the name.
     # e.g. if a custom relationship is defined in Studio between Tasks and Documents,
     # the link_field will be `tasks_documents` but a human would call the relationship `documents`
@@ -88,7 +108,6 @@ module SugarCRM
       return link_field unless link_field.to_s =~ /((.*)_)?#{Regexp.quote(@owner.class._module.name.downcase)}(_(.*))?/
       [$2, $4].compact.join('_')
     end
-    
   end
 end
 

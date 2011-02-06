@@ -18,7 +18,7 @@ class TestGetEntryList < Test::Unit::TestCase
         "Users",
         "users.deleted = 0"
       )
-      assert_equal "Administrator", users.first.last_name
+      assert_equal "admin", users.first.user_name
     end
     should "return an object when #get_entry_list" do
       assert_instance_of Array, @response

@@ -1,6 +1,13 @@
 require 'helper'
 
 class TestAssociations < Test::Unit::TestCase
+  context "A SugarCRM::Associations class" do
+    should "Return an array of Association objects when self#register(SugarCRM::User.new)" do
+      associations = SugarCRM::Associations.register(SugarCRM::User.new)
+      assert associations.include? "email_addresses"
+      assert associations.proxy_methods.include? "email_addresses"
+    end
+  end
   context "A SugarCRM::Base instance" do
     should "return an email address when sent #email_addresses" do
       u = SugarCRM::User.find("seed_sarah_id")

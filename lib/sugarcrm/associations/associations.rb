@@ -19,6 +19,13 @@ module SugarCRM
       self
     end
     
+    # Returns the proxy methods of all the associations in the collection
+    def proxy_methods
+      @associations.inject([]) { |pm,a|
+        pm = pm | a.proxy_methods
+      } 
+    end
+    
     # Looks up an association by object, link_field, or method.
     # Raises an exception if not found
     def find!(target)
@@ -32,26 +39,13 @@ module SugarCRM
     # Returns false if not found
     def find(association)
       begin
-        find!
+        find!(association)
       rescue InvalidAssociation
         false
       end
     end
-    
-    def inspect
-      self
-    end
-    
-    def to_s
-      methods = []
-      @associations.each do |a|
-        a.methods.each do |m|
-          methods << m
-        end
-      end
-      "[#{methods.join(', ')}]"
-    end
-      
+    alias :include? :find
+          
     # delegate undefined methods to the @collection array
     # E.g. contact.cases should behave like an array and allow `length`, `size`, `each`, etc.
     def method_missing(method_name, *args, &block)
