@@ -190,7 +190,7 @@ If you want to extend the gem's capabilities (e.g. to add methods specific to yo
 
 == TEST:
 
-Set the values in `test/helper.rb` to point to a SugarCRM instance with demo data
+Put your credentials in a file called `test/config.yaml` (which you will have to create). These must point to a SugarCRM test instance with demo data. See an example file in `test/config_test.yaml` (leave that file as is).
 
 == Note on Patches/Pull Requests
  
