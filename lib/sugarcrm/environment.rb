@@ -7,6 +7,7 @@ module SugarCRM; class Environment
   
   def initialize
     @config = {}
+    @version = nil
     
     # see README for reasoning behind the priorization
     config_file_paths.each{|path|
@@ -37,6 +38,11 @@ module SugarCRM; class Environment
       @config[k.to_sym] = v
     }
     @config
+  end
+  
+  # lazy load the SugarCRM version we're connecting to
+  def version
+    @version ||= SugarCRM.connection.get_server_info["version"]
   end
   
   # load all the monkey patch extension files in the provided folder

@@ -40,6 +40,10 @@ class TestEnvironment < Test::Unit::TestCase
         assert_equal config["config"][k], SugarCRM::Environment.config[k.to_sym]
       }
     end
+    
+    should "return the server version" do
+      assert_equal String, SugarCRM::Environment.version.class
+    end
   end
   
 end
