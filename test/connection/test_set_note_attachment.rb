@@ -3,7 +3,6 @@ require 'helper'
 class TestSetNoteAttachment < Test::Unit::TestCase
   context "A SugarCRM.connection" do
     should "Add an attachment to a Note" do
-      SugarCRM.connect(URL, USER, PASS, {:debug => false})
       n = SugarCRM::Note.new
       n.name = "A Test Note"
       assert n.save

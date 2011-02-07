@@ -3,7 +3,6 @@ require 'helper'
 class TestResponse < Test::Unit::TestCase
   context "A SugarCRM::Response instance" do
     setup do
-      @connection = SugarCRM::Connection.new(URL, USER, PASS)
       @json =  {"entry_list"=> [{
                 "name_value_list"=> {
                   "address_city" => {"name"=>"address_city", "value"=>""},

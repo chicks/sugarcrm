@@ -3,7 +3,6 @@ require 'helper'
 class TestGetEntry < Test::Unit::TestCase
   context "A SugarCRM.connection" do
     setup do
-      SugarCRM::Connection.new(URL, USER, PASS, {:debug => false })
       @response = SugarCRM.connection.get_entry(
         "Users",
         1,

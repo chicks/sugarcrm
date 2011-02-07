@@ -3,7 +3,6 @@ require 'helper'
 class TestSetRelationship < Test::Unit::TestCase
   context "A SugarCRM.connection" do
     should "add and remove a relationship when #set_relationship" do
-      SugarCRM.connect(URL, USER, PASS, {:debug => false})    
       meeting  = SugarCRM::Meeting.new
       meeting.date_start = DateTime.now
       meeting.duration_hours = 0.5

@@ -35,9 +35,9 @@ class TestEnvironment < Test::Unit::TestCase
     end
     
     should "update the login credentials on connection" do
-      SugarCRM.connect!(URL, USER, PASS)
-      {:base_url => URL, :username => USER, :password => PASS}.each{|k,v|
-        assert_equal v, SugarCRM::Environment.config[k]
+      config = YAML.load_file(File.join(File.dirname(__FILE__), 'config.yaml'))
+      ["base_url", "username", "password"].each{|k|
+        assert_equal config["config"][k], SugarCRM::Environment.config[k.to_sym]
       }
     end
   end

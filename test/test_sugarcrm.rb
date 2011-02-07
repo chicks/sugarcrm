@@ -3,13 +3,8 @@ require 'helper'
 class TestSugarCRM < Test::Unit::TestCase
   context "A SugarCRM::Base instance" do
     
-    should "establish a connection when SugarCRM#connect!" do
-      SugarCRM.connect!(URL, USER, PASS)
-      assert SugarCRM.connection.connected?
-    end
-    
     should "establish a connection when Base#establish_connection" do
-      SugarCRM::Base.establish_connection(URL, USER, PASS)
+      # Base#establish_connection was called automatically when loading config file containing connection params
       assert SugarCRM.connection.connected?
     end
   

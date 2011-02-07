@@ -28,6 +28,7 @@ module SugarCRM; class Environment
         @config[k.to_sym] = v
       }
     end
+    SugarCRM::Base.establish_connection(@config[:base_url], @config[:username], @config[:password], {:load_environment => false}) if SugarCRM.connection.nil? && connection_info_loaded?
     @config
   end
   
