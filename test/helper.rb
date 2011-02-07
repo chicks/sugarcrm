@@ -7,14 +7,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'sugarcrm'
 
 class Test::Unit::TestCase
+  # put your credentials into a YAML file in the test directory
+  # the format should be identical to the config_test.yaml found in the same directory
   SugarCRM::Environment.load_config(File.join(File.dirname(__FILE__),'config.yaml'))
-  
-#   # Replace these with your test instance
-#   URL   = "http://127.0.0.1/sugarcrm"
-#   USER  = "admin"
-#   PASS  = 'letmein' 
-# 
-#   def setup_connection
-#     SugarCRM.connect(URL, USER, PASS, {:debug => false})
-#   end
 end
