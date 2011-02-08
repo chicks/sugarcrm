@@ -111,6 +111,11 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal expected_account.id, account.id
     end
     
+    should "support returning only certain fields" do
+      user = SugarCRM::User.first(:fields => [:first_name, :department])
+      assert_instance_of SugarCRM::User, user
+    end
+    
     should "raise a RuntimeError when searching for last instance with multiple order clauses" do
       assert_raise(RuntimeError){ SugarCRM::Account.last({:order_by => 'name, id DESC'}) }
     end
