@@ -331,7 +331,7 @@ module SugarCRM; class Base
       attributes
     end
     
-    VALID_FIND_OPTIONS = [ :conditions, :include, :joins, :limit, :offset,
+    VALID_FIND_OPTIONS = [ :conditions, :deleted, :fields, :include, :joins, :limit, :link_fields, :offset,
                            :order_by, :select, :readonly, :group, :having, :from, :lock ]
 
     def validate_find_options(options) #:nodoc:
