@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require 'irb'
+
+begin
+  require 'sugarcrm'
+rescue LoadError
+  sugarcrm_path = File.expand_path('../../lib', __FILE__)
+  $:.unshift(sugarcrm_path)
+  require 'sugarcrm'
+  IRB.start
+end
