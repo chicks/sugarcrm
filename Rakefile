@@ -17,6 +17,7 @@ Jeweler::Tasks.new do |gem|
   gem.email = "carl.hicks@gmail.com"
   gem.homepage = "http://github.com/chicks/sugarcrm"
   gem.authors = ["Carl Hicks", "David Sulc"]
+  gem.executables = ['sugarcrm']
 end
 Jeweler::RubygemsDotOrgTasks.new
 

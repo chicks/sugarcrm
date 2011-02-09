@@ -5,8 +5,22 @@ require 'irb'
 begin
   require 'sugarcrm'
 rescue LoadError
-  sugarcrm_path = File.expand_path('../../lib', __FILE__)
+  sugarcrm_path = File.join(File.dirname(__FILE__), '..', 'lib')
   $:.unshift(sugarcrm_path)
   require 'sugarcrm'
-  IRB.start
 end
+puts <<-EOF
+Welcome to the SugarCRM Console!
+EOF
+
+IRB.start
+IRB.conf[:PROMPT][:SUGARCRM] = {
+  :PROMPT_C => "SugarCRM :%03n > ", 
+  :AUTO_INDENT=>true, 
+  :RETURN=>" => %s \n", 
+  :PROMPT_I=>"SugarCRM :%03n > ", 
+  :PROMPT_N=>"SugarCRM :%03n?> ", 
+  :PROMPT_S=>"SugarCRM :%03n%l> "
+}
+IRB.conf[:PROMPT_MODE] = :SUGARCRM
+

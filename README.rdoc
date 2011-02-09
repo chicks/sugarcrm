@@ -61,7 +61,7 @@ A less clunky way to interact with SugarCRM via REST.
   # Retrieve all Email Addresses on an Account
   SugarCRM::Account.find_by_name("JAB Funds Ltd.").contacts.each do |contact|
     contact.email_addresses.each do |email|
-      puts "#{email.email_address}" unless email.opt_out == true
+      puts "#{email.email_address}" unless email.opt_out
     end
   end
   
