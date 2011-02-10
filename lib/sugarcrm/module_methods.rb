@@ -23,7 +23,7 @@ module SugarCRM
   end
   
   def self.current_user
-    SugarCRM::User.find_by_user_name(connection.user)
+    SugarCRM::User.find_by_user_name(SugarCRM::Environment.config[:username])
   end
   
   # If a user tries to access a SugarCRM class before they're logged in,
