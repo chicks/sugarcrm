@@ -15,4 +15,12 @@ class TestModule < Test::Unit::TestCase
     #  assert_equal "accounts_cstm", SugarCRM::Account._module.custom_table_name
     #end
   end
+  
+  context "The SugarCRM class" do
+    should "return current user" do
+      current_user = SugarCRM.current_user
+      assert_instance_of SugarCRM::User, current_user
+      assert_equal SugarCRM::Environment.config[:username], current_user.user_name
+    end
+  end
 end
