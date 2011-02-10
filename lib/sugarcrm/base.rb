@@ -35,7 +35,7 @@ module SugarCRM; class Base
     
     def find(*args)
       options = args.extract_options!
-      options = {:order_by => 'date_modified'}.merge(options)
+      options = {:order_by => 'date_entered'}.merge(options)
       validate_find_options(options)
 
       case args.first

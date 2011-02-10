@@ -105,8 +105,8 @@ class TestSugarCRM < Test::Unit::TestCase
       assert_equal expected_account.id, account.id
     end
     
-    should "support finding last instance (most recently modified)" do
-      expected_account = SugarCRM::Account.first({:order_by => 'date_modified DESC'})
+    should "support finding last instance (last created)" do
+      expected_account = SugarCRM::Account.first({:order_by => 'date_entered DESC'})
       account = SugarCRM::Account.last
       assert_equal expected_account.id, account.id
     end
