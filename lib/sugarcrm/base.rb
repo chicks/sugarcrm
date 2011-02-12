@@ -24,10 +24,6 @@ module SugarCRM; class Base
   attr :errors, true
 
   class << self # Class methods
-    def establish_connection(url, user, pass, opts)
-      @@connection = SugarCRM::Connection.new(url, user, pass, opts)
-    end
-    
     def find(*args)
       options = args.extract_options!
       options = {:order_by => 'date_entered'}.merge(options)
