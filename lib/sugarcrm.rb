@@ -9,6 +9,7 @@ require 'active_support/core_ext'
 require 'json'
 
 require 'sugarcrm/environment'
+require 'sugarcrm/session'
 require 'sugarcrm/module_methods'
 require 'sugarcrm/connection'
 require 'sugarcrm/exceptions'

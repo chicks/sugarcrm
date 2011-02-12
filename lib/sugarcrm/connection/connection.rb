@@ -47,7 +47,6 @@ module SugarCRM; class Connection
     raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
     SugarCRM.connection = self
     SugarCRM::Base.connection = self
-    Module.register_all if @options[:register_modules]
   end
 
   # Check to see if we are connected

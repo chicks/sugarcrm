@@ -24,13 +24,8 @@ module SugarCRM; class Base
   attr :errors, true
 
   class << self # Class methods
-    def establish_connection(url, user, pass, opts={})
-      options = { 
-        :debug  => false,
-        :register_modules => true
-      }.merge(opts)
-      @debug  = options[:debug]
-      @@connection = SugarCRM::Connection.new(url, user, pass, options)
+    def establish_connection(url, user, pass, opts)
+      @@connection = SugarCRM::Connection.new(url, user, pass, opts)
     end
     
     def find(*args)
