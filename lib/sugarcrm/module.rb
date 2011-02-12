@@ -91,8 +91,8 @@ module SugarCRM
     # Adds module to SugarCRM.modules (SugarCRM.modules << Module.new("Users"))
     # Adds module class to SugarCRM parent module (SugarCRM.constants << User)
     # Note, SugarCRM::User.module == Module.find("Users")
-    def register
-      return self if registered?
+    def register(namespace)
+      return self if registered? namespace
       mod_instance = self
       # class Class < SugarCRM::Base
       #   module_name = "Accounts"
@@ -102,12 +102,12 @@ module SugarCRM
       end 
       
       # class Account < SugarCRM::Base
-      SugarCRM.const_set self.klass, klass
+      namespace.const_set self.klass, klass
       self
     end
 
-    def registered?
-      SugarCRM.const_defined? @klass
+    def registered?(namespace)
+      namespace.const_defined? @klass
     end  
       
     def to_s
@@ -123,8 +123,9 @@ module SugarCRM
       
       # Registers all of the SugarCRM Modules
       def register_all(session)
+        namespace = Session.const_get(session.namespace)
         session.connection.get_modules.each do |m|
-          SugarCRM.modules << m.register
+          session.modules << m.register(namespace)
         end
         @initialized = true
         true

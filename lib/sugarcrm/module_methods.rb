@@ -12,7 +12,8 @@ module SugarCRM
   def self.connect(url=SugarCRM::Environment.config[:base_url], user=SugarCRM::Environment.config[:username], pass=SugarCRM::Environment.config[:password], options={})
     session = SugarCRM::Session.new(url, user, pass, options)
     @@sessions << session
-    session
+    # return the namespace module
+    Session.const_get(session.namespace)
   end
   class << self
     alias :connect! :connect
