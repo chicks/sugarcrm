@@ -45,7 +45,6 @@ module SugarCRM; class Connection
   def login!
     @session = login["id"]
     raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
-    SugarCRM.connection = self
     SugarCRM::Base.connection = self
   end
 

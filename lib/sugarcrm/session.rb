@@ -8,6 +8,6 @@ module SugarCRM; class Session
       :register_modules => true
     }.merge(opts)
     @connection = SugarCRM::Connection.new(url, user, pass, opts)
-    Module.register_all if options[:register_modules]
+    Module.register_all(self) if options[:register_modules]
   end
 end; end

@@ -122,8 +122,8 @@ module SugarCRM
       @initialized = false
       
       # Registers all of the SugarCRM Modules
-      def register_all
-        SugarCRM.connection.get_modules.each do |m|
+      def register_all(session)
+        session.connection.get_modules.each do |m|
           SugarCRM.modules << m.register
         end
         @initialized = true

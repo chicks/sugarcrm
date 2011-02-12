@@ -4,12 +4,10 @@ module SugarCRM
     @@sessions
   end
   
-  @@connection = nil
   def self.connection
-    @@connection
-  end
-  def self.connection=(connection)
-    @@connection = connection
+    return nil if @@sessions.size == 0
+    raise if @@sessions.size > 1
+    @@sessions.first.connection
   end
   def self.connect(url=SugarCRM::Environment.config[:base_url], user=SugarCRM::Environment.config[:username], pass=SugarCRM::Environment.config[:password], options={})
     session = SugarCRM::Session.new(url, user, pass, options)
