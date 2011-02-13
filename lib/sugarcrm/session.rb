@@ -66,6 +66,10 @@ module SugarCRM; class Session
     end
   end
   
+  def namespace_const
+    SugarCRM.const_get(@namespace)
+  end
+  
   # load all the monkey patch extension files in the provided folder
   def extensions_folder=(folder, dirstring=nil)
     self.class.validate_path folder
