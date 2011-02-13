@@ -16,6 +16,21 @@ class TestModule < Test::Unit::TestCase
     #end
   end
   
+  context "SugarCRM::Module" do
+    should "(de)register all modules" do
+      assert SugarCRM.session.modules.size > 0
+      assert SugarCRM.session.namespace_const.const_defined? 'User'
+      
+      SugarCRM::Module.deregister_all(SugarCRM.session)
+      assert SugarCRM.session.modules.size == 0
+      assert ! (SugarCRM.session.namespace_const.const_defined? 'User')
+      
+      SugarCRM::Module.register_all(SugarCRM.session)
+      assert SugarCRM.session.modules.size > 0
+      assert SugarCRM.session.namespace_const.const_defined? 'User'
+    end
+  end
+  
   context "The SugarCRM class" do
     should "return current user" do
       current_user = SugarCRM.current_user
