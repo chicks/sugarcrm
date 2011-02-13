@@ -1,7 +1,7 @@
 # This class hold an individual connection to a SugarCRM server.
 # There can be several such simultaneous connections
 module SugarCRM; class Session
-  attr_reader :connection, :namespace
+  attr_reader :config, :connection, :namespace
   attr_accessor :modules
   def initialize(url, user, pass, opts={})
     options = { 
@@ -13,9 +13,11 @@ module SugarCRM; class Session
     @modules = []
     @namespace = "Namespace#{SugarCRM.sessions.size}"
     
-    @base_url = url
-    @username = user
-    @password = pass
+    @config = {
+      :base_url => url,
+      :username => user,
+      :password => pass
+    }
     
     # Create a new module to have a separate namespace in which to register the SugarCRM modules.
     # This will prevent issues with modules from separate SugarCRM instances colliding within the same namespace
@@ -29,7 +31,7 @@ module SugarCRM; class Session
         @session = sess
       end
       def self.current_user
-        SugarCRM.const_get(@session.namespace)::User.find_by_user_name(@username)
+        SugarCRM.const_get(@session.namespace)::User.find_by_user_name(@session.config[:username])
       end
     end
     # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session
