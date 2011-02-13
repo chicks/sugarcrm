@@ -13,6 +13,10 @@ module SugarCRM; class Base
   class_attribute :_module
   self._module = nil
   
+  # the session to which we're linked
+  class_attribute :session
+  self.session = nil
+  
   # Contains a list of attributes
   attr :attributes, true
   attr :modified_attributes, true
@@ -41,6 +45,11 @@ module SugarCRM; class Base
         else
           find_from_ids(args, options)
       end
+    end
+  
+    # return the connection to the correct SugarCRM server (there can be several)
+    def connection
+      self.parent.session.connection
     end
 
     # A convenience wrapper for <tt>find(:first, *args)</tt>. You can pass in all the
@@ -122,7 +131,7 @@ module SugarCRM; class Base
   
     def find_one(id, options)
       
-      if result = SugarCRM.connection.get_entry(self._module.name, id, {:fields => self._module.fields.keys})
+      if result = connection.get_entry(self._module.name, id, {:fields => self._module.fields.keys})
         result
       else
         raise RecordNotFound, "Couldn't find #{name} with ID=#{id}#{conditions}"
@@ -130,7 +139,7 @@ module SugarCRM; class Base
     end
     
     def find_some(ids, options)
-      result = SugarCRM.connection.get_entries(self._module.name, ids, {:fields => self._module.fields.keys})
+      result = connection.get_entries(self._module.name, ids, {:fields => self._module.fields.keys})
 
       # Determine expected size from limit and offset, not just ids.size.
       expected_size =
@@ -181,7 +190,7 @@ module SugarCRM; class Base
       # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
       # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
       # with :limit always smaller than :offset
-      results = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
+      results = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
       return nil unless results
       results = Array.wrap(results)
       
@@ -198,7 +207,7 @@ module SugarCRM; class Base
       # continue fetching results until we either
       # a) have as many results as the user wants (specified via the original :limit option)
       # b) there are no more results matching the criteria
-      while result_slice = SugarCRM.connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
+      while result_slice = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
         results.concat(Array.wrap(result_slice))
         # make sure we don't return more results than the user requested (via original :limit option)
         if nb_to_fetch && results.size >= nb_to_fetch
@@ -378,7 +387,7 @@ module SugarCRM; class Base
     params          = {}
     params[:id]     = serialize_id
     params[:deleted]= {:name => "deleted", :value => "1"}
-    (SugarCRM.connection.set_entry(self.class._module.name, params).class == Hash)       
+    (connection.set_entry(self.class._module.name, params).class == Hash)       
   end
   
   # Returns true if +comparison_object+ is the same exact object, or +comparison_object+ 

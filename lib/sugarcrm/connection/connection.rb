@@ -9,6 +9,7 @@ module SugarCRM; class Connection
   attr :user, false
   attr :pass, false
   attr :session, true
+  attr_accessor :session_instance
   attr :connection, true
   attr :options, true
   attr :request, true

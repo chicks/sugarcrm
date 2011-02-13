@@ -12,7 +12,7 @@ module SugarCRM; class Connection
     mods = send!(:get_available_modules, json)["modules"]
     modules = []
     mods.each do |mod|
-      modules << Module.new(mod)
+      modules << Module.new(@session_instance, mod)
     end
     modules
   end

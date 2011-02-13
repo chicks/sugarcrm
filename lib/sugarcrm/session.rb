@@ -9,12 +9,26 @@ module SugarCRM; class Session
       :register_modules => true
     }.merge(opts)
     @connection = SugarCRM::Connection.new(url, user, pass, opts)
+    @connection.session_instance = self
     @modules = []
     
+    # Create a new module to have a separate namespace in which to register the SugarCRM modules.
+    # This will prevent issues with modules from separate SugarCRM instances colliding within the same namespace
+    # (e.g. 2 SugarCRM instances where only one has custom fields on the Account module)
     namespace_module = Object::Module.new do
+      @session = nil
+      def self.session
+        @session
+      end
+      def self.session=(sess)
+        @session = sess
+      end
     end
+    # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session
+    namespace_module.session = self
+    
     @namespace = "Namespace#{SugarCRM.sessions.size}"
-    Session.const_set(@namespace, namespace_module)
+    SugarCRM.const_set(@namespace, namespace_module)
     
     Module.register_all(self) if options[:register_modules]
   end

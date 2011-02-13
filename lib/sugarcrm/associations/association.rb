@@ -69,16 +69,17 @@ module SugarCRM
     def resolve_target
       # Use the link_field name first
       klass = @link_field.singularize.camelize
-      return "SugarCRM::#{klass}".constantize if SugarCRM.const_defined? klass
+      namespace = SugarCRM.const_get(@owner.class.session.namespace)
+      return namespace.const_get(klass) if namespace.const_defined? klass
       # Use the link_field attribute "module"
       if @attributes["module"].length > 0
-        module_name = SugarCRM::Module.find(@attributes["module"])
-        return "SugarCRM::#{module_name.klass}".constantize if SugarCRM.const_defined? module_name.klass
+        module_name = SugarCRM::Module.find(@owner.class.session, @attributes["module"])
+        return namespace.const_get(module_name.klass) if namespace.const_defined? module_name.klass
       end
       # Use the "relationship" target
       if @attributes["relationship"].length > 0
         klass = @relationship[:target][:name].singularize.camelize
-        return "SugarCRM::#{klass}".constantize if SugarCRM.const_defined? klass
+        return namespace.const_get(klass) if namespace.const_defined? klass
       end
       false
     end

@@ -9,7 +9,7 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{6}/,'')
-    SugarCRM::Response.handle(send!(:get_module_fields, json))
+    SugarCRM::Response.handle(send!(:get_module_fields, json), @session_instance)
   end
   alias :get_fields :get_module_fields
 end; end

@@ -12,7 +12,8 @@ module SugarCRM
     # Dynamically register objects based on Module name
     # I.e. a SugarCRM Module named Users will generate
     # a SugarCRM::User class.
-    def initialize(name)
+    def initialize(session, name)
+      @session = session # the session from which this module was retrieved
       @name   = name
       @klass  = name.classify
       unless custom_module?
@@ -50,7 +51,7 @@ module SugarCRM
     # Returns the fields associated with the module
     def fields
       return @fields if fields_registered?
-      all_fields  = SugarCRM.connection.get_fields(@name)
+      all_fields  = @session.connection.get_fields(@name)
       @fields     = all_fields["module_fields"].with_indifferent_access
       @link_fields= all_fields["link_fields"]
       handle_empty_arrays
@@ -94,12 +95,14 @@ module SugarCRM
     def register(namespace)
       return self if registered? namespace
       mod_instance = self
+      sess = @session
       # class Class < SugarCRM::Base
       #   module_name = "Accounts"
       # end
       klass = Class.new(SugarCRM::Base) do
         self._module = mod_instance
-      end 
+        self.session = sess
+      end
       
       # class Account < SugarCRM::Base
       namespace.const_set self.klass, klass
@@ -123,7 +126,7 @@ module SugarCRM
       
       # Registers all of the SugarCRM Modules
       def register_all(session)
-        namespace = Session.const_get(session.namespace)
+        namespace = SugarCRM.const_get(session.namespace)
         session.connection.get_modules.each do |m|
           session.modules << m.register(namespace)
         end
@@ -132,9 +135,9 @@ module SugarCRM
       end
 
       # Finds a module by name, or klass name
-      def find(name)
+      def find(session, name)
         register_all unless initialized?
-        SugarCRM.modules.each do |m|
+        session.modules.each do |m|
           return m if m.name  == name
           return m if m.klass == name
         end

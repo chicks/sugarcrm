@@ -18,6 +18,6 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{6}/,'')
-    SugarCRM::Response.handle(send!(:get_entries, json))
+    SugarCRM::Response.handle(send!(:get_entries, json), @session_instance)
   end
 end; end

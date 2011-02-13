@@ -13,7 +13,7 @@ module SugarCRM
     session = SugarCRM::Session.new(url, user, pass, options)
     @@sessions << session
     # return the namespace module
-    Session.const_get(session.namespace)
+    SugarCRM.const_get(session.namespace)
   end
   class << self
     alias :connect! :connect
