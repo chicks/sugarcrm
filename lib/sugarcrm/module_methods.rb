@@ -19,16 +19,13 @@ module SugarCRM
     alias :connect! :connect
   end
   
-  @@modules = []
-  def self.modules
-    @@modules
-  end
-  def self.modules=(modules)
-    @@modules = modules
-  end
-  
   def self.current_user
     SugarCRM::User.find_by_user_name(SugarCRM::Environment.config[:username])
+  end
+  
+  def self.method_missing(sym, *args, &block)
+    raise if @@sessions.size > 1
+    @@sessions.first.send(sym, *args, &block)
   end
   
   # If a user tries to access a SugarCRM class before they're logged in,
