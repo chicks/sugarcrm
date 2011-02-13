@@ -38,7 +38,13 @@ module SugarCRM
     (raise MultipleSessions, "There are multiple active sessions: use the session instance instead of SugarCRM") if @@sessions.size > 1
     # if we're logged in, modules should be loaded and available
     if SugarCRM.connection && SugarCRM.connection.logged_in?
-      super
+      # if user calls (e.g.) SugarCRM::Account, delegate to SugarCRM::Namespace0::Account
+      namespace_const = SugarCRM.const_get(@@sessions.first.namespace)
+      if namespace_const.const_defined? sym
+        namespace_const.const_get(sym)
+      else
+        super
+      end
     else
       # attempt to create a new session from credentials sotred in a config file
       begin
