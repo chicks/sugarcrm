@@ -11,5 +11,5 @@ class Test::Unit::TestCase
   # the format should be identical to the config_test.yaml found in the same directory
   path = File.join(File.dirname(__FILE__),'config.yaml')
   raise "test/config.yaml file not found. See README for instructions on setting up a testing environment" unless File.exists? path
-  SugarCRM::Environment.load_config(path)
+  SugarCRM::Session.new_from_file(path)
 end
