@@ -7,7 +7,7 @@ class TestConnection < Test::Unit::TestCase
       assert_instance_of SugarCRM::Module, SugarCRM.modules[0]
     end
     should "create sub-classes by module name" do
-      assert SugarCRM.sessions.first.namespace_const.const_defined? "User"
+      assert SugarCRM.session.namespace_const.const_defined? "User"
     end
   end
 end

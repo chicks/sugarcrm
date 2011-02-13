@@ -20,7 +20,7 @@ class TestModule < Test::Unit::TestCase
     should "return current user" do
       current_user = SugarCRM.current_user
       assert_instance_of SugarCRM::User, current_user
-      assert_equal SugarCRM.sessions.first.config[:username], current_user.user_name
+      assert_equal SugarCRM.session.config[:username], current_user.user_name
     end
   end
 end
