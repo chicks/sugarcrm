@@ -42,6 +42,13 @@ module SugarCRM; class Session
     Module.register_all(self) if options[:register_modules]
   end
   
+  def update_config(params)
+    params.each{|k,v|
+      @config[k.to_sym] = v
+    }
+    @config
+  end
+  
   # lazy load the SugarCRM version we're connecting to
   def sugar_version
     @version ||= @connection.get_server_info["version"]
