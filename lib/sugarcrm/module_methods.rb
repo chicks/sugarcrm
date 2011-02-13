@@ -18,7 +18,7 @@ module SugarCRM
   def self.connect(url, user, pass, options={})
     session = SugarCRM::Session.new(url, user, pass, options)
     # return the namespace module
-    SugarCRM.const_get(session.namespace)
+    session.namespace_const
   end
   class << self
     alias :connect! :connect
@@ -27,7 +27,7 @@ module SugarCRM
   def self.current_user
     (raise NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
     (raise MultipleSessions, "There are multiple active sessions: call methods on the session instance instead of SugarCRM") if @@sessions.size > 1
-    SugarCRM.const_get(@@sessions.first.namespace).current_user
+    @@sessions.first.namespace_const.current_user
   end
   
   def self.method_missing(sym, *args, &block)
@@ -45,7 +45,7 @@ module SugarCRM
     # if we're logged in, modules should be loaded and available
     if SugarCRM.connection && SugarCRM.connection.logged_in?
       # if user calls (e.g.) SugarCRM::Account, delegate to SugarCRM::Namespace0::Account
-      namespace_const = SugarCRM.const_get(@@sessions.first.namespace)
+      namespace_const = @@sessions.first.namespace_const
       if namespace_const.const_defined? sym
         namespace_const.const_get(sym)
       else

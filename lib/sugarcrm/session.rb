@@ -45,7 +45,7 @@ module SugarCRM; class Session
         @session = sess
       end
       def self.current_user
-        SugarCRM.const_get(@session.namespace)::User.find_by_user_name(@session.config[:username])
+        (@session.namespace_const)::User.find_by_user_name(@session.config[:username])
       end
     end
     # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session

@@ -43,7 +43,7 @@ module SugarCRM; class Response
       attributes = []
       _module    = resolve_module(object)
       attributes = flatten_name_value_list(object)
-      namespace = SugarCRM.const_get(@session.namespace)
+      namespace = @session.namespace_const
       if namespace.const_get(_module)
         if attributes.length == 0
           raise AttributeParsingError, "response contains objects without attributes!"

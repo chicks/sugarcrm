@@ -31,8 +31,7 @@ module SugarCRM; class Connection
   # Returns an instance of class for the provided module name
   def class_for(module_name)
     begin
-      class_const = SugarCRM.const_get(@session.namespace).const_get(module_name.classify)
-#       klass = "SugarCRM::#{module_name.classify}".constantize.new
+      class_const = @session.namespace_const.const_get(module_name.classify)
       klass = class_const.new
     rescue NameError
       raise InvalidModule, "Module: #{module_name} is not registered"
