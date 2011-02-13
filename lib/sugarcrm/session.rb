@@ -8,7 +8,6 @@ module SugarCRM; class Session
       :debug  => false,
       :register_modules => true
     }.merge(opts)
-    @id = nil
     @modules = []
     @namespace = "Namespace#{SugarCRM.sessions.size}"
     
