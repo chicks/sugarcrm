@@ -44,7 +44,7 @@ module SugarCRM
       begin
         Session.new
       rescue MissingCredentials => e
-        # unable to load ncessary login credentials from config file => pass exception on
+        # unable to load necessary login credentials from config file => pass exception on
         super
       end
       # try and return the requested module
