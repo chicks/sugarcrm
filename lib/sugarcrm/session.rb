@@ -1,7 +1,7 @@
 # This class hold an individual connection to a SugarCRM server.
 # There can be several such simultaneous connections
 module SugarCRM; class Session
-  attr_reader :config, :connection, :id, :namespace
+  attr_reader :config, :connection, :id, :namespace, :namespace_const
   attr_accessor :modules
   def initialize(url=nil, user=nil, pass=nil, opts={})
     options = { 
@@ -52,6 +52,7 @@ module SugarCRM; class Session
     namespace_module.session = self
     
     SugarCRM.const_set(@namespace, namespace_module)
+    @namespace_const = SugarCRM.const_get(@namespace)
     
     Module.register_all(self) if options[:register_modules]
     
@@ -66,10 +67,6 @@ module SugarCRM; class Session
     rescue MissingCredentials => e
       return false
     end
-  end
-  
-  def namespace_const
-    SugarCRM.const_get(@namespace)
   end
   
   # load all the monkey patch extension files in the provided folder
