@@ -6,13 +6,13 @@ module SugarCRM
   
   def self.session
     return nil if @@sessions.size < 1
-    (raise MultipleSessions, "There are multiple active sessions") if @@sessions.size > 1
+    (raise SugarCRM::MultipleSessions, "There are multiple active sessions") if @@sessions.size > 1
     @@sessions.first
   end
   
   def self.connection
     return nil if @@sessions.size == 0
-    (raise MultipleSessions, "There are multiple active sessions: use the session instance instead of SugarCRM") if @@sessions.size > 1
+    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: use the session instance instead of SugarCRM") if @@sessions.size > 1
     @@sessions.first.connection
   end
   def self.connect(url, user, pass, options={})
@@ -25,14 +25,14 @@ module SugarCRM
   end
   
   def self.current_user
-    (raise NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
-    (raise MultipleSessions, "There are multiple active sessions: call methods on the session instance instead of SugarCRM") if @@sessions.size > 1
+    (raise SugarCRM::NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
+    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: call methods on the session instance instead of SugarCRM") if @@sessions.size > 1
     @@sessions.first.namespace_const.current_user
   end
   
   def self.method_missing(sym, *args, &block)
-    (raise NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
-    (raise MultipleSessions, "There are multiple active sessions: call methods on the session instance instead of SugarCRM") if @@sessions.size > 1
+    (raise SugarCRM::NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
+    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: call methods on the session instance instead of SugarCRM") if @@sessions.size > 1
     @@sessions.first.send(sym, *args, &block)
   end
   
@@ -41,7 +41,7 @@ module SugarCRM
   # This will trigger module loading,
   # and we can then attempt to return the requested class automagically
   def self.const_missing(sym)
-    (raise MultipleSessions, "There are multiple active sessions: use the session instance instead of SugarCRM") if @@sessions.size > 1
+    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: use the session instance instead of SugarCRM") if @@sessions.size > 1
     # if we're logged in, modules should be loaded and available
     if SugarCRM.connection && SugarCRM.connection.logged_in?
       # if user calls (e.g.) SugarCRM::Account, delegate to SugarCRM::Namespace0::Account
@@ -55,7 +55,7 @@ module SugarCRM
       # attempt to create a new session from credentials sotred in a config file
       begin
         Session.new
-      rescue MissingCredentials => e
+      rescue SugarCRM::MissingCredentials => e
         # unable to load necessary login credentials from config file => pass exception on
         super
       end
