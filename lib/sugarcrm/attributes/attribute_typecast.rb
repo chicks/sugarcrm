@@ -6,8 +6,8 @@ module SugarCRM; module AttributeTypeCast
   def attr_type_for(attribute)
     fields = self.class._module.fields
     field  = fields[attribute]
-    raise UninitializedModule, "SugarCRM::Module #{self.class._module.name} was not initialized properly (fields.length == 0)" if fields.length == 0
-    raise InvalidAttribute, "#{self.class}_module.fields does not contain an entry for #{attribute} (of type: #{attribute.class})\nValid fields: #{self.class._module.fields.keys.sort.join(", ")}" if field.nil?
+    raise UninitializedModule, "#{self.class.session.namespace_const}Module #{self.class._module.name} was not initialized properly (fields.length == 0)" if fields.length == 0
+    raise InvalidAttribute, "#{self.class}._module.fields does not contain an entry for #{attribute} (of type: #{attribute.class})\nValid fields: #{self.class._module.fields.keys.sort.join(", ")}" if field.nil?
     raise InvalidAttributeType, "#{self.class}._module.fields[#{attribute}] does not have a key for \'type\'" if field["type"].nil?
     field["type"].to_sym
   end

@@ -53,7 +53,7 @@ module SugarCRM
     end
     
     def to_s
-      "#<SugarCRM::Association @proxy_methods=[#{@proxy_methods.join(", ")}], " +
+      "#<#{@owner.class.session.namespace_const}::Association @proxy_methods=[#{@proxy_methods.join(", ")}], " +
       "@link_field=\"#{@link_field}\", @target=#{@target}, @owner=#{@owner.class}, " +
       "@cardinality=:#{@cardinality}>"
     end
