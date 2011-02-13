@@ -15,7 +15,7 @@ class TestResponse < Test::Unit::TestCase
               }],
              "relationship_list"=>[]}
   
-      @response = SugarCRM::Response.handle(@json)
+      @response = SugarCRM::Response.handle(@json, SugarCRM.session)
     end
       
     should "return an instance of a SugarCRM Module" do
