@@ -4,6 +4,12 @@ module SugarCRM
     @@sessions
   end
   
+  def self.session
+    return nil if @@sessions.size < 1
+    (raise MultipleSessions, "There are multiple active sessions") if @@sessions.size > 1
+    @@sessions.first
+  end
+  
   def self.connection
     return nil if @@sessions.size == 0
     (raise MultipleSessions, "There are multiple active sessions: use the session instance instead of SugarCRM") if @@sessions.size > 1
