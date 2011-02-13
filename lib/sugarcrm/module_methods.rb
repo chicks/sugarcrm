@@ -25,7 +25,7 @@ module SugarCRM
   end
   
   def self.method_missing(sym, *args, &block)
-    raise if @@sessions.size > 1
+    raise unless @@sessions.size == 1
     @@sessions.first.send(sym, *args, &block)
   end
   
