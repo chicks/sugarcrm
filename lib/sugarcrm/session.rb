@@ -3,7 +3,7 @@
 module SugarCRM; class Session
   attr_reader :config, :connection, :id, :namespace, :namespace_const
   attr_accessor :modules
-  def initialize(url=nil, user=nil, pass=nil, opts={})
+  def initialize(url, user, pass, opts={})
     options = { 
       :debug  => false,
       :register_modules => true
@@ -26,12 +26,6 @@ module SugarCRM; class Session
     
     raise MissingCredentials, "Missing login credentials. Make sure you provide the SugarCRM URL, username, and password" unless connection_info_loaded?
     
-    @connection = SugarCRM::Connection.new(url, user, pass, opts)
-    @connection.session = self
-    @id = @connection.session_id
-    
-    extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
-    
     # Create a new module to have a separate namespace in which to register the SugarCRM modules.
     # This will prevent issues with modules from separate SugarCRM instances colliding within the same namespace
     # (e.g. 2 SugarCRM instances where only one has custom fields on the Account module)
@@ -53,7 +47,11 @@ module SugarCRM; class Session
     SugarCRM.const_set(@namespace, namespace_module)
     @namespace_const = SugarCRM.const_get(@namespace)
     
+    connect(url, user, pass, options)
+    
     Module.register_all(self) if options[:register_modules]
+    
+    extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
     
     SugarCRM.sessions << self
   end
@@ -68,6 +66,23 @@ module SugarCRM; class Session
     end
   end
   
+  # re-use this session and namespace if the user wants to connect with different credentials
+  def connect(url, user, pass, opts={})
+    options = { 
+      :debug  => false,
+      :register_modules => true
+    }.merge(opts)
+    
+    SugarCRM::Module.deregister_all(self)
+    @connection = SugarCRM::Connection.new(@config[:base_url], @config[:username], @config[:password], options) if connection_info_loaded?
+    @connection.session = self
+    @id = @connection.session_id
+    SugarCRM::Module.register_all(self)
+  end
+  alias :connect! :connect
+  alias :reconnect :connect
+  alias :reconnect! :connect
+  
   # load all the monkey patch extension files in the provided folder
   def extensions_folder=(folder, dirstring=nil)
     self.class.validate_path folder
@@ -78,7 +93,7 @@ module SugarCRM; class Session
   # load credentials from file, and (re)connect to SugarCRM
   def load_config(path)
     @config = self.class.load_and_parse_config(path)
-    @connection = SugarCRM::Connection.new(@config[:base_url], @config[:username], @config[:password]) if connection_info_loaded?
+    reconnect(@config[:base_url], @config[:username], @config[:password]) if connection_info_loaded?
     @config
   end
   
