@@ -4,7 +4,7 @@ module SugarCRM; class Connection
     login! unless logged_in?
     json = <<-EOF
       {
-        "session": "#{@session}",
+        "session": "#{@session.id}",
         "targets": #{targets.to_json},
         "campaign-id": "#{campaign_id}"
       }

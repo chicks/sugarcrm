@@ -4,7 +4,7 @@ module SugarCRM; class Connection
     login! unless logged_in?
     json = <<-EOF
       {
-        "session": "#{@session}"
+        "session": "#{@session.id}"
       }
     EOF
     
@@ -12,7 +12,7 @@ module SugarCRM; class Connection
     mods = send!(:get_available_modules, json)["modules"]
     modules = []
     mods.each do |mod|
-      modules << Module.new(@session_instance, mod)
+      modules << Module.new(@session, mod)
     end
     modules
   end

@@ -1,13 +1,14 @@
 # This class hold an individual connection to a SugarCRM server.
 # There can be several such simultaneous connections
 module SugarCRM; class Session
-  attr_reader :config, :connection, :namespace
+  attr_reader :config, :connection, :id, :namespace
   attr_accessor :modules
   def initialize(url=nil, user=nil, pass=nil, opts={})
     options = { 
       :debug  => false,
       :register_modules => true
     }.merge(opts)
+    @id = nil
     @modules = []
     @namespace = "Namespace#{SugarCRM.sessions.size}"
     
@@ -27,7 +28,8 @@ module SugarCRM; class Session
     raise MissingCredentials, "Missing login credentials. Make sure you provide the SugarCRM URL, username, and password" unless connection_info_loaded?
     
     @connection = SugarCRM::Connection.new(url, user, pass, opts)
-    @connection.session_instance = self
+    @connection.session = self
+    @id = @connection.session_id
     
     extensions_folder = File.join(File.dirname(__FILE__), 'extensions')
     

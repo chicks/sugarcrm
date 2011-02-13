@@ -2,6 +2,6 @@ module SugarCRM; class Connection
   # Returns server information such as version, flavor, and gmt_time.
   def get_server_info
     login! unless logged_in?
-    Response.handle(send!(:get_server_info, ""), @session_instance)
+    Response.handle(send!(:get_server_info, ""), @session)
   end
 end; end

@@ -4,12 +4,12 @@ module SugarCRM; class Connection
     login! unless logged_in?  
     json = <<-EOF
       {
-        "session": "#{@session}",
+        "session": "#{@session.id}",
         "module_name": "#{module_name}"
       }
     EOF
     json.gsub!(/^\s{6}/,'')
-    SugarCRM::Response.handle(send!(:get_module_fields, json), @session_instance)
+    SugarCRM::Response.handle(send!(:get_module_fields, json), @session)
   end
   alias :get_fields :get_module_fields
 end; end

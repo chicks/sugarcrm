@@ -6,7 +6,7 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        "session": "#{@session}",
+        "session": "#{@session.id}",
         "ids": #{ids.to_json},
         "select_fields": "#{options[:select_fields].to_json}"
       }
