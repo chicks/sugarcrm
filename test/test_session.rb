@@ -8,22 +8,22 @@ class TestSession < Test::Unit::TestCase
       assert SugarCRM::Contact.is_extended?
     end
     
-#     should "load config file" do
-#       SugarCRM::Environment.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
-#       
-#       config_contents = { 
-#         :config => {
-#                       :base_url => 'http://127.0.0.1/sugarcrm',
-#                       :username => 'admin',
-#                       :password => 'letmein'
-#                    }
-#       }
-#       
-#       config_contents[:config].each{|k,v|
-#         assert_equal v, SugarCRM::Environment.config[k]
-#       }
-#     end
-#     
+    should "load config file" do
+      SugarCRM.session.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
+      
+      config_contents = { 
+        :config => {
+                      :base_url => 'http://127.0.0.1/sugarcrm',
+                      :username => 'admin',
+                      :password => 'letmein'
+                   }
+      }
+      
+      config_contents[:config].each{|k,v|
+        assert_equal v, SugarCRM.session.config[k]
+      }
+    end
+    
 #     should "log in to Sugar automatically if credentials are present in config file" do
 #       SugarCRM::Environment.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
 #       assert SugarCRM.connection.logged_in?
