@@ -69,7 +69,7 @@ module SugarCRM
     def resolve_target
       # Use the link_field name first
       klass = @link_field.singularize.camelize
-      namespace = SugarCRM.const_get(@owner.class.session.namespace)
+      namespace = @owner.class.session.namespace_const
       return namespace.const_get(klass) if namespace.const_defined? klass
       # Use the link_field attribute "module"
       if @attributes["module"].length > 0
