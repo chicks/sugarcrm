@@ -9,9 +9,8 @@ module SugarCRM
     raise if @@sessions.size > 1
     @@sessions.first.connection
   end
-  def self.connect(url=SugarCRM::Environment.config[:base_url], user=SugarCRM::Environment.config[:username], pass=SugarCRM::Environment.config[:password], options={})
+  def self.connect(url, user, pass, options={})
     session = SugarCRM::Session.new(url, user, pass, options)
-    @@sessions << session
     # return the namespace module
     SugarCRM.const_get(session.namespace)
   end
@@ -34,14 +33,18 @@ module SugarCRM
   # This will trigger module loading,
   # and we can then attempt to return the requested class automagically
   def self.const_missing(sym)
+    raise if @@sessions.size > 1
     # if we're logged in, modules should be loaded and available
     if SugarCRM.connection && SugarCRM.connection.logged_in?
       super
     else
-      # here, we initialize the environment (which happens on any method call, if singleton hasn't already been initialized)
-      # initializing the environment will log user in if credentials present in config file
-      # if it isn't possible to log in and access modules, pass the exception on
-      super unless SugarCRM::Environment.connection_info_loaded?
+      # attempt to create a new session from credentials sotred in a config file
+      begin
+        Session.new
+      rescue MissingCredentials => e
+        # unable to load ncessary login credentials from config file => pass exception on
+        super
+      end
       # try and return the requested module
       SugarCRM.const_get(sym)
     end
