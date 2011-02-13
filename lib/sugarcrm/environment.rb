@@ -40,11 +40,6 @@ module SugarCRM; class Environment
     @config
   end
   
-  # lazy load the SugarCRM version we're connecting to
-  def version
-    @version ||= SugarCRM.connection.get_server_info["version"]
-  end
-  
   # load all the monkey patch extension files in the provided folder
   def extensions_folder=(folder, dirstring=nil)
     validate_path folder

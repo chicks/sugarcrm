@@ -39,4 +39,9 @@ module SugarCRM; class Session
     
     Module.register_all(self) if options[:register_modules]
   end
+  
+  # lazy load the SugarCRM version we're connecting to
+  def sugar_version
+    @version ||= @connection.get_server_info["version"]
+  end
 end; end
