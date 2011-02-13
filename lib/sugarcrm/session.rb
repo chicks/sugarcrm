@@ -11,6 +11,11 @@ module SugarCRM; class Session
     @connection = SugarCRM::Connection.new(url, user, pass, opts)
     @connection.session_instance = self
     @modules = []
+    @namespace = "Namespace#{SugarCRM.sessions.size}"
+    
+    @base_url = url
+    @username = user
+    @password = pass
     
     # Create a new module to have a separate namespace in which to register the SugarCRM modules.
     # This will prevent issues with modules from separate SugarCRM instances colliding within the same namespace
@@ -27,7 +32,6 @@ module SugarCRM; class Session
     # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session
     namespace_module.session = self
     
-    @namespace = "Namespace#{SugarCRM.sessions.size}"
     SugarCRM.const_set(@namespace, namespace_module)
     
     Module.register_all(self) if options[:register_modules]
