@@ -20,7 +20,8 @@ module SugarCRM
   end
   
   def self.current_user
-    SugarCRM::User.find_by_user_name(SugarCRM::Environment.config[:username])
+    raise unless @@sessions.size == 1
+    SugarCRM.const_get(@@sessions.first.namespace).current_user
   end
   
   def self.method_missing(sym, *args, &block)
