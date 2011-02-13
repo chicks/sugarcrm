@@ -25,7 +25,7 @@ module SugarCRM; class Response
 
   attr :response, false
   
-  def initialize(json, session=nil, opts={})
+  def initialize(json, session, opts={})
     @options  = { :always_return_array => false }.merge! opts
     @response = json
     @response = json.with_indifferent_access if json.is_a? Hash
