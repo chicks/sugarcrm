@@ -41,7 +41,7 @@ class TestSession < Test::Unit::TestCase
     end
     
     should "return the server version" do
-      assert_equal String, @current_session.version.class
+      assert_equal String, @current_session.sugar_version.class
     end
   end
   
