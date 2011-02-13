@@ -108,6 +108,14 @@ module SugarCRM
       @session.namespace_const.const_set self.klass, klass
       self
     end
+    
+    # Deregisters the module
+    def deregister
+      return true unless registered?
+      klass = self.klass
+      @session.namespace_const.instance_eval{ remove_const klass }
+      true
+    end
 
     def registered?
       @session.namespace_const.const_defined? @klass
@@ -131,6 +139,17 @@ module SugarCRM
           session.modules << m.register
         end
         @initialized = true
+        true
+      end
+      
+      # Deregisters all of the SugarCRM Modules
+      def deregister_all(session)
+        namespace = session.namespace_const
+        session.modules.each do |m|
+          m.deregister
+        end
+        session.modules = []
+        @initialized = false
         true
       end
 
