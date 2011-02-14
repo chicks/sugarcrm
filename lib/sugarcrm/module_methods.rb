@@ -24,6 +24,12 @@ module SugarCRM
     alias :connect! :connect
   end
   
+  def self.reload!
+    (raise SugarCRM::NoActiveSession, "Nothing to reload") if @@sessions.size < 1
+    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: call methods on the session instance instead of SugarCRM") if @@sessions.size > 1
+    SugarCRM.session.reload!
+  end
+  
   def self.current_user
     (raise SugarCRM::NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
     (raise SugarCRM::MultipleSessions, "There are multiple active sessions: call methods on the session instance instead of SugarCRM") if @@sessions.size > 1

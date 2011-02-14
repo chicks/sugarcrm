@@ -41,5 +41,11 @@ class TestModule < Test::Unit::TestCase
       assert_instance_of SugarCRM::User, current_user
       assert_equal SugarCRM.session.config[:username], current_user.user_name
     end
+    
+    should "implement reload!" do
+      assert_nothing_raised do
+        SugarCRM.reload!
+      end
+    end
   end
 end

@@ -8,6 +8,12 @@ class TestSession < Test::Unit::TestCase
       assert SugarCRM::Contact.is_extended?
     end
     
+    should "implement reload!" do
+      assert_nothing_raised do
+        SugarCRM.session.reload!
+      end
+    end
+    
     should "load config file" do
       SugarCRM.session.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
       
