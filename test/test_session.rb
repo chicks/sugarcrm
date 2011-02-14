@@ -42,6 +42,21 @@ class TestSession < Test::Unit::TestCase
       Three.disconnect!
     end
     
+    should "be able to disconnect, and log in to Sugar automatically if credentials are present in config file" do
+      assert_nothing_raised{ SugarCRM.current_user }
+      assert SugarCRM.sessions.size == 1
+      
+      SugarCRM.disconnect!
+      assert SugarCRM.sessions.size == 0
+      
+      assert_raise(SugarCRM::NoActiveSession){ SugarCRM.current_user }
+      
+      SugarCRM::Session.new_from_file(CONFIG_PATH)
+      
+      assert_nothing_raised{ SugarCRM.current_user }
+      assert SugarCRM.sessions.size == 1
+    end
+    
     should "update the login credentials on connection" do
       config = YAML.load_file(CONFIG_PATH) # was loaded in helper.rb
       ["base_url", "username", "password"].each{|k|
