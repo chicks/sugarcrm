@@ -18,7 +18,7 @@ module SugarCRM; class Connection
     # FIXME: This is to work around a bug in SugarCRM 6.0
     # where no fields are returned if no fields are specified
     if fields.length == 0
-      mod = Module.find(@session, module_name.classify)
+      mod = Module.find(module_name.classify, @session)
       if mod
         fields = mod.fields.keys
       else
