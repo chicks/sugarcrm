@@ -148,7 +148,7 @@ If you want to use a configuration file instead of always specifying the url, us
 * `~/.sugarcrm.yaml` (i.e. your home directory on Linux and Mac OSX)
 * a `sugarcrm.yaml` file at the root of you Windows home directory (execute `ENV['USERPROFILE']` in Ruby to see which directory should contain the file)
 * `config/sugarcrm.yaml` (will need to be copied each time you upgrade or reinstall the gem)
-* a YAML file and call `SugarCRM::Environment.load_config` followed by the absolute path to your configuration file
+* a YAML file and call `SugarCRM.load_config` followed by the absolute path to your configuration file
 
 If there are several configuration files, they are loaded sequentially in the order above and will overwrite previous values (if present). This allows you to (e.g.) have a config file in `/etc/sugarcrm.yaml` with system-wide configuration information (such as the url where SugarCRM is located) and/or defaults. Each developer/user can then have his personal configuration file in `~/.sugarcrm.yaml` with his own username and password. A developer could also specify a different location for the SugarCRM instance (e.g. a local testing instance) in his configuration file, which will take precedence over the value in `/etc/sugarcrm.yaml`.
 
@@ -168,10 +168,12 @@ An example, accompanied by instructions, can be found in the `config/sugarcrm.ya
 2.  Require the gem with `require 'sugarcrm'`
 
 3.  * if your login credentials are stored in the `config/sugarcrm.yaml` file, you have been automagically logged in already ;
-    * if your login credentials are stored in a different config file, just call `SugarCRM::Environment.load_config` followed by the absolute path to your config file. This will log you in automatically ;
+    * if your login credentials are stored in a different config file, just call `SugarCRM.load_config` followed by the absolute path to your config file. This will log you in automatically ;
     * if you don't have a configuration file, you can still call the basic `SugarCRM.connect` and give it the proper arguments (see documentation above)
 
 4. You now have full access to the gem's functionality, e.g. `puts SugarCRM::Account.first.name`
+
+5. If you make changes on the SugarCRM server (e.g. adding a field to a module), you can call `SugarCRM.reload!` to rebuild the gem's modules and gain access to the new fields
   
 == EXTENDING THE GEM
 
@@ -179,7 +181,7 @@ If you want to extend the gem's capabilities (e.g. to add methods specific to yo
 
 * drop your `*.rb` files in `lib/sugarcrm/extensions/` (see the README in that folder)
 
-* drop your `*.rb` files in any other folder and call `SugarCRM::Environment.extensions_folder = ` followed by the absolute path to the folder containing your extensions
+* drop your `*.rb` files in any other folder and call `SugarCRM.extensions_folder = ` followed by the absolute path to the folder containing your extensions
 
 == WORKING WITH SIMULTANEOUS SESSIONS
 
