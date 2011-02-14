@@ -94,6 +94,8 @@ module SugarCRM; class Session
   def disconnect
     @connection.logout
     SugarCRM::Module.deregister_all(self)
+    namespace = @namespace
+    SugarCRM.instance_eval{ remove_const namespace } # remove NamespaceX from SugarCRM
     SugarCRM.remove_session(self)
   end
   alias :disconnect! :disconnect

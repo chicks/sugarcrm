@@ -5,6 +5,15 @@ module SugarCRM
     @@used_namespaces
   end
   
+  # return the namespaces linked to active sessions
+  def self.namespaces
+    result = []
+    @@used_namespaces.each{|n|
+      result << n if SugarCRM.const_defined? n
+    }
+    result
+  end
+  
   # store the various connected sessions
   # key = session.id, value = session instance
   @@sessions = {}
