@@ -90,6 +90,14 @@ module SugarCRM; class Session
   alias :reconnect! :connect
   alias :reload! :connect
   
+  # log out from SugarCRM and cleanup (deregister modules, remove session, etc.)
+  def disconnect
+    @connection.logout
+    SugarCRM::Module.deregister_all(self)
+    SugarCRM.remove_session(self)
+  end
+  alias :disconnect! :disconnect
+  
   # load all the monkey patch extension files in the provided folder
   def extensions_folder=(folder, dirstring=nil)
     self.class.validate_path folder
