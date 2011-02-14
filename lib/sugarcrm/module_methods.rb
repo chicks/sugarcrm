@@ -1,4 +1,10 @@
 module SugarCRM
+  # store the namespaces that have been used to prevent namespace collision
+  @@used_namespaces = []
+  def self.used_namespaces
+    @@used_namespaces
+  end
+  
   # store the various connected sessions
   # key = session.id, value = session instance
   @@sessions = {}
@@ -7,6 +13,7 @@ module SugarCRM
   end
   
   def self.add_session(session)
+    @@used_namespaces << session.namespace unless @@used_namespaces.include? session.namespace
     @@sessions[session.id] = session
   end
   

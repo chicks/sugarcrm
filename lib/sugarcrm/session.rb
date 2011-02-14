@@ -9,7 +9,7 @@ module SugarCRM; class Session
       :register_modules => true
     }.merge(opts)
     @modules = []
-    @namespace = "Namespace#{SugarCRM.sessions.size}"
+    @namespace = "Namespace#{SugarCRM.used_namespaces.size}"
     
     @config = {
       :base_url => url,
