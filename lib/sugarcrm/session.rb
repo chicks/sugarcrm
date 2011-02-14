@@ -67,11 +67,15 @@ module SugarCRM; class Session
   end
   
   # re-use this session and namespace if the user wants to connect with different credentials
-  def connect(url, user, pass, opts={})
+  def connect(url=nil, user=nil, pass=nil, opts={})
     options = { 
-      :debug  => false,
+      :debug  => (@connection && @connection.debug?),
       :register_modules => true
     }.merge(opts)
+    
+    {:base_url => url, :username => user, :password => pass}.each{|k,v|
+      @config[k] = v  unless v.nil?
+    }
     
     SugarCRM::Module.deregister_all(self)
     @connection = SugarCRM::Connection.new(@config[:base_url], @config[:username], @config[:password], options) if connection_info_loaded?
@@ -82,6 +86,7 @@ module SugarCRM; class Session
   alias :connect! :connect
   alias :reconnect :connect
   alias :reconnect! :connect
+  alias :reload! :connect
   
   # load all the monkey patch extension files in the provided folder
   def extensions_folder=(folder, dirstring=nil)
