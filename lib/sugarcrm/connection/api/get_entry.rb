@@ -9,7 +9,7 @@ module SugarCRM; class Connection
     
     json = <<-EOF
       {
-        "session": "#{@session}",
+        "session": "#{@session.id}",
         "module_name": "#{module_name}",
         "id": "#{id}",
         "select_fields": #{resolve_fields(module_name, options[:fields])},
@@ -18,6 +18,6 @@ module SugarCRM; class Connection
     EOF
         
     json.gsub!(/^\s{6}/,'')
-    SugarCRM::Response.handle(send!(:get_entry, json))
+    SugarCRM::Response.handle(send!(:get_entry, json), @session)
   end
 end; end

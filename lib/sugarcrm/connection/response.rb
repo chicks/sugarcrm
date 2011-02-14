@@ -3,8 +3,8 @@ module SugarCRM; class Response
     # This class handles the response from the server.
     # It tries to convert the response into an object such as User
     # or an object collection.  If it fails, it just returns the response hash
-    def handle(json)
-      r = new(json)
+    def handle(json, session)
+      r = new(json, session)
       begin
         return r.to_obj
       rescue UninitializedModule => e
@@ -14,7 +14,7 @@ module SugarCRM; class Response
       rescue InvalidAttributeType => e
         raise e
       rescue => e
-        if SugarCRM.connection.debug?
+        if session.connection.debug?
           puts "Failed to process JSON:"
           pp json
         end
@@ -25,10 +25,11 @@ module SugarCRM; class Response
 
   attr :response, false
   
-  def initialize(json,opts={})
+  def initialize(json, session, opts={})
     @options  = { :always_return_array => false }.merge! opts
     @response = json
     @response = json.with_indifferent_access if json.is_a? Hash
+    @session = session
   end
   
   # Tries to instantiate and return an object with the values
@@ -42,11 +43,12 @@ module SugarCRM; class Response
       attributes = []
       _module    = resolve_module(object)
       attributes = flatten_name_value_list(object)
-      if SugarCRM.const_get(_module)
+      namespace = @session.namespace_const
+      if namespace.const_get(_module)
         if attributes.length == 0
           raise AttributeParsingError, "response contains objects without attributes!"
         end
-        objects << SugarCRM.const_get(_module).new(attributes) 
+        objects << namespace.const_get(_module).new(attributes) 
       else
         raise InvalidModule, "#{_module} does not exist, or is not accessible"
       end

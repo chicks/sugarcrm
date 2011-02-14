@@ -16,11 +16,36 @@ class TestModule < Test::Unit::TestCase
     #end
   end
   
+  context "SugarCRM::Module" do
+    should "find modules" do
+      assert_instance_of SugarCRM::Module, SugarCRM::Module.find("Accounts")
+    end
+    
+    should "(de)register all modules" do
+      assert SugarCRM.session.modules.size > 0
+      assert SugarCRM.session.namespace_const.const_defined? 'User'
+      
+      SugarCRM::Module.deregister_all(SugarCRM.session)
+      assert SugarCRM.session.modules.size == 0
+      assert ! (SugarCRM.session.namespace_const.const_defined? 'User')
+      
+      SugarCRM::Module.register_all(SugarCRM.session)
+      assert SugarCRM.session.modules.size > 0
+      assert SugarCRM.session.namespace_const.const_defined? 'User'
+    end
+  end
+  
   context "The SugarCRM class" do
     should "return current user" do
       current_user = SugarCRM.current_user
       assert_instance_of SugarCRM::User, current_user
-      assert_equal SugarCRM::Environment.config[:username], current_user.user_name
+      assert_equal SugarCRM.session.config[:username], current_user.user_name
+    end
+    
+    should "implement reload!" do
+      assert_nothing_raised do
+        SugarCRM.reload!
+      end
     end
   end
 end

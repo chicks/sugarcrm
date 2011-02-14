@@ -18,7 +18,7 @@ module SugarCRM; class Connection
     # FIXME: This is to work around a bug in SugarCRM 6.0
     # where no fields are returned if no fields are specified
     if fields.length == 0
-      mod = Module.find(module_name.classify)
+      mod = Module.find(module_name.classify, @session)
       if mod
         fields = mod.fields.keys
       else
@@ -31,7 +31,8 @@ module SugarCRM; class Connection
   # Returns an instance of class for the provided module name
   def class_for(module_name)
     begin
-      klass = "SugarCRM::#{module_name.classify}".constantize.new
+      class_const = @session.namespace_const.const_get(module_name.classify)
+      klass = class_const.new
     rescue NameError
       raise InvalidModule, "Module: #{module_name} is not registered"
     end

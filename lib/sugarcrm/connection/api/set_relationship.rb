@@ -9,7 +9,7 @@ module SugarCRM; class Connection
     raise ArgumentError, "related_ids must be an Array" unless related_ids.class == Array
     json = <<-EOF
       {
-        "session": "#{@session}",
+        "session": "#{@session.id}",
         "module_name": "#{module_name}",
         "module_id": "#{module_id}",
         "link_field_name": "#{link_field_name}",

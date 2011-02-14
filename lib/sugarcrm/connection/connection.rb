@@ -8,7 +8,8 @@ module SugarCRM; class Connection
   attr :url, true
   attr :user, false
   attr :pass, false
-  attr :session, true
+  attr :session_id, true
+  attr_accessor :session
   attr :connection, true
   attr :options, true
   attr :request, true
@@ -28,26 +29,20 @@ module SugarCRM; class Connection
     @response = ""
     resolve_url
     login!
-    # make sure the environment singleton gets loaded
-    if @options[:load_environment] # prevent loops when Environment tries to log in automatically
-      SugarCRM::Environment.update_config({:base_url => url, :username => user, :password => pass}) 
-    end
+    @session.update_config({:base_url => url, :username => user, :password => pass}) if @session
     self
   end
   
   # Check to see if we are logged in
   def logged_in?
     connect! unless connected?
-    @session ? true : false
+    @session_id ? true : false
   end
   
   # Login
   def login!
-    @session = login["id"]
+    @session_id = login["id"]
     raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
-    SugarCRM.connection = self
-    SugarCRM::Base.connection = self
-    Module.register_all if @options[:register_modules]
   end
 
   # Check to see if we are connected

@@ -13,7 +13,7 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        "session": "#{@session}",
+        "session": "#{@session.id}",
         "module_name": "#{module_name}",
         "module_id": "#{id}",
         "link_field_name": "#{related_to.downcase}",
@@ -24,7 +24,7 @@ module SugarCRM; class Connection
       }
     EOF
     json.gsub!(/^\s{6}/,'')
-    SugarCRM::Response.new(send!(:get_relationships, json), {:always_return_array => true}).to_obj
+    SugarCRM::Response.new(send!(:get_relationships, json), @session, {:always_return_array => true}).to_obj
   end
   alias :get_relationship :get_relationships
 end; end
