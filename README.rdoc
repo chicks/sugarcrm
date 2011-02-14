@@ -28,6 +28,9 @@ A less clunky way to interact with SugarCRM via REST.
   # Enable debugging on the current connection
   SugarCRM.connection.debug = true
 
+  # Reload the environment (will make the gem classes reflect changes made on SugarCRM server, such as adding fields)
+  SugarCRM.reload!
+
   # Get the logged in user
   SugarCRM.current_user
 
@@ -177,6 +180,31 @@ If you want to extend the gem's capabilities (e.g. to add methods specific to yo
 * drop your `*.rb` files in `lib/sugarcrm/extensions/` (see the README in that folder)
 
 * drop your `*.rb` files in any other folder and call `SugarCRM::Environment.extensions_folder = ` followed by the absolute path to the folder containing your extensions
+
+== WORKING WITH SIMULTANEOUS SESSIONS
+
+This gem allows you to work with several SugarCRM session simultaneously: on each `SugarCRM.connect` call, a namespace is returned. Make sure you do NOT store this namespace in a reserved name (such as SugarCRM). This namespace can then be used just like you would use the `SugarCRM` module. For example:
+
+    ServerOne = SugarCRM.connect(URL1,...)
+    ServerOne::User.first
+    ServerTwo = SugarCRM.connect(URL2,...)
+    ServerTwo::User.first
+
+If you have only one active session, calls to SugarCRM are delegated to the active session's namespace, like so
+
+    ServerOne = SugarCRM.connect(...)
+    ServerOne::User.first # this call does
+    SugarCRM::User.first # the exact same thing as this one
+
+To replace your session to connect with different credentials, use
+
+    ServerOne.session.reconnect(...)
+
+Then your session will be reused (SugarCRM modules will be reloaded).
+
+To disconnect an active session:
+
+    ServerOne.session.disconnect!
 
 == REQUIREMENTS:
 
