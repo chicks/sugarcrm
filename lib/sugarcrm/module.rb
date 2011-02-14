@@ -156,7 +156,7 @@ module SugarCRM
       # Finds a module by name, or klass name
       def find(name, session=nil)
         session ||= SugarCRM.session
-        register_all unless initialized?
+        register_all(session) unless initialized?
         session.modules.each do |m|
           return m if m.name  == name
           return m if m.klass == name
