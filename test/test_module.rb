@@ -17,6 +17,10 @@ class TestModule < Test::Unit::TestCase
   end
   
   context "SugarCRM::Module" do
+    should "find modules" do
+      assert_instance_of SugarCRM::Module, SugarCRM::Module.find("Accounts")
+    end
+    
     should "(de)register all modules" do
       assert SugarCRM.session.modules.size > 0
       assert SugarCRM.session.namespace_const.const_defined? 'User'
