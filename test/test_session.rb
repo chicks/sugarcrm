@@ -30,9 +30,16 @@ class TestSession < Test::Unit::TestCase
       }
     end
     
-    should "log in to Sugar automatically if credentials are present in config file" do
-      # tested with helper.rb: tests run, so automatic login was successful
-      true
+    should "assign namespaces reliably" do
+      # Namespae0 already assigned (linked to the current connection)
+      One = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      Two = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      One.disconnect!
+      Three = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      
+      assert_not_equal Two.namespace, Three.namespace
+      Two.disconnect!
+      Three.disconnect!
     end
     
     should "update the login credentials on connection" do
