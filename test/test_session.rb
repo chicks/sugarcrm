@@ -36,7 +36,7 @@ class TestSession < Test::Unit::TestCase
     end
     
     should "update the login credentials on connection" do
-      config = YAML.load_file(File.join(File.dirname(__FILE__), 'config.yaml')) # was loaded in helper.rb
+      config = YAML.load_file(CONFIG_PATH) # was loaded in helper.rb
       ["base_url", "username", "password"].each{|k|
         assert_equal config["config"][k], SugarCRM.session.config[k.to_sym]
       }
