@@ -58,10 +58,11 @@ module SugarCRM; class Session
   def self.new_from_file(path, opts={})
     config = load_and_parse_config(path)
     begin
-      self.new(config[:base_url], config[:username], config[:password], opts)
+      session = self.new(config[:base_url], config[:username], config[:password], opts)
     rescue MissingCredentials => e
       return false
     end
+    session.namespace_const
   end
   
   # re-use this session and namespace if the user wants to connect with different credentials
