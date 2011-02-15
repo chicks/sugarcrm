@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestAssociations < Test::Unit::TestCase
+class TestAssociations < ActiveSupport::TestCase
   context "A SugarCRM::Associations class" do
     should "Return an array of Association objects when self#register(SugarCRM::User.new)" do
       associations = SugarCRM::Associations.register(SugarCRM::User.new)

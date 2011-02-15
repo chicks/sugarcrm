@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestResponse < Test::Unit::TestCase
+class TestResponse < ActiveSupport::TestCase
   context "A SugarCRM::Response instance" do
     setup do
       @json =  {"entry_list"=> [{

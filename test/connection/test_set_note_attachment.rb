@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestSetNoteAttachment < Test::Unit::TestCase
+class TestSetNoteAttachment < ActiveSupport::TestCase
   context "A SugarCRM.connection" do
     should "Add an attachment to a Note" do
       n = SugarCRM::Note.new

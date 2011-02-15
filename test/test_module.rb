@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestModule < Test::Unit::TestCase
+class TestModule < ActiveSupport::TestCase
   context "A SugarCRM::Module instance" do
     should "respond to #fields" do
       assert_respond_to SugarCRM.modules[0], :fields

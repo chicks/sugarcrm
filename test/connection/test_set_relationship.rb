@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestSetRelationship < Test::Unit::TestCase
+class TestSetRelationship < ActiveSupport::TestCase
   context "A SugarCRM.connection" do
     should "add and remove a relationship when #set_relationship" do
       meeting  = SugarCRM::Meeting.new

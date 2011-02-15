@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestGetEntryList < Test::Unit::TestCase
+class TestGetEntryList < ActiveSupport::TestCase
   context "A SugarCRM.connection" do
     should "return a list of entries when sent #get_entry_list and no fields." do
       users = SugarCRM.connection.get_entry_list(

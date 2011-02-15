@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestSession < Test::Unit::TestCase
+class TestSession < ActiveSupport::TestCase
   context "A SugarCRM::Session instance" do
     should "load monkey patch extensions" do
       SugarCRM.session.extensions_folder = File.join(File.dirname(__FILE__), 'extensions_test')

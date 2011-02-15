@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestGetEntry < Test::Unit::TestCase
+class TestGetEntry < ActiveSupport::TestCase
   context "A SugarCRM.connection" do
     setup do
       @response = SugarCRM.connection.get_entry(

@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestAssociationCollection < Test::Unit::TestCase
+class TestAssociationCollection < ActiveSupport::TestCase
   context "A SugarCRM::AssociationCollection instance" do
     should "create a new instance when #new" do
       u   = SugarCRM::User.find("seed_sarah_id")

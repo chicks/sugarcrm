@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestSugarCRM < Test::Unit::TestCase
+class TestSugarCRM < ActiveSupport::TestCase
   context "A SugarCRM::Base instance" do
     
     should "establish a connection when Base#establish_connection" do

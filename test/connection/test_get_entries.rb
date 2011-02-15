@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestGetEntries < Test::Unit::TestCase
+class TestGetEntries < ActiveSupport::TestCase
   context "A SugarCRM.connection" do
     should "return an object when #get_entries" do
       @response = SugarCRM.connection.get_entries(
