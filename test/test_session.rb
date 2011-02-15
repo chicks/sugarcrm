@@ -30,7 +30,7 @@ class TestSession < Test::Unit::TestCase
       }
     end
     
-    should "assign namespaces reliably" do
+    should "assign namespaces in a way that prevents collisions" do
       # Namespae0 already assigned (linked to the current connection)
       One = SugarCRM::Session.new_from_file(CONFIG_PATH)
       Two = SugarCRM::Session.new_from_file(CONFIG_PATH)
