@@ -217,6 +217,21 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert a.save!
       assert a.delete
     end
+    
+    should "implement Base#reload!" do
+      user = SugarCRM::User.last
+      assert_not_equal 'admin', user.user_name # make sure we don't mess up admin user
+      
+      # change that user in CRM
+      same_user = SugarCRM::User.last
+      new_name = same_user.last_name + 'crm'
+      same_user.last_name = new_name
+      same_user.save!
+      
+      assert_not_equal new_name, user.last_name
+      user.reload!
+      assert_equal new_name, user.last_name
+    end
   end
   
 end

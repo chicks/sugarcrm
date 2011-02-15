@@ -390,6 +390,10 @@ module SugarCRM; class Base
     (self.class.connection.set_entry(self.class._module.name, params).class == Hash)       
   end
   
+  def reload!
+    self.attributes = self.class.find(self.id).attributes
+  end
+  
   # Returns true if +comparison_object+ is the same exact object, or +comparison_object+ 
   # is of the same type and +self+ has an ID and it is equal to +comparison_object.id+.
   #
