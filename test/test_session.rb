@@ -69,4 +69,32 @@ class TestSession < ActiveSupport::TestCase
     end
   end
   
+  context "The SugarCRM module" do
+    should "show the only the namespaces currently in use with SugarCRM.namespaces" do
+      assert_equal 1, SugarCRM.namespaces.size
+      
+      assert_difference('SugarCRM.namespaces.size') do
+        OneA = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      end
+      
+      assert_difference('SugarCRM.namespaces.size', -1) do
+        OneA.session.disconnect!
+      end
+    end
+    
+    should "add a used namespace on each new connection" do
+      assert_difference('SugarCRM.used_namespaces.size') do
+        OneB = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      end
+      
+      # connection (and namespace) is reused => no used namespace should be added
+      assert_no_difference('SugarCRM.used_namespaces.size') do
+        OneB.session.reconnect!
+      end
+      
+      assert_no_difference('SugarCRM.used_namespaces.size') do
+        OneB.session.disconnect!
+      end
+    end
+  end
 end
