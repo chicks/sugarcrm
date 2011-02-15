@@ -1,6 +1,20 @@
 require 'helper'
 
 class TestSession < ActiveSupport::TestCase
+  context "The SugarCRM::Session class" do
+    should "assign namespaces in a way that prevents collisions" do
+      # Namespae0 already assigned (linked to the current connection)
+      One = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      Two = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      One.session.disconnect!
+      Three = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      
+      assert_not_equal Two, Three # namespaces must be different
+      Two.session.disconnect!
+      Three.session.disconnect!
+    end
+  end
+
   context "A SugarCRM::Session instance" do
     should "load monkey patch extensions" do
       SugarCRM.session.extensions_folder = File.join(File.dirname(__FILE__), 'extensions_test')
@@ -28,18 +42,6 @@ class TestSession < ActiveSupport::TestCase
       config_contents[:config].each{|k,v|
         assert_equal v, SugarCRM.session.config[k]
       }
-    end
-    
-    should "assign namespaces in a way that prevents collisions" do
-      # Namespae0 already assigned (linked to the current connection)
-      One = SugarCRM::Session.new_from_file(CONFIG_PATH)
-      Two = SugarCRM::Session.new_from_file(CONFIG_PATH)
-      One.session.disconnect!
-      Three = SugarCRM::Session.new_from_file(CONFIG_PATH)
-      
-      assert_not_equal Two, Three # namespaces must be different
-      Two.session.disconnect!
-      Three.session.disconnect!
     end
     
     should "be able to disconnect, and log in to Sugar automatically if credentials are present in config file" do
