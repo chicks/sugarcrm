@@ -2,6 +2,10 @@ require 'helper'
 
 class TestSession < ActiveSupport::TestCase
   context "The SugarCRM::Session class" do
+    should "raise SugarCRM::MissingCredentials if at least one of url/username/password is missing" do
+      assert_raise(SugarCRM::MissingCredentials){ SugarCRM.connect('http://127.0.0.1/sugarcrm', nil, nil) }
+    end
+    
     should "assign namespaces in a way that prevents collisions" do
       # Namespae0 already assigned (linked to the current connection)
       One = SugarCRM::Session.new_from_file(CONFIG_PATH)
@@ -97,6 +101,14 @@ class TestSession < ActiveSupport::TestCase
       assert_no_difference('SugarCRM.used_namespaces.size') do
         OneB.session.disconnect!
       end
+    end
+    
+    should "not allow access to methods on SugarCRM if there are multiple active connections" do
+      OneC = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      
+      assert_raise(SugarCRM::MultipleSessions){ SugarCRM.current_user }
+      
+      OneC.session.disconnect!
     end
   end
 end
