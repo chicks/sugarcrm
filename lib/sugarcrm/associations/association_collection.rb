@@ -106,7 +106,7 @@ module SugarCRM
     
     # Loads related records for the given association
     def load_associated_records
-      array = SugarCRM.connection.get_relationships(@owner.class._module.name, @owner.id, @association.to_s)
+      array = @owner.class.session.connection.get_relationships(@owner.class._module.name, @owner.id, @association.to_s)
       @loaded = true
       # we use original to track the state of the collection at start
       @collection = Array.wrap(array).dup

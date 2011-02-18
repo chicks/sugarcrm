@@ -134,7 +134,7 @@ module SugarCRM; module AttributeMethods
     # Complain if we aren't valid
     raise InvalidRecord, errors.to_a.join(", ") if !valid?
     # Send the save request
-    response = SugarCRM.connection.set_entry(self.class._module.name, serialize_modified_attributes)
+    response = self.class.session.connection.set_entry(self.class._module.name, serialize_modified_attributes)
     # Complain if we don't get a parseable response back
     raise RecordsaveFailed, "Failed to save record: #{self}.  Response was not a Hash" unless response.is_a? Hash
     # Complain if we don't get a valid id back

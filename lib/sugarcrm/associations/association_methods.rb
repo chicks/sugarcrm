@@ -29,7 +29,7 @@ module SugarCRM; module AssociationMethods
     targets = Array.wrap(target)
     targets.each do |t|
       association = @associations.find!(t)
-      response = SugarCRM.connection.set_relationship(
+      response = self.class.session.connection.set_relationship(
         self.class._module.name, self.id, 
         association.link_field, [t.id], opts
       )
