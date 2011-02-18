@@ -41,11 +41,13 @@ module SugarCRM
     (raise SugarCRM::MultipleSessions, "There are multiple active sessions: use the session namespace instead of SugarCRM") if @@sessions.size > 1
     @@sessions.values.first.connection
   end
+  
   def self.connect(url, user, pass, options={})
     session = SugarCRM::Session.new(url, user, pass, options)
     # return the namespace module
     session.namespace_const
   end
+  
   class << self
     alias :connect! :connect
   end

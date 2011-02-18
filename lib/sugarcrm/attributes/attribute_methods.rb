@@ -33,9 +33,9 @@ module SugarCRM; module AttributeMethods
         operator ||= '=' 
         # Extract value from query
         value = $3
-        if [TrueClass, FalseClass].include? (condition_class = attribute_condition.class)
+        if [TrueClass, FalseClass].include? attribute_condition.class
           # fix value for checkboxes: users can pass true/false as condition, should be converted to '1' or '0' respectively
-          value = (condition_class == TrueClass ? '1' : '0')
+          value = (attribute_condition.class == TrueClass ? '1' : '0')
         end
         
         # TODO: Write a test for sending invalid attribute names.  
