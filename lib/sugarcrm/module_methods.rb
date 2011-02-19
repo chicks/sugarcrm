@@ -32,14 +32,13 @@ module SugarCRM
   
   def self.session
     return nil if @@sessions.size < 1
-    (raise SugarCRM::MultipleSessions, "There are multiple active sessions") if @@sessions.size > 1
+    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: use the session namespace instead of SugarCRM") if @@sessions.size > 1
     @@sessions.values.first
   end
   
   def self.connection
-    return nil if @@sessions.size == 0
-    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: use the session namespace instead of SugarCRM") if @@sessions.size > 1
-    @@sessions.values.first.connection
+    return nil unless self.session
+    self.session.connection
   end
   
   def self.connect(url, user, pass, options={})
@@ -52,22 +51,19 @@ module SugarCRM
     alias :connect! :connect
   end
   
-  def self.reload!
-    (raise SugarCRM::NoActiveSession, "Nothing to reload") if @@sessions.size < 1
-    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: call methods on the session namespace instead of SugarCRM") if @@sessions.size > 1
-    SugarCRM.session.reload!
-  end
-  
-  def self.current_user
-    (raise SugarCRM::NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
-    (raise SugarCRM::MultipleSessions, "There are multiple active sessions: call methods on the session namespace instead of SugarCRM") if @@sessions.size > 1
-    SugarCRM.session.namespace_const.current_user
+  def respond_to?(sym)
+    return true if @@sessions.size == 1 && SugarCRM.session.namespace_const.respond_to?(sym)
+    super
   end
   
   def self.method_missing(sym, *args, &block)
     (raise SugarCRM::NoActiveSession, "No session is active. Create a new session with 'SugarCRM.connect(...)'") if @@sessions.size < 1
     (raise SugarCRM::MultipleSessions, "There are multiple active sessions: call methods on the session namespace instead of SugarCRM") if @@sessions.size > 1
-    SugarCRM.session.send(sym, *args, &block)
+    if SugarCRM.session.namespace_const.respond_to? sym
+      SugarCRM.session.namespace_const.send(sym, *args, &block)
+    else
+      super
+    end
   end
   
   # If a user tries to access a SugarCRM class before they're logged in,
