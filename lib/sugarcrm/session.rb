@@ -140,6 +140,10 @@ module SugarCRM; class Session
       def self.current_user
         (@session.namespace_const)::User.find_by_user_name(@session.config[:username])
       end
+      def self.method_missing(sym, *args, &block)
+        raise unless @session.respond_to? sym
+        @session.send(sym, *args, &block)
+      end
     end
     # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session
     namespace_module.session = self

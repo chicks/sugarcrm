@@ -200,13 +200,13 @@ If you have only one active session, calls to SugarCRM are delegated to the acti
 
 To replace your session to connect with different credentials, use
 
-    ServerOne.session.reconnect(...)
+    ServerOne.reconnect(...)
 
 Then your session will be reused (SugarCRM modules will be reloaded).
 
 To disconnect an active session:
 
-    ServerOne.session.disconnect!
+    ServerOne.disconnect!
 
 == REQUIREMENTS:
 
