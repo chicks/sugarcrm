@@ -46,7 +46,7 @@ class TestSession < ActiveSupport::TestCase
     should "be able to disconnect, and log in to Sugar automatically if credentials are present in config file" do
       assert_nothing_raised{ SugarCRM.current_user }
       assert SugarCRM.sessions.size == 1
-      
+    
       SugarCRM.disconnect!
       assert SugarCRM.sessions.size == 0
       

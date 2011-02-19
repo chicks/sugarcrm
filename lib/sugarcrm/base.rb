@@ -70,7 +70,7 @@ module SugarCRM; class Base
       find(:all, *args)
     end
     
-    # Creates an object (or multiple objects) and saves it to SugarCRM, if validations pass.
+    # Creates an object (or multiple objects) and saves it to SugarCRM if validations pass.
     # The resulting object is returned whether the object was saved successfully to the database or not.
     #
     # The +attributes+ parameter can be either be a Hash or an Array of Hashes.  These Hashes describe the
