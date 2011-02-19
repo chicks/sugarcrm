@@ -421,13 +421,17 @@ module SugarCRM; class Base
     end
     self.save
   end
-  
+    
   # Delegates to id in order to allow two records of the same type and id to work with something like:
   #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
   def hash
     id.hash
   end
-  
+
+  def pretty_print(pp)
+    pp.text self.inspect, 0
+  end
+
   def attribute_methods_generated?
     self.class.attribute_methods_generated
   end  

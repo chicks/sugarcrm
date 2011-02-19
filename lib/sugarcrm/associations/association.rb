@@ -58,6 +58,10 @@ module SugarCRM
       "@cardinality=:#{@cardinality}>"
     end
     
+    def pretty_print(pp)
+      pp.text self.inspect, 0
+    end
+    
     protected
 
     def check_valid_owner
@@ -150,7 +154,6 @@ module SugarCRM
     def resolve_cardinality
       "#{@relationship[:owner][:cardinality]}_to_#{@relationship[:target][:cardinality]}".to_sym
     end
-    
   end
 end
 

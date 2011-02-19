@@ -19,6 +19,10 @@ class TestAssociations < ActiveSupport::TestCase
       assert_equal :many_to_one, link_fields_hash['accounts'].first.cardinality
       assert_equal :many_to_many, link_fields_hash['contacts'].first.cardinality
     end
+    should "respond to #pretty_print" do
+      a = SugarCRM::Case.first.associations.first
+      assert_respond_to a, :pretty_print
+    end
   end
   
   context "A SugarCRM::Base instance" do

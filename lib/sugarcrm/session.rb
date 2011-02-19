@@ -8,27 +8,15 @@ module SugarCRM; class Session
       :debug  => false,
       :register_modules => true
     }.merge(opts)
-    @modules = []
-    @namespace = "Namespace#{SugarCRM.used_namespaces.size}"
     
-    @config = {
-      :base_url => url,
-      :username => user,
-      :password => pass
-    }
+    @modules    = []
+    @namespace  = "Namespace#{SugarCRM.used_namespaces.size}"
+    @config     = {:base_url => url,:username => user,:password => pass,:options => options}
     
-    load_config_files unless connection_info_loaded?
-    
-    raise MissingCredentials, "Missing login credentials. Make sure you provide the SugarCRM URL, username, and password" unless connection_info_loaded?
-    
-    @namespace_const = register_namespace
-    
-    # load extensions
-    @extensions_path = File.join(File.dirname(__FILE__), 'extensions')
-    
-    connect(url, user, pass, options)
-    
-    SugarCRM.add_session(self)
+    setup_connection
+    register_namespace
+    load_extensions
+    connect_and_add_session
   end
   
   # create a new session from the credentials present in a file
@@ -40,6 +28,11 @@ module SugarCRM; class Session
       return false
     end
     session.namespace_const
+  end
+  
+  def setup_connection
+    load_config_files unless connection_info_loaded?
+    raise MissingCredentials, "Missing login credentials. Make sure you provide the SugarCRM URL, username, and password" unless connection_info_loaded?
   end
   
   # re-use this session and namespace if the user wants to connect with different credentials
@@ -162,6 +155,17 @@ module SugarCRM; class Session
   
   def register_namespace
     SugarCRM.const_set(@namespace, generate_namespace_module)
-    SugarCRM.const_get(@namespace)
+    @namespace_const = SugarCRM.const_get(@namespace)
   end
+  
+  def load_extensions
+    # load extensions
+    @extensions_path = File.join(File.dirname(__FILE__), 'extensions')
+  end  
+  
+  def connect_and_add_session
+    connect(@config[:base_url], @config[:username], @config[:password], @config[:options])
+    SugarCRM.add_session(self)
+  end
+  
 end; end

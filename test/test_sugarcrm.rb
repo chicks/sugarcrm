@@ -234,4 +234,8 @@ class TestSugarCRM < ActiveSupport::TestCase
     end
   end
   
+  should "respond to #pretty_print" do 
+    assert_respond_to SugarCRM::User.new, :pretty_print
+  end
+  
 end
