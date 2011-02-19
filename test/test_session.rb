@@ -10,30 +10,30 @@ class TestSession < ActiveSupport::TestCase
       # Namespae0 already assigned (linked to the current connection)
       One = SugarCRM::Session.new_from_file(CONFIG_PATH)
       Two = SugarCRM::Session.new_from_file(CONFIG_PATH)
-      One.session.disconnect!
+      One.disconnect!
       Three = SugarCRM::Session.new_from_file(CONFIG_PATH)
       
       assert_not_equal Two, Three # namespaces must be different
-      Two.session.disconnect!
-      Three.session.disconnect!
+      Two.disconnect!
+      Three.disconnect!
     end
   end
 
   context "A SugarCRM::Session instance" do
     should "load monkey patch extensions" do
-      SugarCRM.session.extensions_folder = File.join(File.dirname(__FILE__), 'extensions_test')
+      SugarCRM.extensions_folder = File.join(File.dirname(__FILE__), 'extensions_test')
       assert SugarCRM::Contact.is_extended?
       assert SugarCRM::Contact.is_extended?
     end
     
     should "implement reload!" do
       assert_nothing_raised do
-        SugarCRM.session.reload!
+        SugarCRM.reload!
       end
     end
     
     should "load config file" do
-      SugarCRM.session.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
+      SugarCRM.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
       
       config_contents = { 
         :config => {
@@ -44,7 +44,7 @@ class TestSession < ActiveSupport::TestCase
       }
       
       config_contents[:config].each{|k,v|
-        assert_equal v, SugarCRM.session.config[k]
+        assert_equal v, SugarCRM.config[k]
       }
     end
     
@@ -52,7 +52,7 @@ class TestSession < ActiveSupport::TestCase
       assert_nothing_raised{ SugarCRM.current_user }
       assert SugarCRM.sessions.size == 1
       
-      SugarCRM.session.disconnect!
+      SugarCRM.disconnect!
       assert SugarCRM.sessions.size == 0
       
       assert_raise(SugarCRM::NoActiveSession){ SugarCRM.current_user }
@@ -66,12 +66,12 @@ class TestSession < ActiveSupport::TestCase
     should "update the login credentials on connection" do
       config = YAML.load_file(CONFIG_PATH) # was loaded in helper.rb
       ["base_url", "username", "password"].each{|k|
-        assert_equal config["config"][k], SugarCRM.session.config[k.to_sym]
+        assert_equal config["config"][k], SugarCRM.config[k.to_sym]
       }
     end
     
     should "return the server version" do
-      assert_equal String, SugarCRM.session.sugar_version.class
+      assert_equal String, SugarCRM.sugar_version.class
     end
   end
   
@@ -84,7 +84,7 @@ class TestSession < ActiveSupport::TestCase
       end
       
       assert_difference('SugarCRM.namespaces.size', -1) do
-        OneA.session.disconnect!
+        OneA.disconnect!
       end
     end
     
@@ -95,11 +95,11 @@ class TestSession < ActiveSupport::TestCase
       
       # connection (and namespace) is reused => no used namespace should be added
       assert_no_difference('SugarCRM.used_namespaces.size') do
-        OneB.session.reconnect!
+        OneB.reconnect!
       end
       
       assert_no_difference('SugarCRM.used_namespaces.size') do
-        OneB.session.disconnect!
+        OneB.disconnect!
       end
     end
     
@@ -108,7 +108,7 @@ class TestSession < ActiveSupport::TestCase
       
       assert_raise(SugarCRM::MultipleSessions){ SugarCRM.current_user }
       
-      OneC.session.disconnect!
+      OneC.disconnect!
     end
   end
 end
