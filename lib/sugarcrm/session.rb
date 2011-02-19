@@ -12,10 +12,10 @@ module SugarCRM; class Session
     @modules    = []
     @namespace  = "Namespace#{SugarCRM.used_namespaces.size}"
     @config     = {:base_url => url,:username => user,:password => pass,:options => options}
+    @extensions_path = File.join(File.dirname(__FILE__), 'extensions')
     
     setup_connection
     register_namespace
-    load_extensions
     connect_and_add_session
   end
   
@@ -53,7 +53,7 @@ module SugarCRM; class Session
     @id = @connection.session_id
     SugarCRM.add_session(self) # must be removed and added back, as the session id (used as the hash key) changes
     SugarCRM::Module.register_all(self)
-    extensions_folder = @extensions_path
+    load_extensions
     true
   end
   alias :connect! :connect
@@ -71,11 +71,10 @@ module SugarCRM; class Session
   end
   alias :disconnect! :disconnect
   
-  # load all the monkey patch extension files in the provided folder
   def extensions_folder=(folder, dirstring=nil)
-    self.class.validate_path folder
     path = File.expand_path(folder, dirstring)
-    Dir[File.join(path, '**', '*.rb').to_s].each { |f| load(f) }
+    @extensions_path = path
+    load_extensions
   end
   
   # load credentials from file, and (re)connect to SugarCRM
@@ -166,9 +165,10 @@ module SugarCRM; class Session
     @namespace_const = SugarCRM.const_get(@namespace)
   end
   
+  # load all the monkey patch extension files in the provided folder
   def load_extensions
-    # load extensions
-    @extensions_path = File.join(File.dirname(__FILE__), 'extensions')
+    self.class.validate_path @extensions_path
+    Dir[File.join(@extensions_path, '**', '*.rb').to_s].each { |f| load(f) }
   end  
   
   def connect_and_add_session
