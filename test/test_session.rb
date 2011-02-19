@@ -12,7 +12,6 @@ class TestSession < ActiveSupport::TestCase
       Two = SugarCRM::Session.new_from_file(CONFIG_PATH)
       One.disconnect!
       Three = SugarCRM::Session.new_from_file(CONFIG_PATH)
-      
       assert_not_equal Two, Three # namespaces must be different
       Two.disconnect!
       Three.disconnect!
@@ -34,18 +33,14 @@ class TestSession < ActiveSupport::TestCase
     
     should "load config file" do
       SugarCRM.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
-      
       config_contents = { 
         :config => {
-                      :base_url => 'http://127.0.0.1/sugarcrm',
-                      :username => 'admin',
-                      :password => 'letmein'
-                   }
+          :base_url => 'http://127.0.0.1/sugarcrm',
+          :username => 'admin',
+          :password => 'letmein'
+        }
       }
-      
-      config_contents[:config].each{|k,v|
-        assert_equal v, SugarCRM.config[k]
-      }
+      config_contents[:config].each{|k,v| assert_equal v, SugarCRM.config[k]}
     end
     
     should "be able to disconnect, and log in to Sugar automatically if credentials are present in config file" do
