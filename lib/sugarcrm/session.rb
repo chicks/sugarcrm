@@ -140,6 +140,10 @@ module SugarCRM; class Session
       def self.current_user
         (@session.namespace_const)::User.find_by_user_name(@session.config[:username])
       end
+      def self.respond_to?(sym)
+        return true if @session.respond_to? sym
+        super
+      end
       def self.method_missing(sym, *args, &block)
         raise unless @session.respond_to? sym
         @session.send(sym, *args, &block)
