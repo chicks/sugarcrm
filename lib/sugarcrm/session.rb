@@ -17,36 +17,13 @@ module SugarCRM; class Session
       :password => pass
     }
     
-    unless connection_info_loaded?
-      # see README for reasoning behind the priorization
-      config_file_paths.each{|path|
-        load_config path if File.exists? path
-      }
-    end
+    load_config_files unless connection_info_loaded?
     
     raise MissingCredentials, "Missing login credentials. Make sure you provide the SugarCRM URL, username, and password" unless connection_info_loaded?
     
-    # Create a new module to have a separate namespace in which to register the SugarCRM modules.
-    # This will prevent issues with modules from separate SugarCRM instances colliding within the same namespace
-    # (e.g. 2 SugarCRM instances where only one has custom fields on the Account module)
-    namespace_module = Object::Module.new do
-      @session = nil
-      def self.session
-        @session
-      end
-      def self.session=(sess)
-        @session = sess
-      end
-      def self.current_user
-        (@session.namespace_const)::User.find_by_user_name(@session.config[:username])
-      end
-    end
-    # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session
-    namespace_module.session = self
+    @namespace_const = register_namespace
     
-    SugarCRM.const_set(@namespace, namespace_module)
-    @namespace_const = SugarCRM.const_get(@namespace)
-    
+    # load extensions
     @extensions_path = File.join(File.dirname(__FILE__), 'extensions')
     
     connect(url, user, pass, options)
@@ -153,5 +130,38 @@ module SugarCRM; class Session
   
   def connection_info_loaded?
     @config[:base_url] && @config[:username] && @config[:password]
+  end
+  
+  def generate_namespace_module
+    # Create a new module to have a separate namespace in which to register the SugarCRM modules.
+    # This will prevent issues with modules from separate SugarCRM instances colliding within the same namespace
+    # (e.g. 2 SugarCRM instances where only one has custom fields on the Account module)
+    namespace_module = Object::Module.new do
+      @session = nil
+      def self.session
+        @session
+      end
+      def self.session=(sess)
+        @session = sess
+      end
+      def self.current_user
+        (@session.namespace_const)::User.find_by_user_name(@session.config[:username])
+      end
+    end
+    # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session
+    namespace_module.session = self
+    namespace_module
+  end
+  
+  def load_config_files
+    # see README for reasoning behind the priorization
+    config_file_paths.each{|path|
+      load_config path if File.exists? path
+    }
+  end
+  
+  def register_namespace
+    SugarCRM.const_set(@namespace, generate_namespace_module)
+    SugarCRM.const_get(@namespace)
   end
 end; end
