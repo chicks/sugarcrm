@@ -219,18 +219,21 @@ class TestSugarCRM < ActiveSupport::TestCase
     end
     
     should "implement Base#reload!" do
-      user = SugarCRM::User.last
-      assert_not_equal 'admin', user.user_name # make sure we don't mess up admin user
-      
-      # change that user in CRM
-      same_user = SugarCRM::User.last
-      new_name = same_user.last_name + 'crm'
-      same_user.last_name = new_name
-      same_user.save!
-      
-      assert_not_equal new_name, user.last_name
-      user.reload!
-      assert_equal new_name, user.last_name
+      a = SugarCRM::User.last
+      b = SugarCRM::User.last
+      assert_not_equal 'admin', a.user_name # make sure we don't mess up admin user
+      # Save the original value, so we can set it back.
+      orig_last_name = a.last_name.dup
+      diff_last_name = a.last_name + 'crm'
+      b.last_name    = diff_last_name
+      b.save!
+      # Compare the two user objects
+      assert_not_equal b.last_name, a.last_name
+      a.reload!
+      assert_equal a.last_name, b.last_name
+      # Set the name back to what it was before
+      b.last_name = orig_last_name
+      b.save!
     end
   end
   

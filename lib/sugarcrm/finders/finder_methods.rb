@@ -1,0 +1,236 @@
+module SugarCRM; module FinderMethods
+  module ClassMethods
+    private 
+      def find_initial(options)
+        options.update(:limit => 1)
+        result = find_by_sql(options)
+        return result.first if result.instance_of? Array # find_by_sql will return an Array if result are found
+        result
+      end
+  
+      def find_from_ids(ids, options)
+        expects_array = ids.first.kind_of?(Array)
+        return ids.first if expects_array && ids.first.empty?
+
+        ids = ids.flatten.compact.uniq
+
+        case ids.size
+          when 0
+            raise RecordNotFound, "Couldn't find #{self._module.name} without an ID"
+          when 1
+            result = find_one(ids.first, options)
+            expects_array ? [ result ] : result
+          else
+            find_some(ids, options)
+        end
+      end
+  
+      def find_one(id, options)
+      
+        if result = connection.get_entry(self._module.name, id, {:fields => self._module.fields.keys})
+          result
+        else
+          raise RecordNotFound, "Couldn't find #{name} with ID=#{id}#{conditions}"
+        end
+      end
+    
+      def find_some(ids, options)
+        result = connection.get_entries(self._module.name, ids, {:fields => self._module.fields.keys})
+
+        # Determine expected size from limit and offset, not just ids.size.
+        expected_size =
+          if options[:limit] && ids.size > options[:limit]
+            options[:limit]
+          else
+            ids.size
+          end
+
+        # 11 ids with limit 3, offset 9 should give 2 results.
+        if options[:offset] && (ids.size - options[:offset] < expected_size)
+          expected_size = ids.size - options[:offset]
+        end
+
+        if result.size == expected_size
+          result
+        else
+          raise RecordNotFound, "Couldn't find all #{name.pluralize} with IDs (#{ids_list})#{conditions} (found #{result.size} results, but was looking for #{expected_size})"
+        end
+      end
+    
+      def find_every(options)
+        find_by_sql(options)
+      end
+        
+      def find_by_sql(options)
+        # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously, :limit is considered to be the smallest of the two, and :offset is the larger
+        # in addition to allowing querying of large datasets while avoiding timeouts,
+        # this implementation fixes the :limit - :offset bug so that it behaves correctly
+        local_options = {}
+        options.keys.each{|k|
+          local_options[k] = options[k]
+        }
+        local_options.delete(:offset) if local_options[:offset] == 0
+      
+        # store the number of records wanted by user, as we'll overwrite :limit option to obtain several slices of records (to avoid timeout issues)
+        nb_to_fetch = local_options[:limit]
+        nb_to_fetch = nb_to_fetch.to_i if nb_to_fetch
+        offset_value = local_options[:offset] || 10 # arbitrary value, must be bigger than :limit used (see comment above)
+        offset_value = offset_value.to_i
+        offset_value.freeze
+        initial_limit = nb_to_fetch.nil?  ? offset_value : [offset_value, nb_to_fetch].min # how many records should be fetched on first pass
+        # ensure results are ordered so :limit and :offset option behave in a deterministic fashion
+        local_options = { :order_by => :id }.merge(local_options)
+        local_options.update(:limit => initial_limit) # override original argument
+      
+        # get first slice of results
+        # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
+        # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
+        # with :limit always smaller than :offset
+        results = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
+        return nil unless results
+        results = Array.wrap(results)
+      
+        limit_value = [5, offset_value].min # arbitrary value, must be smaller than :offset used (see comment above)
+        limit_value.freeze
+        local_options = { :order_by => :id }.merge(local_options)
+        local_options.update(:limit => limit_value)
+      
+        # a portion of the results has already been queried
+        # update or set the :offset value to reflect this
+        local_options[:offset] ||= results.size
+        local_options[:offset] += offset_value
+      
+        # continue fetching results until we either
+        # a) have as many results as the user wants (specified via the original :limit option)
+        # b) there are no more results matching the criteria
+        while result_slice = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
+          results.concat(Array.wrap(result_slice))
+          # make sure we don't return more results than the user requested (via original :limit option)
+          if nb_to_fetch && results.size >= nb_to_fetch
+            return results.slice(0, nb_to_fetch)
+          end
+          local_options[:offset] += local_options[:limit] # update :offset as we get more records
+        end
+        results
+      end
+
+      def query_from_options(options)
+        # If we dont have conditions, just return an empty query
+        return "" unless options[:conditions]
+        conditions = []
+        options[:conditions].each do |condition|
+          # Merge the result into the conditions array
+          conditions |= flatten_conditions_for(condition)
+        end
+        conditions.join(" AND ")
+      end
+    
+      # return the opposite of the provided order clause
+      # this is used for the :last find option
+      # in other words SugarCRM::Account.last(:order_by => "name")
+      # is equivalent to SugarCRM::Account.first(:order_by => "name DESC")
+      def reverse_order_clause(order)
+        raise "reversing multiple order clauses not supported" if order.split(',').size > 1
+        raise "order clause format not understood; expected 'column_name (ASC|DESC)?'" unless order =~ /^\s*(\S+)\s*(ASC|DESC)?\s*$/
+        column_name = $1
+        reversed_order = {'ASC' => 'DESC', 'DESC' => 'ASC'}[$2 || 'ASC']
+        return "#{column_name} #{reversed_order}"
+      end
+    
+      # Enables dynamic finders like <tt>find_by_user_name(user_name)</tt> and <tt>find_by_user_name_and_password(user_name, password)</tt>
+      # that are turned into <tt>find(:first, :conditions => ["user_name = ?", user_name])</tt> and
+      # <tt>find(:first, :conditions => ["user_name = ? AND password = ?", user_name, password])</tt> respectively. Also works for
+      # <tt>find(:all)</tt> by using <tt>find_all_by_amount(50)</tt> that is turned into <tt>find(:all, :conditions => ["amount = ?", 50])</tt>.
+      #
+      # It's even possible to use all the additional parameters to +find+. For example, the full interface for +find_all_by_amount+
+      # is actually <tt>find_all_by_amount(amount, options)</tt>.
+      #
+      # Also enables dynamic scopes like scoped_by_user_name(user_name) and scoped_by_user_name_and_password(user_name, password) that
+      # are turned into scoped(:conditions => ["user_name = ?", user_name]) and scoped(:conditions => ["user_name = ? AND password = ?", user_name, password])
+      # respectively.
+      #
+      # Each dynamic finder, scope or initializer/creator is also defined in the class after it is first invoked, so that future
+      # attempts to use it do not run through method_missing.
+      def method_missing(method_id, *arguments, &block)
+        if match = DynamicFinderMatch.match(method_id)
+          attribute_names = match.attribute_names
+          super unless all_attributes_exists?(attribute_names)
+          if match.finder?
+            finder = match.finder
+            bang = match.bang?
+            self.class_eval <<-EOS, __FILE__, __LINE__ + 1
+              def self.#{method_id}(*args)
+                options = args.extract_options!
+                attributes = construct_attributes_from_arguments(
+                  [:#{attribute_names.join(',:')}],
+                  args
+                )
+                finder_options = { :conditions => attributes }
+                validate_find_options(options)
+
+                #{'result = ' if bang}if options[:conditions]
+                  with_scope(:find => finder_options) do
+                    find(:#{finder}, options)
+                  end
+                else
+                  find(:#{finder}, options.merge(finder_options))
+                end
+                #{'result || raise(RecordNotFound, "Couldn\'t find #{name} with #{attributes.to_a.collect {|pair| "#{pair.first} = #{pair.second}"}.join(\', \')}")' if bang}
+              end
+            EOS
+            send(method_id, *arguments)
+          elsif match.instantiator?
+            instantiator = match.instantiator
+            self.class_eval <<-EOS, __FILE__, __LINE__ + 1
+              def self.#{method_id}(*args)
+                attributes = [:#{attribute_names.join(',:')}]
+                protected_attributes_for_create, unprotected_attributes_for_create = {}, {}
+                args.each_with_index do |arg, i|
+                  if arg.is_a?(Hash)
+                    protected_attributes_for_create = args[i].with_indifferent_access
+                  else
+                    unprotected_attributes_for_create[attributes[i]] = args[i]
+                  end
+                end
+
+                find_attributes = (protected_attributes_for_create.merge(unprotected_attributes_for_create)).slice(*attributes)
+
+                options = { :conditions => find_attributes }
+
+                record = find(:first, options)
+
+                if record.nil?
+                  record = self.new(unprotected_attributes_for_create)
+                  #{'record.save' if instantiator == :create}
+                  record
+                else
+                  record
+                end
+              end
+            EOS
+            send(method_id, *arguments, &block)
+          end
+        else
+          super
+        end
+      end
+    
+      def all_attributes_exists?(attribute_names)
+        attribute_names.all? { |name| attributes_from_module.include?(name) }
+      end
+    
+      def construct_attributes_from_arguments(attribute_names, arguments)
+        attributes = {}
+        attribute_names.each_with_index { |name, idx| attributes[name] = arguments[idx] }
+        attributes
+      end
+    
+      VALID_FIND_OPTIONS = [ :conditions, :deleted, :fields, :include, :joins, :limit, :link_fields, :offset,
+                             :order_by, :select, :readonly, :group, :having, :from, :lock ]
+
+      def validate_find_options(options) #:nodoc:
+        options.assert_valid_keys(VALID_FIND_OPTIONS)
+      end
+    end
+  end
+end
