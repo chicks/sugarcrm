@@ -52,5 +52,10 @@ module SugarCRM
       @associations.send(method_name.to_sym, *args, &block)
     end
     
+    # respond correctly for delegated methods
+    def respond_to?(method_name)
+      return true if @associations.respond_to? method_name
+      super
+    end
   end
 end

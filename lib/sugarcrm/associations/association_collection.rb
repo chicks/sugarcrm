@@ -81,6 +81,13 @@ module SugarCRM
       @collection.send(method_name.to_sym, *args, &block)
     end
     
+    # respond correctly for delegated methods
+    def respond_to?(method_name)
+      load
+      return true if @collection.respond_to? method_name
+      super
+    end
+    
     def save
       begin
         save!
