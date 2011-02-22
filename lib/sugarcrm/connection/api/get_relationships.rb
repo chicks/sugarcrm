@@ -8,7 +8,7 @@ module SugarCRM; class Connection
       :query => '',
       :fields => [], 
       :link_fields => [], 
-      :deleted => ''
+      :deleted => 0
     }.merge! opts  
 
     json = <<-EOF
