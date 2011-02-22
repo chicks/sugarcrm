@@ -5,7 +5,7 @@ module SugarCRM; class Connection
     json = <<-EOF
       {
         "session": "#{@session.id}",
-        "id": #{id}
+        "id": "#{id}"
       }
     EOF
     json.gsub!(/^\s{6}/,'')
