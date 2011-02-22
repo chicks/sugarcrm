@@ -17,7 +17,7 @@ module SugarCRM; class Connection
         "session": "#{@session.id}",
         "document_revision": {
            "id": "#{document_id}",
-           "filename": "#{options[:filename]}",
+           "filename": "#{options[:file_name]}",
            "file": "#{Base64.encode64(options[:file])}",
            "revision": "#{revision_number}"
         }
