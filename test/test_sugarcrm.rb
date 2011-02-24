@@ -2,11 +2,6 @@ require 'helper'
 
 class TestSugarCRM < ActiveSupport::TestCase
   context "A SugarCRM::Base instance" do
-    
-    should "establish a connection when Base#establish_connection" do
-      # Base#establish_connection was called automatically when loading config file containing connection params
-      assert SugarCRM.connection.connected?
-    end
   
     should "return the module name" do
       assert_equal "Users", SugarCRM::User._module.name
