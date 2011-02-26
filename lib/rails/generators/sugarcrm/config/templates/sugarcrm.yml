@@ -1,0 +1,4 @@
+config:
+  base_url: http://127.0.0.1/sugarcrm # where your SugarCRM instance is located
+  username: admin
+  password: letmein
