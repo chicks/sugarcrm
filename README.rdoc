@@ -140,6 +140,17 @@ A less clunky way to interact with SugarCRM via REST.
     } 
   )
 
+== USING THE GEM WITH RAILS 3
+
+Note: this gem requires Rails 3 as it depends on Active Support >= 3.
+
+1. Add the sugarcrm gem to your Gemfile (sugarcrm gem version >= 0.9.12)
+2. Run `bundle install`
+4. Run `rails g sugarcrm:config`
+5. Edit the configuration file in `config/sugarcrm.yml` to match your environment
+
+Example app here: https://github.com/davidsulc/sugar_on_rails_basic
+
 == USING A CONFIGURATION FILE
 
 If you want to use a configuration file instead of always specifying the url, username, and password to connect to SugarCRM, you can add your credentials to one (or more) of
