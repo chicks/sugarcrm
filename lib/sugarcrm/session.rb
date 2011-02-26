@@ -126,6 +126,7 @@ module SugarCRM; class Session
   end
   
   def connection_info_loaded?
+    return false unless @config
     @config[:base_url] && @config[:username] && @config[:password]
   end
   
