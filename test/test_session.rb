@@ -1,5 +1,7 @@
 require 'helper'
 
+CONFIG_TEST_PATH = File.join(File.dirname(__FILE__), 'config_test.yaml')
+
 class TestSession < ActiveSupport::TestCase
   context "The SugarCRM::Session class" do
     should "raise SugarCRM::MissingCredentials if at least one of url/username/password is missing" do
@@ -40,7 +42,7 @@ class TestSession < ActiveSupport::TestCase
     end
     
     should "load config file" do
-      SugarCRM.load_config File.join(File.dirname(__FILE__), 'config_test.yaml')
+      SugarCRM.load_config CONFIG_TEST_PATH
       config_contents = { 
         :config => {
           :base_url => 'http://127.0.0.1/sugarcrm',
