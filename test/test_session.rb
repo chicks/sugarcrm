@@ -16,6 +16,14 @@ class TestSession < ActiveSupport::TestCase
       Two.disconnect!
       Three.disconnect!
     end
+    
+    should "create a session from a config file" do
+      assert_difference('SugarCRM.namespaces.size') do
+        SugarCRM::Session.new_from_file(CONFIG_PATH)
+      end
+      
+      SugarCRM.const_get(SugarCRM.namespaces.last).disconnect
+    end
   end
 
   context "A SugarCRM::Session instance" do
