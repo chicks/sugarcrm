@@ -18,7 +18,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/chicks/sugarcrm"
   gem.authors = ["Carl Hicks", "David Sulc"]
   gem.executables = ['sugarcrm']
-  gem.files = FileList['./**/*'].to_a.reject!{|f| ['Gemfile.lock', 'config.yaml'].include? f } # ignore config.yaml (used for tests, each contributor has his own)
+  gem.files = FileList['./lib/**/*', './*'].exclude("*.lock").to_a
 end
 Jeweler::RubygemsDotOrgTasks.new
 
