@@ -29,6 +29,10 @@ class TestSession < ActiveSupport::TestCase
       Three.disconnect!
     end
     
+    should "parse config parameters from a file" do
+      assert_equal CONFIG_CONTENTS, SugarCRM::Session.parse_config_file(CONFIG_PATH)
+    end
+    
     should "create a session from a config file" do
       assert_difference('SugarCRM.namespaces.size') do
         SugarCRM::Session.new_from_file(CONFIG_PATH)

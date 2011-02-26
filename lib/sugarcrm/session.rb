@@ -21,8 +21,8 @@ module SugarCRM; class Session
   
   # create a new session from the credentials present in a file
   def self.new_from_file(path, opts={})
-    config = load_and_parse_config(path)
-    self.new_from_hash(config, opts)
+    config_values = self.parse_config_file(path)
+    self.new_from_hash(config_values[:config], opts)
   end
   
   # Creates a new session from the credentials in the hash
@@ -33,6 +33,14 @@ module SugarCRM; class Session
       return false
     end
     session.namespace_const
+  end
+  
+  # Returns a hash with the content in the YAML argument file
+  def self.parse_config_file(path)
+    self.validate_path path
+    contents = YAML.load_file(path)
+    return {} unless contents
+    self.symbolize_keys(contents)
   end
   
   def setup_connection
@@ -84,7 +92,8 @@ module SugarCRM; class Session
   
   # load credentials from file, and (re)connect to SugarCRM
   def load_config(path)
-    @config = self.class.load_and_parse_config(path)
+    @config = self.class.parse_config_file(path)
+    @config = @config[:config] if @config
     reconnect(@config[:base_url], @config[:username], @config[:password]) if connection_info_loaded?
     @config
   end
@@ -102,16 +111,17 @@ module SugarCRM; class Session
   end
   
   private
-  def self.load_and_parse_config(path)
-    validate_path path
-    hash = {}
-    config = YAML.load_file(path)
-    if config && config["config"]
-      config["config"].each{|k,v|
-        hash[k.to_sym] = v
-      }
-    end
-    hash
+  # Converts all hash keys to symbols (if a hash value is itself a hash, call the method recursively)
+  #   Session.symbolize_keys({"one" => 1, "two" => {"foo" => "bar"}}) # => {:one => 1, :two => {:foo => "bar"}}
+  def self.symbolize_keys(hash)
+    hash.inject({}){|memo,(k,v)|
+      unless v.class == Hash
+        memo[k.to_sym] = v
+      else
+        memo[k.to_sym] = self.symbolize_keys(v)
+      end
+      memo
+    }
   end
   
   def self.validate_path(path)
