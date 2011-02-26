@@ -1,0 +1,14 @@
+development:
+  base_url: http://127.0.0.1/sugarcrm # where your SugarCRM instance is located
+  username: admin
+  password: letmein
+
+test:
+  base_url: http://127.0.0.1/sugarcrm
+  username: admin
+  password: letmein
+
+production:
+  base_url: http://127.0.0.1/sugarcrm
+  username: admin
+  password: letmein

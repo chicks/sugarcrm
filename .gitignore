@@ -20,7 +20,6 @@ pkg
 Gemfile.lock
 
 ## PROJECT::SPECIFIC
-*.gemspec
 
 .bundle
 
