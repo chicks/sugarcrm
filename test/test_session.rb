@@ -20,10 +20,10 @@ class TestSession < ActiveSupport::TestCase
     
     should "assign namespaces in a way that prevents collisions" do
       # Namespae0 already assigned (linked to the current connection)
-      One = SugarCRM::Session.new_from_file(CONFIG_PATH)
-      Two = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      One = SugarCRM::Session.from_file(CONFIG_PATH)
+      Two = SugarCRM::Session.from_file(CONFIG_PATH)
       One.disconnect!
-      Three = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      Three = SugarCRM::Session.from_file(CONFIG_PATH)
       assert_not_equal Two, Three # namespaces must be different
       Two.disconnect!
       Three.disconnect!
@@ -35,7 +35,7 @@ class TestSession < ActiveSupport::TestCase
     
     should "create a session from a config file" do
       assert_difference('SugarCRM.namespaces.size') do
-        SugarCRM::Session.new_from_file(CONFIG_PATH)
+        SugarCRM::Session.from_file(CONFIG_PATH)
       end
       
       SugarCRM.const_get(SugarCRM.namespaces.last).disconnect
@@ -69,7 +69,7 @@ class TestSession < ActiveSupport::TestCase
       
       assert_raise(SugarCRM::NoActiveSession){ SugarCRM.current_user }
       
-      SugarCRM::Session.new_from_file(CONFIG_PATH)
+      SugarCRM::Session.from_file(CONFIG_PATH)
       
       assert_nothing_raised{ SugarCRM.current_user }
       assert SugarCRM.sessions.size == 1
@@ -92,7 +92,7 @@ class TestSession < ActiveSupport::TestCase
       assert_equal 1, SugarCRM.namespaces.size
       
       assert_difference('SugarCRM.namespaces.size') do
-        OneA = SugarCRM::Session.new_from_file(CONFIG_PATH)
+        OneA = SugarCRM::Session.from_file(CONFIG_PATH)
       end
       
       assert_difference('SugarCRM.namespaces.size', -1) do
@@ -102,7 +102,7 @@ class TestSession < ActiveSupport::TestCase
     
     should "add a used namespace on each new connection" do
       assert_difference('SugarCRM.used_namespaces.size') do
-        OneB = SugarCRM::Session.new_from_file(CONFIG_PATH)
+        OneB = SugarCRM::Session.from_file(CONFIG_PATH)
       end
       
       # connection (and namespace) is reused => no used namespace should be added
@@ -116,7 +116,7 @@ class TestSession < ActiveSupport::TestCase
     end
     
     should "not allow access to methods on SugarCRM if there are multiple active connections" do
-      OneC = SugarCRM::Session.new_from_file(CONFIG_PATH)
+      OneC = SugarCRM::Session.from_file(CONFIG_PATH)
       
       assert_raise(SugarCRM::MultipleSessions){ SugarCRM.current_user }
       

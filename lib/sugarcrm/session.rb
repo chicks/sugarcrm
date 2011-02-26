@@ -19,14 +19,14 @@ module SugarCRM; class Session
     connect_and_add_session
   end
   
-  # create a new session from the credentials present in a file
-  def self.new_from_file(path, opts={})
+  # Creates a new session from the credentials present in a file
+  def self.from_file(path, opts={})
     config_values = self.parse_config_file(path)
-    self.new_from_hash(config_values[:config], opts)
+    self.from_hash(config_values[:config], opts)
   end
   
   # Creates a new session from the credentials in the hash
-  def self.new_from_hash(hash, opts={})
+  def self.from_hash(hash, opts={})
     begin
       session = self.new(hash[:base_url], hash[:username], hash[:password], opts)
     rescue MissingCredentials => e
