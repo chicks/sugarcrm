@@ -14,7 +14,7 @@ module SugarCRM; class ConnectionPool
     @timeout = @session.config[:wait_timeout] || 5
     
     # default max pool size to 5
-    @size = (@session.config[:pool] && @session.config[:pool].to_i) || default_pool_size
+    @size = config_pool_size || default_pool_size
     
     @connections = []
     @checked_out = []
@@ -134,6 +134,15 @@ module SugarCRM; class ConnectionPool
   
   def current_connection_id #:nodoc:
     Thread.current.object_id
+  end
+  
+  # Returns the connection pool size, if present
+  def config_pool_size
+    begin
+      @session.config[:options][:connection_pool][:size] && @session.config[:options][:connection_pool][:size].to_i
+    rescue
+      false
+    end
   end
   
   # The default for the connection pool's maximum size depends on environment:

@@ -5,5 +5,16 @@ class TestConnectionPool < ActiveSupport::TestCase
     should "have a default pool size of 1 if Rails isn't defined" do
       assert_equal 1, SugarCRM.session.connection_pool.size
     end
+    
+    should "be able to specify its pool size" do
+      config = SugarCRM.session.config
+      sess = SugarCRM::Session.new(config[:base_url], config[:username], config[:password], {:connection_pool => {:size => 3}})
+      
+      begin
+        assert_equal 3, sess.connection_pool.size
+      ensure
+        sess.disconnect!
+      end
+    end
   end
 end
