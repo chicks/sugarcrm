@@ -1,7 +1,7 @@
 require 'monitor'
 
 module SugarCRM; class ConnectionPool
-  attr_reader :size
+  attr_reader :size, :timeout
   def initialize(session)
     @session = session
     
@@ -11,7 +11,7 @@ module SugarCRM; class ConnectionPool
     # The mutex used to synchronize pool access
     @connection_mutex = Monitor.new
     @queue = @connection_mutex.new_cond
-    @timeout = @session.config[:wait_timeout] || 5
+    @timeout = config_timeout || 5
     
     # default max pool size to 5
     @size = config_pool_size || default_pool_size
@@ -134,6 +134,15 @@ module SugarCRM; class ConnectionPool
   
   def current_connection_id #:nodoc:
     Thread.current.object_id
+  end
+  
+  # Returns the connection pool timeout, if present
+  def config_timeout
+    begin
+      @session.config[:options][:connection_pool][:wait_timeout] && @session.config[:options][:connection_pool][:wait_timeout].to_i
+    rescue
+      false
+    end
   end
   
   # Returns the connection pool size, if present
