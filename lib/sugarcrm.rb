@@ -10,6 +10,7 @@ require 'json'
 
 require 'sugarcrm/session'
 require 'sugarcrm/module_methods'
+require 'sugarcrm/connection_pool'
 require 'sugarcrm/connection'
 require 'sugarcrm/exceptions'
 require 'sugarcrm/finders'
