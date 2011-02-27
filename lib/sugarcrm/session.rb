@@ -55,6 +55,7 @@ module SugarCRM; class Session
       :register_modules => true
     }.merge(opts)
     
+    # store the params used to connect
     {:base_url => url, :username => user, :password => pass}.each{|k,v|
       @config[k] = v  unless v.nil?
     }
