@@ -1,22 +1,22 @@
 require 'monitor'
 
 module SugarCRM; class ConnectionPool
-  def initialize(params)
+  def initialize(session)
+    @session = session
+    
     # The cache of reserved connections mapped to threads
     @reserved_connections = {}
     
     # The mutex used to synchronize pool access
     @connection_mutex = Monitor.new
     @queue = @connection_mutex.new_cond
-    @timeout = params[:wait_timeout] || 5
+    @timeout = @session.config[:wait_timeout] || 5
     
     # default max pool size to 5
-    @size = (params[:pool] && params[:pool].to_i) || 5
+    @size = (@session.config[:pool] && @session.config[:pool].to_i) || 5
     
     @connections = []
     @checked_out = []
-    
-    @credentials = params[:credentials]
   end
   
   # If a connection already exists yield it to the block. If no connection
@@ -84,6 +84,18 @@ module SugarCRM; class ConnectionPool
     end
   end
   
+  # Disconnects all connections in the pool, and clears the pool.
+  def disconnect!
+    @reserved_connections.each_value do |conn|
+      checkin conn
+    end
+    @reserved_connections = {}
+    @connections.each do |conn|
+      conn.logout
+    end
+    @connections = []
+  end
+  
   # Return any checked-out connections back to the pool by threads that
   # are no longer alive.
   def clear_stale_cached_connections!
@@ -98,7 +110,9 @@ module SugarCRM; class ConnectionPool
   
   private
   def new_connection
-    Connection.new(@credentials[:base_url], @credentials[:username], @credentials[:password])
+    c = Connection.new(@session.config[:base_url], @session.config[:username], @session.config[:password], @session.config[:options])
+    c.session = @session
+    c
   end
   
   def checkout_new_connection

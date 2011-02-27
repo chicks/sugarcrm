@@ -1,7 +1,7 @@
 # This class hold an individual connection to a SugarCRM server.
 # There can be several such simultaneous connections
 module SugarCRM; class Session
-  attr_reader :config, :connection, :extensions_path, :namespace, :namespace_const
+  attr_reader :config, :extensions_path, :namespace, :namespace_const
   attr_accessor :modules
   def initialize(url, user, pass, opts={})
     options = { 
@@ -61,8 +61,7 @@ module SugarCRM; class Session
     }
     
     SugarCRM::Module.deregister_all(self)
-    @connection = SugarCRM::Connection.new(@config[:base_url], @config[:username], @config[:password], options) if connection_info_loaded?
-    @connection.session = self
+    @connection_pool = SugarCRM::ConnectionPool.new(self)
     SugarCRM::Module.register_all(self)
     load_extensions
     true
@@ -72,9 +71,14 @@ module SugarCRM; class Session
   alias :reconnect! :connect
   alias :reload! :connect
   
+  # Returns a connection from the connection pool, if available
+  def connection
+    @connection_pool.connection
+  end
+  
   # log out from SugarCRM and cleanup (deregister modules, remove session, etc.)
   def disconnect
-    @connection.logout
+    @connection_pool.disconnect!
     SugarCRM::Module.deregister_all(self)
     namespace = @namespace
     SugarCRM.instance_eval{ remove_const namespace } # remove NamespaceX from SugarCRM
@@ -105,7 +109,7 @@ module SugarCRM; class Session
   
   # lazy load the SugarCRM version we're connecting to
   def sugar_version
-    @version ||= @connection.get_server_info["version"]
+    @version ||= connection.get_server_info["version"]
   end
   
   private

@@ -43,6 +43,11 @@ module SugarCRM; class Connection
     @sugar_session_id = login["id"]
     raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
   end
+  
+  def logout
+    logout
+    @sugar_session_id = nil
+  end
 
   # Check to see if we are connected
   def connected?
