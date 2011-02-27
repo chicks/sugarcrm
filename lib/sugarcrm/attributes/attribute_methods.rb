@@ -54,6 +54,10 @@ module SugarCRM; module AttributeMethods
     false
   end
   
+  def destroyed?
+    @attributes[:deleted]
+  end
+  
   def attributes_changed?
     @modified_attributes.length > 0
   end
@@ -62,10 +66,16 @@ module SugarCRM; module AttributeMethods
   def new?
     @attributes[:id].blank?
   end
+  alias :new_record? :new?
   
   # List the required attributes for save
   def required_attributes
     self.class._module.required_fields
+  end
+  alias :required_fields :required_attributes
+  
+  def to_model
+    self
   end
 
   protected
@@ -98,6 +108,9 @@ module SugarCRM; module AttributeMethods
       end
       def #{k}=(value)
         write_attribute :#{k},value
+      end
+      def #{k}\?
+        has_attribute\? :#{k}
       end
       ?
     end
@@ -156,6 +169,10 @@ module SugarCRM; module AttributeMethods
   def write_attribute(key, value)
     @modified_attributes[key] = { :old => @attributes[key].to_s, :new => value }
     @attributes[key] = value
+  end
+  
+  def has_attribute?(key)
+    @attributes.has_key? key
   end
   
 end; end

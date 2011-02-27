@@ -154,7 +154,7 @@ module SugarCRM; class Base
     params          = {}
     params[:id]     = serialize_id
     params[:deleted]= {:name => "deleted", :value => "1"}
-    (self.class.connection.set_entry(self.class._module.name, params).class == Hash)       
+    @attributes[:deleted] = (self.class.connection.set_entry(self.class._module.name, params).class == Hash)
   end
   
   # Reloads the record from SugarCRM

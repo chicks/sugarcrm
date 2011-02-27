@@ -63,6 +63,7 @@ class TestSugarCRM < ActiveSupport::TestCase
 
     should "create, modify, and delete a record" do
       u = SugarCRM::User.new
+      assert u.email1?
       u.email1 = "abc@abc.com"
       u.first_name = "Test"
       u.last_name = "User"
@@ -77,6 +78,7 @@ class TestSugarCRM < ActiveSupport::TestCase
       m.title = "Test User"
       assert m.save!
       assert m.delete
+      assert m.destroyed?
     end
     
     should "support finding first instance (sorted by attribute)" do
