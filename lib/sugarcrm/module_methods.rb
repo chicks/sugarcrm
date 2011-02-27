@@ -15,7 +15,7 @@ module SugarCRM
   end
   
   # store the various connected sessions
-  # key = session.id, value = session instance
+  # key = session.object_id, value = session instance
   @@sessions = {}
   def self.sessions
     @@sessions
@@ -23,11 +23,11 @@ module SugarCRM
   
   def self.add_session(session)
     @@used_namespaces << session.namespace unless @@used_namespaces.include? session.namespace
-    @@sessions[session.id] = session
+    @@sessions[session.object_id] = session
   end
   
   def self.remove_session(session)
-    @@sessions.delete(session.id)
+    @@sessions.delete(session.object_id)
   end
   
   def self.session

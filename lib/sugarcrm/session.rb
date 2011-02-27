@@ -60,11 +60,9 @@ module SugarCRM; class Session
     }
     
     SugarCRM::Module.deregister_all(self)
-    SugarCRM.remove_session(self)
     @connection = SugarCRM::Connection.new(@config[:base_url], @config[:username], @config[:password], options) if connection_info_loaded?
     @connection.session = self
     @id = @connection.session_id
-    SugarCRM.add_session(self) # must be removed and added back, as the session id (used as the hash key) changes
     SugarCRM::Module.register_all(self)
     load_extensions
     true
