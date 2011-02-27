@@ -10,7 +10,7 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        "session": "#{@session.id}",
+        "session": "#{@sugar_session_id}",
         "module_name": "#{module_name}",
         "ids": #{ids.to_json},
         "select_fields": #{resolve_fields(module_name, options[:fields])},

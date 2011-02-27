@@ -14,7 +14,7 @@ module SugarCRM; class Connection
     login! unless logged_in?
     json = <<-EOF
       {
-        "session": "#{@session.id}",
+        "session": "#{@sugar_session_id}",
         "document_revision": {
            "id": "#{document_id}",
            "filename": "#{options[:file_name]}",

@@ -13,7 +13,7 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        "session": "#{@session.id}",
+        "session": "#{@sugar_session_id}",
         "module_name": "#{module_name}",
         "module_id": "#{id}",
         "link_field_name": "#{related_to.downcase}",

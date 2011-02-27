@@ -1,7 +1,7 @@
 # This class hold an individual connection to a SugarCRM server.
 # There can be several such simultaneous connections
 module SugarCRM; class Session
-  attr_reader :config, :connection, :extensions_path, :id, :namespace, :namespace_const
+  attr_reader :config, :connection, :extensions_path, :namespace, :namespace_const
   attr_accessor :modules
   def initialize(url, user, pass, opts={})
     options = { 
@@ -63,7 +63,6 @@ module SugarCRM; class Session
     SugarCRM::Module.deregister_all(self)
     @connection = SugarCRM::Connection.new(@config[:base_url], @config[:username], @config[:password], options) if connection_info_loaded?
     @connection.session = self
-    @id = @connection.session_id
     SugarCRM::Module.register_all(self)
     load_extensions
     true

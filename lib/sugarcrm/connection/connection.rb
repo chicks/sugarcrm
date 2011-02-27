@@ -8,8 +8,8 @@ module SugarCRM; class Connection
   attr :url, true
   attr :user, false
   attr :pass, false
-  attr :session_id, true
-  attr_accessor :session
+  attr :session, true
+  attr :sugar_session_id, true
   attr :connection, true
   attr :options, true
   attr :request, true
@@ -29,19 +29,18 @@ module SugarCRM; class Connection
     @response = ""
     resolve_url
     login!
-    @session.update_config({:base_url => url, :username => user, :password => pass}) if @session
     self
   end
   
   # Check to see if we are logged in
   def logged_in?
     connect! unless connected?
-    @session_id ? true : false
+    @sugar_session_id ? true : false
   end
   
   # Login
   def login!
-    @session_id = login["id"]
+    @sugar_session_id = login["id"]
     raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
   end
 

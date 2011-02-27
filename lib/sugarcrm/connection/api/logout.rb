@@ -5,7 +5,7 @@ module SugarCRM; class Connection
     json = <<-EOF
       {
         "user_auth": {
-          "session": "#{@session.id}"
+          "session": "#{@sugar_session_id}"
         }
       }
     EOF

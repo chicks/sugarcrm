@@ -14,7 +14,7 @@ module SugarCRM; class Connection
 
     json = <<-EOF
       {
-        "session": "#{@session.id}",
+        "session": "#{@sugar_session_id}",
         "module_name": "#{module_name}",
         "query": "#{query}",
         "order_by": "#{options[:order_by]}",
