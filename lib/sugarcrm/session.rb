@@ -51,7 +51,7 @@ module SugarCRM; class Session
   # re-use this session and namespace if the user wants to connect with different credentials
   def connect(url=nil, user=nil, pass=nil, opts={})
     options = { 
-      :debug  => (@connection && @connection.debug?),
+      :debug  => @config[:options][:debug],
       :register_modules => true
     }.merge(opts)
     
@@ -90,8 +90,8 @@ module SugarCRM; class Session
   
   # load credentials from file, and (re)connect to SugarCRM
   def load_config(path)
-    @config = self.class.parse_config_file(path)
-    @config = @config[:config] if @config
+    new_config = self.class.parse_config_file(path)
+    @config[:config] = new_config[:config] if new_config
     reconnect(@config[:base_url], @config[:username], @config[:password]) if connection_info_loaded?
     @config
   end
