@@ -52,7 +52,6 @@ module SugarCRM; class Session
     raise MissingCredentials, "Missing login credentials. Make sure you provide the SugarCRM URL, username, and password" unless connection_info_loaded?
   end
   
-  # re-use this session and namespace if the user wants to connect with different credentials
   def connect(url=nil, user=nil, pass=nil, opts={})
     options = { 
       :debug  => @config[:options][:debug],
@@ -71,9 +70,14 @@ module SugarCRM; class Session
     true
   end
   alias :connect! :connect
-  alias :reconnect :connect
-  alias :reconnect! :connect
-  alias :reload! :connect
+  
+  # Re-uses this session and namespace if the user wants to connect with different credentials
+  def reconnect(url=nil, user=nil, pass=nil, opts={})
+    disconnect
+    connect(url, user, pass, opts)
+  end
+  alias :reconnect! :reconnect
+  alias :reload! :reconnect
   
   # log out from SugarCRM and cleanup (deregister modules, remove session, etc.)
   def disconnect
