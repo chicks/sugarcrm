@@ -75,11 +75,6 @@ module SugarCRM; class Session
   alias :reconnect! :connect
   alias :reload! :connect
   
-  # Returns a connection from the connection pool, if available
-  def connection
-    @connection_pool.connection
-  end
-  
   # log out from SugarCRM and cleanup (deregister modules, remove session, etc.)
   def disconnect
     @connection_pool.disconnect!
@@ -89,6 +84,11 @@ module SugarCRM; class Session
     SugarCRM.remove_session(self)
   end
   alias :disconnect! :disconnect
+  
+  # Returns a connection from the connection pool, if available
+  def connection
+    @connection_pool.connection
+  end
   
   def extensions_folder=(folder, dirstring=nil)
     path = File.expand_path(folder, dirstring)
