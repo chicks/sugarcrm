@@ -2,6 +2,11 @@ development:
   base_url: http://127.0.0.1/sugarcrm # where your SugarCRM instance is located
   username: admin
   password: letmein
+  # connection pool settings
+  # if you don't know what purpose this serves, you can safely ignore these settings
+  # works similarly to Rails' database connection pooling (documented here: http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/ConnectionPool.html)
+#   pool: 3 # the maximum number of simulatenous connections the gem should open with the SugarCRM server (default is 5)
+#   wait_timeout: 7 # maximum time to wait for an available connection to SugarCRM server, in seconds (default is 5)
 
 test:
   base_url: http://127.0.0.1/sugarcrm

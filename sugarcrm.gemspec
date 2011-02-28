@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carl Hicks", "David Sulc"]
-  s.date = %q{2011-02-26}
+  s.date = %q{2011-02-27}
   s.default_executable = %q{sugarcrm}
   s.email = %q{carl.hicks@gmail.com}
   s.executables = ["sugarcrm"]
@@ -69,6 +69,7 @@ Gem::Specification.new do |s|
     "./lib/sugarcrm/connection/helper.rb",
     "./lib/sugarcrm/connection/request.rb",
     "./lib/sugarcrm/connection/response.rb",
+    "./lib/sugarcrm/connection_pool.rb",
     "./lib/sugarcrm/exceptions.rb",
     "./lib/sugarcrm/extensions/README.txt",
     "./lib/sugarcrm/finders.rb",
@@ -103,6 +104,7 @@ Gem::Specification.new do |s|
     "test/test_association_collection.rb",
     "test/test_associations.rb",
     "test/test_connection.rb",
+    "test/test_connection_pool.rb",
     "test/test_module.rb",
     "test/test_response.rb",
     "test/test_session.rb",
