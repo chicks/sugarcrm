@@ -18,7 +18,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/chicks/sugarcrm"
   gem.authors = ["Carl Hicks", "David Sulc"]
   gem.executables = ['sugarcrm']
-  gem.files = FileList['./lib/**/*', './*'].exclude("*.lock").to_a
+  gem.files = FileList['./lib/**/*', './*'].exclude("*.lock", "*.tmproj").to_a
 end
 Jeweler::RubygemsDotOrgTasks.new
 
