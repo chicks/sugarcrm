@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sugarcrm}
-  s.version = "0.9.11"
+  s.version = "0.9.12"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carl Hicks", "David Sulc"]
-  s.date = %q{2011-02-27}
+  s.date = %q{2011-03-02}
   s.default_executable = %q{sugarcrm}
   s.email = %q{carl.hicks@gmail.com}
   s.executables = ["sugarcrm"]
@@ -78,7 +78,8 @@ Gem::Specification.new do |s|
     "./lib/sugarcrm/module.rb",
     "./lib/sugarcrm/module_methods.rb",
     "./lib/sugarcrm/session.rb",
-    "./sugarcrm.gemspec"
+    "./sugarcrm.gemspec",
+    "./sugarcrm.tmproj"
   ]
   s.homepage = %q{http://github.com/chicks/sugarcrm}
   s.require_paths = ["lib"]
