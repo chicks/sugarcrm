@@ -73,7 +73,7 @@ module SugarCRM; class Session
   
   # Re-uses this session and namespace if the user wants to connect with different credentials
   def reconnect(url=nil, user=nil, pass=nil, opts={})
-    disconnect
+    @connection_pool.disconnect!
     connect(url, user, pass, opts)
   end
   alias :reconnect! :reconnect
