@@ -16,7 +16,7 @@ module SugarCRM; class Session
     
     setup_connection
     register_namespace
-    connect_and_add_session
+    connect(@config[:base_url], @config[:username], @config[:password], @config[:options])
   end
   
   # Creates a new session from the credentials present in a file
@@ -66,6 +66,7 @@ module SugarCRM; class Session
     SugarCRM::Module.deregister_all(self)
     @connection_pool = SugarCRM::ConnectionPool.new(self)
     SugarCRM::Module.register_all(self)
+    SugarCRM.add_session(self)
     load_extensions
     true
   end
@@ -195,11 +196,6 @@ module SugarCRM; class Session
   def load_extensions
     self.class.validate_path @extensions_path
     Dir[File.join(@extensions_path, '**', '*.rb').to_s].each { |f| load(f) }
-  end  
-  
-  def connect_and_add_session
-    connect(@config[:base_url], @config[:username], @config[:password], @config[:options])
-    SugarCRM.add_session(self)
   end
   
   # Returns hash containing only keys/values relating to connection pool options. These are removed from parameter hash.
