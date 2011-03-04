@@ -38,7 +38,10 @@ A less clunky way to interact with SugarCRM via REST.
   SugarCRM.modules
 
   # Retrieve a User by user_name
-  SugarCRM::User.find_by_user_name("admin")
+  users = SugarCRM::User.find_by_user_name("admin")
+  
+  # Return a User instance's SugarCRM URL (also works for any other module instance)
+  users.url
   
   # Update a User's title
   u = SugarCRM::User.find_by_first_name_and_last_name("Will", "Westin")

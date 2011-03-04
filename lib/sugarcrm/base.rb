@@ -189,6 +189,11 @@ module SugarCRM; class Base
     end
     self.save
   end
+  
+  # Returns the URL (in string format) where the module instance is available in CRM
+  def url
+    "#{SugarCRM.session.config[:base_url]}/index.php?module=#{self.class._module}&action=DetailView&record=#{self.id}"
+  end
     
   # Delegates to id in order to allow two records of the same type and id to work with something like:
   #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
