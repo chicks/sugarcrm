@@ -121,7 +121,10 @@ A less clunky way to interact with SugarCRM via REST.
   })
 
   # Use block to iterate over results: print all account names
-  SugarCRM::Account.all{|a| puts a.name }
+  SugarCRM::Account.all{|a| puts a.name } # note: this method will be much quicker than SugarCRM::Account.all.each{|a| puts a.name }
+                                          # because records are passed to the block as they get fetched from SugarCRM (whereas `each`
+                                          # will fetch all records, and only then pass them to the block). This will make a major difference
+                                          # in resource use and execution time if you're dealing with many records.
   
   # Look up the fields for a given module
   SugarCRM::Module.find("Accounts").fields
