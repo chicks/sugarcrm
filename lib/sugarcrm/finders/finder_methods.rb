@@ -8,7 +8,7 @@ module SugarCRM; module FinderMethods
         result
       end
   
-      def find_from_ids(ids, options)
+      def find_from_ids(ids, options, &block)
         expects_array = ids.first.kind_of?(Array)
         return ids.first if expects_array && ids.first.empty?
 
@@ -21,7 +21,7 @@ module SugarCRM; module FinderMethods
             result = find_one(ids.first, options)
             expects_array ? [ result ] : result
           else
-            find_some(ids, options)
+            find_some(ids, options, &block)
         end
       end
   
@@ -34,7 +34,7 @@ module SugarCRM; module FinderMethods
         end
       end
     
-      def find_some(ids, options)
+      def find_some(ids, options, &block)
         result = connection.get_entries(self._module.name, ids, {:fields => self._module.fields.keys})
 
         # Determine expected size from limit and offset, not just ids.size.
@@ -51,17 +51,22 @@ module SugarCRM; module FinderMethods
         end
 
         if result.size == expected_size
+          if block_given?
+            result.each{|r|
+              yield r
+            }
+          end
           result
         else
           raise RecordNotFound, "Couldn't find all #{name.pluralize} with IDs (#{ids_list})#{conditions} (found #{result.size} results, but was looking for #{expected_size})"
         end
       end
     
-      def find_every(options)
-        find_by_sql(options)
+      def find_every(options, &block)
+        find_by_sql(options, &block)
       end
         
-      def find_by_sql(options)
+      def find_by_sql(options, &block)
         # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously, :limit is considered to be the smallest of the two, and :offset is the larger
         # in addition to allowing querying of large datasets while avoiding timeouts,
         # this implementation fixes the :limit - :offset bug so that it behaves correctly
@@ -89,6 +94,17 @@ module SugarCRM; module FinderMethods
         results = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
         return nil unless results
         results = Array.wrap(results)
+        
+        # see if we already have enough results (as specified by original "limit option)
+        if nb_to_fetch && results.size >= nb_to_fetch
+          results = results.slice(0, nb_to_fetch)
+        end
+        
+        if block_given?
+          results.each{|r|
+            yield r
+          }
+        end
       
         limit_value = [5, offset_value].min # arbitrary value, must be smaller than :offset used (see comment above)
         limit_value.freeze
@@ -104,10 +120,21 @@ module SugarCRM; module FinderMethods
         # a) have as many results as the user wants (specified via the original :limit option)
         # b) there are no more results matching the criteria
         while result_slice = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
-          results.concat(Array.wrap(result_slice))
-          # make sure we don't return more results than the user requested (via original :limit option)
+          result_slice = Array.wrap(result_slice)
+          # remove excessive results (if user provided a :limit value)
+          results_missing = nb_to_fetch.to_i - (results.size + result_slice.size) # how many more records do we need?
+          (result_slice = result_slice.slice(0, nb_to_fetch - results.size)) if nb_to_fetch && results_missing < 0 # remove extra records
+          
+          if block_given?
+            result_slice.each{|r|
+              yield r
+            }
+          end
+          
+          results.concat(result_slice)
           if nb_to_fetch && results.size >= nb_to_fetch
-            return results.slice(0, nb_to_fetch)
+            raise "Internal error: too many records fetched in find_by_sql" if results.size > nb_to_fetch
+            return results
           end
           local_options[:offset] += local_options[:limit] # update :offset as we get more records
         end

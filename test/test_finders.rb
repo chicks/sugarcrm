@@ -97,6 +97,26 @@ class TestFinders < ActiveSupport::TestCase
       assert_equal 12, accounts.size
     end
     
+    should "accept a block" do
+      # try small limit which will return result on the first result slice (and call yield block only once)
+      count = 0
+      assert_nothing_raised do
+        SugarCRM::Account.all(:limit => 2){|a|
+          count += 1
+        }
+      end
+      assert_equal 2, count
+      
+      # try larger limit which will require multiple result slices to be fetched and yielded individually (yield block called for each result slice)
+      count = 0
+      assert_nothing_raised do
+        SugarCRM::Account.all(:limit => 12){|a|
+          count += 1
+        }
+      end
+      assert_equal 12, count
+    end
+    
     should "return an array of records when using :order_by, :limit, and :offset options" do
       accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 3, :offset => 10)
       accounts_api = SugarCRM.connection.get_entry_list('Accounts', '1=1', :order_by => 'name', :limit => 3, :offset => 10)

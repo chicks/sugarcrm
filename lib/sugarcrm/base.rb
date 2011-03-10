@@ -25,7 +25,7 @@ module SugarCRM; class Base
   attr :errors, true
 
   class << self # Class methods
-    def find(*args)
+    def find(*args, &block)
       options = args.extract_options!
       options = {:order_by => 'date_entered'}.merge(options)
       validate_find_options(options)
@@ -41,9 +41,9 @@ module SugarCRM; class Base
           end
           find_initial(options)
         when :all
-          Array.wrap(find_every(options)).compact
+          Array.wrap(find_every(options, &block)).compact
         else
-          find_from_ids(args, options)
+          find_from_ids(args, options, &block)
       end
     end
   
@@ -54,20 +54,20 @@ module SugarCRM; class Base
 
     # A convenience wrapper for <tt>find(:first, *args)</tt>. You can pass in all the
     # same arguments to this method as you can to <tt>find(:first)</tt>.
-    def first(*args)
-      find(:first, *args)
+    def first(*args, &block)
+      find(:first, *args, &block)
     end
 
     # A convenience wrapper for <tt>find(:last, *args)</tt>. You can pass in all the
     # same arguments to this method as you can to <tt>find(:last)</tt>.
-    def last(*args)
-      find(:last, *args)
+    def last(*args, &block)
+      find(:last, *args, &block)
     end
 
     # This is an alias for find(:all).  You can pass in all the same arguments to this method as you can
     # to find(:all)
-    def all(*args)
-      find(:all, *args)
+    def all(*args, &block)
+      find(:all, *args, &block)
     end
     
     # Creates an object (or multiple objects) and saves it to SugarCRM if validations pass.
