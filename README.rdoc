@@ -119,6 +119,9 @@ A less clunky way to interact with SugarCRM via REST.
   SugarCRM::Account.all({
     :conditions => { :name => "LIKE '%Fund%'" } # note that SQL operators must be uppercase
   })
+
+  # Use block to iterate over results: print all account names
+  SugarCRM::Account.all{|a| puts a.name }
   
   # Look up the fields for a given module
   SugarCRM::Module.find("Accounts").fields
