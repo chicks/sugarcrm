@@ -49,7 +49,7 @@ module SugarCRM; class Base
   
     # return the connection to the correct SugarCRM server (there can be several)
     def connection
-      self.parent.session.connection
+      self.session.connection
     end
 
     # A convenience wrapper for <tt>find(:first, *args)</tt>. You can pass in all the
