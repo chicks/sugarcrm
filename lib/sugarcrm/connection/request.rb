@@ -21,6 +21,10 @@ module SugarCRM; class Request
     self
   end
   
+  def bytesize
+    self.to_s.bytesize
+  end
+  
   def length
     self.to_s.length
   end
