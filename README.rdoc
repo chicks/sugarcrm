@@ -159,8 +159,8 @@ Note: this gem requires Rails 3 as it depends on Active Support >= 3.
 5. Edit the configuration file in `config/sugarcrm.yml` to match your environment
 
 Example apps:
-    * https://github.com/davidsulc/sugar_on_rails_basic
-    * https://github.com/davidsulc/dev_zone_basic_rails_app
+* https://github.com/davidsulc/sugar_on_rails_basic
+* https://github.com/davidsulc/dev_zone_basic_rails_app
 
 == USING A CONFIGURATION FILE
 
