@@ -2,16 +2,26 @@ module SugarCRM; module AttributeValidations
   # Checks to see if we have all the neccessary attributes
   def valid?
     @errors = ActiveSupport::HashWithIndifferentAccess.new
+    
     self.class._module.required_fields.each do |attribute|
       valid_attribute?(attribute)
     end
     
     # for rails compatibility
     def @errors.full_messages
-      # Flatten the error hash, repeating the name of the attribute before each message:
+      # After removing attributes without errors, flatten the error hash, repeating the name of the attribute before each message:
       # e.g. {'name' => ['cannot be blank', 'is too long'], 'website' => ['is not valid']}
       # will become 'name cannot be blank, name is too long, website is not valid
       self.inject([]){|memo, obj| memo.concat(obj[1].inject([]){|m, o| m << "#{obj[0].to_s.humanize} #{o}" })}
+    end
+    
+    # Rails needs each attribute to be present in the error hash (if the attribute has no error, it has [] as a value)
+    # Redefine the [] method for the errors hash to return [] instead of nil is the hash doesn't contain the key
+    class << @errors
+      alias :old_key_lookup :[]
+      def [](key)
+        old_key_lookup(key) || Array.new
+      end
     end
     
     @errors.size == 0
