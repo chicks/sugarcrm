@@ -102,7 +102,6 @@ module SugarCRM; class Base
         object
       end
     end
-
   end
 
   # Creates an instance of a Module Class, i.e. Account, User, Contact, etc.

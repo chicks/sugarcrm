@@ -5,6 +5,15 @@ module SugarCRM; module AttributeValidations
     self.class._module.required_fields.each do |attribute|
       valid_attribute?(attribute)
     end
+    
+    # for rails compatibility
+    def @errors.full_messages
+      # Flatten the error hash, repeating the name of the attribute before each message:
+      # e.g. {'name' => ['cannot be blank', 'is too long'], 'website' => ['is not valid']}
+      # will become 'name cannot be blank, name is too long, website is not valid
+      self.inject([]){|memo, obj| memo.concat(obj[1].inject([]){|m, o| m << "#{obj[0].to_s.humanize} #{o}" })}
+    end
+    
     @errors.size == 0
   end
   
