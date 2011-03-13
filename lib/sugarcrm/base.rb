@@ -219,6 +219,10 @@ module SugarCRM; class Base
     self.class.association_methods_generated
   end
   
+  def to_key
+    new_record? ? nil : [ id ]
+  end
+  
   Base.class_eval do
     extend  FinderMethods::ClassMethods
     include AttributeMethods
