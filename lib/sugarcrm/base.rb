@@ -223,6 +223,10 @@ module SugarCRM; class Base
     new_record? ? nil : [ id ]
   end
   
+  def to_param
+    id.to_s
+  end
+  
   Base.class_eval do
     extend  FinderMethods::ClassMethods
     include AttributeMethods
