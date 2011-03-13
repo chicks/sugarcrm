@@ -102,7 +102,6 @@ module SugarCRM; class Base
         object
       end
     end
-
   end
 
   # Creates an instance of a Module Class, i.e. Account, User, Contact, etc.
@@ -132,7 +131,7 @@ module SugarCRM; class Base
   # Saves the current object, checks that required fields are present.
   # returns true or false
   def save
-    return false if !changed?
+    return false if !(new_record? || changed?)
     return false if !valid?
     begin
       save!
@@ -158,6 +157,11 @@ module SugarCRM; class Base
     @attributes[:deleted] = (self.class.connection.set_entry(self.class._module.name, params).class == Hash)
   end
   alias :destroy :delete
+  
+  # Returns if the record is persisted, i.e. it’s not a new record and it was not destroyed
+  def persisted?
+    !(new_record? || destroyed?)
+  end
   
   # Reloads the record from SugarCRM
   def reload!
@@ -213,6 +217,31 @@ module SugarCRM; class Base
   
   def association_methods_generated?
     self.class.association_methods_generated
+  end
+  
+  def to_key
+    new_record? ? nil : [ id ]
+  end
+  
+  def to_param
+    id.to_s
+  end
+  
+  def is_a?(klass)
+    superclasses.include? klass
+  end
+  alias :kind_of? :is_a?
+  alias :=== :is_a?
+  
+  private
+  def superclasses
+    return @superclasses if @superclasses
+    @superclasses = [self.class]
+    current_class = self.class
+    while current_class.respond_to? :superclass
+      @superclasses << (current_class = current_class.superclass)
+    end
+    @superclasses
   end
   
   Base.class_eval do

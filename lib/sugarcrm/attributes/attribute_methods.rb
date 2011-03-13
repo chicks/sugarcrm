@@ -145,10 +145,7 @@ module SugarCRM; module AttributeMethods
   # sets the id if it's a new record
   def save_modified_attributes!
     # Complain if we aren't valid
-    # Flatten the error hash, repeating the name of the attribute before each message:
-    # e.g. {'name' => ['cannot be blank', 'is too long'], 'website' => ['is not valid']}
-    # will become 'name cannot be blank, name is too long, website is not valid
-    raise InvalidRecord, @errors.inject([]){|memo, obj| memo.concat(obj[1].inject([]){|m, o| m << "#{obj[0]} #{o}" })}.join(", ") unless valid?
+    raise InvalidRecord, @errors.full_messages.join(", ") unless valid?
     # Send the save request
     response = self.class.session.connection.set_entry(self.class._module.name, serialize_modified_attributes)
     # Complain if we don't get a parseable response back
