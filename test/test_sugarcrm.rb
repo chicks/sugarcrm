@@ -70,6 +70,11 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert m.destroyed?
     end
     
+    should "respond to destroy" do
+      a = SugarCRM::Account.first
+      assert a.respond_to? :destroy
+    end
+    
     should "support saving of records with special characters in them" do
       a = SugarCRM::Account.new
       a.name = "COHEN, WEISS & SIMON LLP"

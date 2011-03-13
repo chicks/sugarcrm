@@ -157,6 +157,7 @@ module SugarCRM; class Base
     params[:deleted]= {:name => "deleted", :value => "1"}
     @attributes[:deleted] = (self.class.connection.set_entry(self.class._module.name, params).class == Hash)
   end
+  alias :destroy :delete
   
   # Reloads the record from SugarCRM
   def reload!
