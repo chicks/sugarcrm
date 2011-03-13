@@ -80,6 +80,7 @@ module SugarCRM; class Response
   # Takes a hash like { "first_name" => {"name" => "first_name", "value" => "John"}}
   # And flattens it into {"first_name" => "John"}
   def flatten(list)
+    raise ArgumentError, list[0]['value'] if list[0]['name'] == 'warning'
     raise ArgumentError, 'method parameter must respond to #each_pair' unless list.respond_to? :each_pair
     flat_list = {}
     list.each_pair do |k,v|
