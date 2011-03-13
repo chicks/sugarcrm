@@ -11,7 +11,7 @@ module SugarCRM; class ConnectionPool
     # The mutex used to synchronize pool access
     @connection_mutex = Monitor.new
     @queue = @connection_mutex.new_cond
-    @timeout = config_timeout || 5
+    @timeout = config_timeout || 10
     
     # default max pool size to 5
     @size = config_pool_size || default_pool_size
