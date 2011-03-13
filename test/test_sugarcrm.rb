@@ -99,6 +99,15 @@ class TestSugarCRM < ActiveSupport::TestCase
       b.last_name = orig_last_name
       b.save!
     end
+    
+    should "implement Base#persisted?" do
+      a = SugarCRM::Account.new(:name => 'temp')
+      assert ! a.persisted?
+      a.save!
+      assert a.persisted?
+      a.delete
+      assert ! a.persisted?
+    end
   
     should "respond to #pretty_print" do 
       assert_respond_to SugarCRM::User.new, :pretty_print

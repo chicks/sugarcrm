@@ -159,6 +159,11 @@ module SugarCRM; class Base
   end
   alias :destroy :delete
   
+  # Returns if the record is persisted, i.e. it’s not a new record and it was not destroyed
+  def persisted?
+    !(new_record? || destroyed?)
+  end
+  
   # Reloads the record from SugarCRM
   def reload!
     self.attributes = self.class.find(self.id).attributes
