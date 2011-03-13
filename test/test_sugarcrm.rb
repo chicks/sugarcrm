@@ -99,7 +99,6 @@ class TestSugarCRM < ActiveSupport::TestCase
       b.last_name = orig_last_name
       b.save!
     end
-  end
   
   should "respond to #pretty_print" do 
     assert_respond_to SugarCRM::User.new, :pretty_print
@@ -108,6 +107,7 @@ class TestSugarCRM < ActiveSupport::TestCase
   should "return an instance's URL" do
     user = SugarCRM::User.first
     assert_equal "#{SugarCRM.session.config[:base_url]}/index.php?module=Users&action=DetailView&record=#{user.id}", user.url
+  end
   end
   
 end
