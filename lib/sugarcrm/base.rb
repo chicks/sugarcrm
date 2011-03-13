@@ -227,6 +227,23 @@ module SugarCRM; class Base
     id.to_s
   end
   
+  def is_a?(klass)
+    superclasses.include? klass
+  end
+  alias :kind_of? :is_a?
+  alias :=== :is_a?
+  
+  private
+  def superclasses
+    return @superclasses if @superclasses
+    @superclasses = [self.class]
+    current_class = self.class
+    while current_class.respond_to? :superclass
+      @superclasses << (current_class = current_class.superclass)
+    end
+    @superclasses
+  end
+  
   Base.class_eval do
     extend  FinderMethods::ClassMethods
     include AttributeMethods
