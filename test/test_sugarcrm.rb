@@ -11,7 +11,7 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert_instance_of ActiveSupport::HashWithIndifferentAccess, SugarCRM::Account._module.fields
     end
     
-    should "responsd to self#methods" do
+    should "respond to self#methods" do
       assert_instance_of Array, SugarCRM::User.new.methods
     end
     
