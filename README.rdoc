@@ -98,6 +98,9 @@ A less clunky way to interact with SugarCRM via REST.
   a.contacts.delete(c)
   a.save # or a.contacts.save
   
+  # Retrieve the number of accounts in CRM with 'Inc' in their name
+  SugarCRM::Account.count(:conditions => {:name => "LIKE '%Inc'"})
+  
   # Look up the Case with the smallest case number
   SugarCRM::Case.first({
     :order_by => 'case_number'
