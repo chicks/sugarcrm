@@ -1,6 +1,16 @@
 require 'helper'
 
 class TestSugarCRM < ActiveSupport::TestCase
+  context "A class inheriting SugarCRM::Base" do
+    should "implement self.class.count" do
+      nb_accounts = SugarCRM::Account.count
+      assert nb_accounts > 0
+      nb_inc_accounts = SugarCRM::Account.count(:conditions => {:name => "LIKE '%Inc'"})
+      assert nb_inc_accounts > 0
+      assert nb_inc_accounts < nb_accounts
+    end
+  end
+  
   context "A SugarCRM::Base instance" do
   
     should "return the module name" do

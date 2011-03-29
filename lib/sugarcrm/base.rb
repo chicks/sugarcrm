@@ -51,6 +51,11 @@ module SugarCRM; class Base
     def connection
       self.session.connection
     end
+    
+    def count(options={})
+      query = query_from_options(options)
+      connection.get_entries_count(self._module.name, query, options)['result_count'].to_i
+    end
 
     # A convenience wrapper for <tt>find(:first, *args)</tt>. You can pass in all the
     # same arguments to this method as you can to <tt>find(:first)</tt>.
