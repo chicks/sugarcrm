@@ -67,8 +67,9 @@ module SugarCRM; module FinderMethods
       end
         
       def find_by_sql(options, &block)
-        # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously, :limit is considered to be the smallest of the two, and :offset is the larger
-        # in addition to allowing querying of large datasets while avoiding timeouts,
+        # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously,
+	# :limit is considered to be the smallest of the two, and :offset is the larger
+        # In addition to allowing querying of large datasets while avoiding timeouts,
         # this implementation fixes the :limit - :offset bug so that it behaves correctly
         local_options = {}
         options.keys.each{|k|
