@@ -138,6 +138,18 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert a.update_attributes(:name => orig_name, :billing_address_street => orig_street) # revert changes
     end
     
+    should "implement Base#update_attributes!" do
+      a = SugarCRM::Account.first
+      orig_name = a.name
+      orig_street = a.billing_address_street
+      assert_nothing_raised do
+        a.update_attributes!(:name => orig_name + 'test', :billing_address_street => orig_street + 'test')
+      end
+      assert_not_equal orig_name, a.name
+      assert_not_equal orig_street, a.billing_address_street
+      assert a.update_attributes(:name => orig_name, :billing_address_street => orig_street) # revert changes
+    end
+    
     should "implement Base#persisted?" do
       a = SugarCRM::Account.new(:name => 'temp')
       assert ! a.persisted?

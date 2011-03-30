@@ -203,11 +203,20 @@ module SugarCRM; class Base
     true
   end
   
-  def update_attributes(attributes)
+  def update_attributes!(attributes)
     attributes.each do |name, value|
       self.send("#{name}=".to_sym, value)
     end
-    self.save
+    self.save!
+  end
+  
+  def update_attributes(attributes)
+    begin
+      update_attributes!(attributes)
+    rescue
+      return false
+    end
+    true
   end
   
   # Returns the URL (in string format) where the module instance is available in CRM
