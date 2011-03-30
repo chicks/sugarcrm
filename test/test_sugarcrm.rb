@@ -6,8 +6,10 @@ class TestSugarCRM < ActiveSupport::TestCase
       nb_accounts = SugarCRM::Account.count
       assert nb_accounts > 0
       nb_inc_accounts = SugarCRM::Account.count(:conditions => {:name => "LIKE '%Inc'"})
+      nb_inc_accounts_size = SugarCRM::Account.all(:conditions => {:name => "LIKE '%Inc'"}).size
       assert nb_inc_accounts > 0
       assert nb_inc_accounts < nb_accounts
+      assert_equal nb_inc_accounts_size, nb_inc_accounts
     end
   end
   
