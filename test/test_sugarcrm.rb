@@ -110,6 +110,14 @@ class TestSugarCRM < ActiveSupport::TestCase
       b.save!
     end
     
+    should "implement Base#update_attribute" do
+      a = SugarCRM::Account.first
+      orig_name = a.name
+      assert a.update_attribute('name', orig_name + 'test')
+      assert_not_equal orig_name, a.name
+      assert a.update_attribute('name', orig_name) # revert changes
+    end
+    
     should "implement Base#persisted?" do
       a = SugarCRM::Account.new(:name => 'temp')
       assert ! a.persisted?
