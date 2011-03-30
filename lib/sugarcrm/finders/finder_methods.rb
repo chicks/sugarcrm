@@ -87,12 +87,14 @@ module SugarCRM; module FinderMethods
         # ensure results are ordered so :limit and :offset option behave in a deterministic fashion
         local_options = { :order_by => :id }.merge(local_options)
         local_options.update(:limit => initial_limit) # override original argument
+        
+        query = query_from_options(local_options)
       
         # get first slice of results
         # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
         # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
         # with :limit always smaller than :offset
-        results = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
+        results = connection.get_entry_list(self._module.name, query, local_options)
         return nil unless results
         results = Array.wrap(results)
         
@@ -120,7 +122,7 @@ module SugarCRM; module FinderMethods
         # continue fetching results until we either
         # a) have as many results as the user wants (specified via the original :limit option)
         # b) there are no more results matching the criteria
-        while result_slice = connection.get_entry_list(self._module.name, query_from_options(local_options), local_options)
+        while result_slice = connection.get_entry_list(self._module.name, query, local_options)
           result_slice = Array.wrap(result_slice)
           # remove excessive results (if user provided a :limit value)
           results_missing = nb_to_fetch.to_i - (results.size + result_slice.size) # how many more records do we need?
@@ -254,7 +256,7 @@ module SugarCRM; module FinderMethods
       end
     
       VALID_FIND_OPTIONS = [ :conditions, :deleted, :fields, :include, :joins, :limit, :link_fields, :offset,
-                             :order_by, :select, :readonly, :group, :having, :from, :lock ]
+                             :order_by, :select, :readonly, :group, :having, :from, :lock, :query ]
 
       def validate_find_options(options) #:nodoc:
         options.assert_valid_keys(VALID_FIND_OPTIONS)
