@@ -118,6 +118,16 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert a.update_attribute('name', orig_name) # revert changes
     end
     
+    should "implement Base#update_attribute!" do
+      a = SugarCRM::Account.first
+      orig_name = a.name
+      assert_nothing_raised do
+        a.update_attribute!('name', orig_name + 'test')
+      end
+      assert_not_equal orig_name, a.name
+      assert a.update_attribute('name', orig_name) # revert changes
+    end
+    
     should "implement Base#update_attributes" do
       a = SugarCRM::Account.first
       orig_name = a.name

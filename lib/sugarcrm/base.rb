@@ -189,9 +189,18 @@ module SugarCRM; class Base
   end
   alias :eql? :==
   
-  def update_attribute(name, value)
+  def update_attribute!(name, value)
     self.send("#{name}=".to_sym, value)
-    self.save
+    self.save!
+  end
+  
+  def update_attribute(name, value)
+    begin
+      update_attribute!(name, value)
+    rescue
+      return false
+    end
+    true
   end
   
   def update_attributes(attributes)
