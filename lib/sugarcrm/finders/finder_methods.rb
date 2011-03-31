@@ -71,14 +71,13 @@ module SugarCRM; module FinderMethods
       SLICE_SIZE = 5
       SLICE_SIZE.freeze
       # results accumulator stores the results we have fetched so far, recursively
-      def find_by_sql(options, results_accumulator=[], &block)
+      def find_by_sql(options, results_accumulator=nil, &block)
         # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously,
         # :limit is considered to be the smallest of the two, and :offset is the larger
         # In addition to allowing querying of large datasets while avoiding timeouts (by fetching results in small slices),
         # this implementation fixes the :limit - :offset bug so that it behaves correctly
         
-        offset = options[:offset]
-        offset = nil if offset.to_i < 1
+        offset = options[:offset].to_i >= 1 ? options[:offset].to_i : nil
         
         # if many results are requested (i.e. multiple result slices), we call this function recursively
         # this array keeps track of which slice we are retrieving (by updating the :offset and :limit options)
@@ -87,28 +86,18 @@ module SugarCRM; module FinderMethods
         local_options[:order_by] = :id unless options[:order_by]
         
         # we must ensure limit <= offset (due to bug mentioned above)
-        unless offset
-          local_options[:limit] = [options[:limit].to_i, SLICE_SIZE].min
-        else
-          local_options[:limit] = [offset.to_i, SLICE_SIZE].min
-        end
+        local_options[:limit] = (offset ? [offset.to_i, SLICE_SIZE].min : [options[:limit].to_i, SLICE_SIZE].min)
         local_options[:limit] = [local_options[:limit], options[:limit]].min if options[:limit] # don't retrieve more records than required
-        
         local_options[:offset] = offset if offset
-        
         local_options = options.merge(local_options)
+        
         query = query_from_options(local_options)
         result_slice = connection.get_entry_list(self._module.name, query, local_options)
-        unless result_slice
-          if results_accumulator.size < 1
-            return nil
-          else
-            return results_accumulator
-          end
-        end
+        return results_accumulator unless result_slice
         
         result_slice_array = Array.wrap(result_slice)
         result_slice_array.each{|r| yield r } if block_given?
+        results_accumulator = [] unless results_accumulator
         results_accumulator = results_accumulator.concat(result_slice_array)
         
         # adjust options to take into account records that were already retrieved
