@@ -225,7 +225,7 @@ module SugarCRM; module FinderMethods
       end
     
       VALID_FIND_OPTIONS = [ :conditions, :deleted, :fields, :include, :joins, :limit, :link_fields, :offset,
-                             :order_by, :select, :readonly, :group, :having, :from, :lock, :query ]
+                             :order_by, :select, :readonly, :group, :having, :from, :lock ]
 
       def validate_find_options(options) #:nodoc:
         options.assert_valid_keys(VALID_FIND_OPTIONS)
