@@ -65,17 +65,16 @@ module SugarCRM; module FinderMethods
       def find_every(options, &block)
         find_by_sql(options, &block)
       end
-        
+      
+      # the number of records we retrieve with each query
+      # it is kept small to avoid timeout issues
+      SLICE_SIZE = 5
+      SLICE_SIZE.freeze
       def find_by_sql(options, &block)
         # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously,
         # :limit is considered to be the smallest of the two, and :offset is the larger
         # In addition to allowing querying of large datasets while avoiding timeouts (by fetching results in small slices),
         # this implementation fixes the :limit - :offset bug so that it behaves correctly
-
-        # the number of records we retrieve with each query
-        # it is kept small to avoid timeout issues
-        slice_size = 5
-        slice_size.freeze
 
         local_options = deep_copy_hash(options)
         local_options.delete(:offset) if local_options[:offset] == 0
@@ -85,9 +84,9 @@ module SugarCRM; module FinderMethods
         # determine how many records to fetch on first pass:
         # we must ensure limit <= offset (due to bug mentioned above)
         unless local_options[:offset]
-          local_options[:limit] = [options[:limit].to_i, slice_size].min
+          local_options[:limit] = [options[:limit].to_i, SLICE_SIZE].min
         else
-          local_options[:limit] = [local_options[:offset].to_i, slice_size].min
+          local_options[:limit] = [local_options[:offset].to_i, SLICE_SIZE].min
         end
         local_options[:limit] = [local_options[:limit], options[:limit]].min if options[:limit] # don't retrieve more records than required
         
@@ -117,7 +116,7 @@ module SugarCRM; module FinderMethods
           local_options[:offset] += result_slice_array.size
           
           # increase the slice size, if possible
-          local_options[:limit] = [local_options[:offset], slice_size].min if local_options[:limit] < slice_size
+          local_options[:limit] = [local_options[:offset], SLICE_SIZE].min if local_options[:limit] < SLICE_SIZE
           if options[:limit]
             # make sure we don't retrieve too many records
             nb_remaining = options[:limit] - results.size
