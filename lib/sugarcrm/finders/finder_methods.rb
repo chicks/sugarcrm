@@ -68,79 +68,78 @@ module SugarCRM; module FinderMethods
         
       def find_by_sql(options, &block)
         # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously,
-	# :limit is considered to be the smallest of the two, and :offset is the larger
-        # In addition to allowing querying of large datasets while avoiding timeouts,
+        # :limit is considered to be the smallest of the two, and :offset is the larger
+        # In addition to allowing querying of large datasets while avoiding timeouts (by fetching results in small slices),
         # this implementation fixes the :limit - :offset bug so that it behaves correctly
-        local_options = {}
-        options.keys.each{|k|
-          local_options[k] = options[k]
-        }
+
+        # the number of records we retrieve with each query
+        # it is kept small to avoid timeout issues
+        slice_size = 5
+        slice_size.freeze
+
+        local_options = deep_copy_hash(options)
         local_options.delete(:offset) if local_options[:offset] == 0
-      
-        # store the number of records wanted by user, as we'll overwrite :limit option to obtain several slices of records (to avoid timeout issues)
-        nb_to_fetch = local_options[:limit]
-        nb_to_fetch = nb_to_fetch.to_i if nb_to_fetch
-        offset_value = local_options[:offset] || 10 # arbitrary value, must be bigger than :limit used (see comment above)
-        offset_value = offset_value.to_i
-        offset_value.freeze
-        initial_limit = nb_to_fetch.nil?  ? offset_value : [offset_value, nb_to_fetch].min # how many records should be fetched on first pass
         # ensure results are ordered so :limit and :offset option behave in a deterministic fashion
         local_options = { :order_by => :id }.merge(local_options)
-        local_options.update(:limit => initial_limit) # override original argument
+
+        # determine how many records to fetch on first pass:
+        # we must ensure limit <= offset (due to bug mentioned above)
+        unless local_options[:offset]
+          local_options[:limit] = [options[:limit].to_i, slice_size].min
+        else
+          local_options[:limit] = [local_options[:offset].to_i, slice_size].min
+        end
+        local_options[:limit] = [local_options[:limit], options[:limit]].min if options[:limit] # don't retrieve more records than required
         
         query = query_from_options(local_options)
       
         # get first slice of results
-        # note: to work around a SugarCRM REST API bug, the :limit option must always be smaller than the :offset option
-        # this is the reason this first query is separate (not in the loop): the initial query has a larger limit, so that we can then use the loop
-        # with :limit always smaller than :offset
         results = connection.get_entry_list(self._module.name, query, local_options)
         return nil unless results
         results = Array.wrap(results)
-        
-        # see if we already have enough results (as specified by original "limit option)
-        if nb_to_fetch && results.size >= nb_to_fetch
-          results = results.slice(0, nb_to_fetch)
-        end
         
         if block_given?
           results.each{|r|
             yield r
           }
         end
-      
-        limit_value = [5, offset_value].min # arbitrary value, must be smaller than :offset used (see comment above)
-        limit_value.freeze
-        local_options = { :order_by => :id }.merge(local_options)
-        local_options.update(:limit => limit_value)
-      
-        # a portion of the results has already been queried
-        # update or set the :offset value to reflect this
-        local_options[:offset] ||= results.size
-        local_options[:offset] += offset_value
-      
-        # continue fetching results until we either
-        # a) have as many results as the user wants (specified via the original :limit option)
-        # b) there are no more results matching the criteria
-        while result_slice = connection.get_entry_list(self._module.name, query, local_options)
-          result_slice = Array.wrap(result_slice)
-          # remove excessive results (if user provided a :limit value)
-          results_missing = nb_to_fetch.to_i - (results.size + result_slice.size) # how many more records do we need?
-          (result_slice = result_slice.slice(0, nb_to_fetch - results.size)) if nb_to_fetch && results_missing < 0 # remove extra records
-          
-          if block_given?
-            result_slice.each{|r|
-              yield r
-            }
-          end
-          
-          results.concat(result_slice)
-          if nb_to_fetch && results.size >= nb_to_fetch
-            raise "Internal error: too many records fetched in find_by_sql" if results.size > nb_to_fetch
-            return results
-          end
-          local_options[:offset] += local_options[:limit] # update :offset as we get more records
+
+        # do we have enough records? (because the user provided a :limit option, or because there are no more records satisfying the query)
+        if (options[:limit] && results.size >= options[:limit]) || (local_options[:limit] > results.size)
+          return results
         end
+
+        # retrieve slices of records and add them to the array that is to be returned
+        result_slice_array = results
+        begin
+          # increase the offset each time additional records are retrieved
+          local_options[:offset] ||= 0
+          local_options[:offset] += result_slice_array.size
+          
+          # increase the slice size, if possible
+          local_options[:limit] = [local_options[:offset], slice_size].min if local_options[:limit] < slice_size
+          if options[:limit]
+            # make sure we don't retrieve too many records
+            nb_remaining = options[:limit] - results.size
+            local_options[:limit] = [local_options[:limit], nb_remaining].min
+          end
+            
+          result_slice = connection.get_entry_list(self._module.name, query, local_options)
+          
+          if result_slice
+            result_slice_array = Array.wrap(result_slice)
+            
+            if block_given?
+              result_slice_array.each{|r|
+                yield r
+              }
+            end
+            
+            results.concat(result_slice_array)
+          end
+        end while options[:limit] ? (results.size < options[:limit]) : result_slice # until we have as many records as requested by the user,
+                                                                                    # or there are no more records satisfying the query
+        
         results
       end
 
@@ -260,6 +259,14 @@ module SugarCRM; module FinderMethods
 
       def validate_find_options(options) #:nodoc:
         options.assert_valid_keys(VALID_FIND_OPTIONS)
+      end
+      
+      def deep_copy_hash(h)
+        result = {}
+        h.keys.each{|k|
+          result[k] = h[k]
+        }
+        result
       end
     end
   end

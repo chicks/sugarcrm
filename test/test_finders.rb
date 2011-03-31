@@ -91,6 +91,12 @@ class TestFinders < ActiveSupport::TestCase
       assert_equal 3, accounts.size
     end
     
+    # test Base#find_by_sql edge case: force slize size to vary up and down
+    should "return an array of records with small offset and a limit greater than 5 but not divisible by 5" do
+      accounts = SugarCRM::Account.all(:limit => 13, :offset => 2)
+      assert_equal 13, accounts.size
+    end
+    
     # test Base#find_by_sql standard case
     should "return an array of records with high limit" do
       accounts = SugarCRM::Account.all(:limit => 12)
