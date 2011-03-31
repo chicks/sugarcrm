@@ -123,6 +123,14 @@ class TestFinders < ActiveSupport::TestCase
       assert_equal 12, count
     end
     
+    should "retrieve all records (with no limit option) correctly" do
+      count = 0
+      SugarCRM::Account.all{|a|
+        count += 1
+      }
+      assert_equal SugarCRM::Account.count, count
+    end
+    
     should "return an array of records when using :order_by, :limit, and :offset options" do
       accounts = SugarCRM::Account.all(:order_by => 'name', :limit => 3, :offset => 10)
       accounts_api = SugarCRM.connection.get_entry_list('Accounts', '1=1', :order_by => 'name', :limit => 3, :offset => 10)

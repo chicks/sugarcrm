@@ -86,9 +86,13 @@ module SugarCRM; module FinderMethods
         local_options[:order_by] = :id unless options[:order_by]
         
         # we must ensure limit <= offset (due to bug mentioned above)
-        local_options[:limit] = (offset ? [offset.to_i, SLICE_SIZE].min : [options[:limit].to_i, SLICE_SIZE].min)
+        if offset
+          local_options[:limit] = [offset.to_i, SLICE_SIZE].min
+          local_options[:offset] = offset if offset
+        else
+          local_options[:limit] = options[:limit] ? [options[:limit].to_i, SLICE_SIZE].min : SLICE_SIZE
+        end
         local_options[:limit] = [local_options[:limit], options[:limit]].min if options[:limit] # don't retrieve more records than required
-        local_options[:offset] = offset if offset
         local_options = options.merge(local_options)
         
         query = query_from_options(local_options)
@@ -102,11 +106,11 @@ module SugarCRM; module FinderMethods
         
         # adjust options to take into account records that were already retrieved
         updated_options = {:offset => options[:offset].to_i + result_slice_array.size}
-        updated_options[:limit] = options[:limit] - result_slice_array.size if options[:limit]
+        updated_options[:limit] = (options[:limit] ? options[:limit] - result_slice_array.size : nil)
         updated_options = options.merge(updated_options)
         
         # have we retrieved all the records?
-        if updated_options[:limit].to_i < 1 || local_options[:limit] > result_slice_array.size
+        if (updated_options[:limit] && updated_options[:limit] < 1) || local_options[:limit] > result_slice_array.size
           return results_accumulator
         else
           find_by_sql(updated_options, results_accumulator, &block)
