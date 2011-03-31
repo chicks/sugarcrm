@@ -57,7 +57,7 @@ class TestFinders < ActiveSupport::TestCase
     should "support searching based on conditions" do
       accounts = SugarCRM::Account.all({
         :conditions => { :billing_address_postalcode => ["> '70000'", "< '79999'" ] },
-        :limit => '10',
+        :limit => 10,
         :order_by => 'billing_address_postalcode'
       })
       assert_instance_of SugarCRM::Account, accounts.first
