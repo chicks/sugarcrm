@@ -231,7 +231,7 @@ module SugarCRM; class Base
   end
 
   def pretty_print(pp)
-    pp.text self.inspect, 0
+    pp.text self.inspect.to_s, 0
   end
 
   def attribute_methods_generated?
