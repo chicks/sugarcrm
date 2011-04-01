@@ -100,9 +100,12 @@ module SugarCRM; module FinderMethods
         return results_accumulator unless result_slice
         
         result_slice_array = Array.wrap(result_slice)
-        result_slice_array.each{|r| yield r } if block_given?
-        results_accumulator = [] unless results_accumulator
-        results_accumulator = results_accumulator.concat(result_slice_array)
+        if block_given?
+          result_slice_array.each{|r| yield r }
+        else
+          results_accumulator = [] unless results_accumulator
+          results_accumulator = results_accumulator.concat(result_slice_array)
+        end
         
         # adjust options to take into account records that were already retrieved
         updated_options = {:offset => options[:offset].to_i + result_slice_array.size}
