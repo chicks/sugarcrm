@@ -34,6 +34,12 @@ class TestFinders < ActiveSupport::TestCase
       assert_equal expected_account.id, account.id
     end
     
+    should "support finding last instance with symbol as :order_by option" do
+      expected_account = SugarCRM::Account.first({:order_by => 'id DESC'})
+      account = SugarCRM::Account.last({:order_by => :id})
+      assert_equal expected_account.id, account.id
+    end
+    
     should "support finding last instance (last created)" do
       expected_account = SugarCRM::Account.first({:order_by => 'date_entered DESC'})
       account = SugarCRM::Account.last

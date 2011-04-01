@@ -35,7 +35,7 @@ module SugarCRM; class Base
           find_initial(options)
         when :last
           begin
-            options[:order_by] = reverse_order_clause(options[:order_by])
+            options[:order_by] = reverse_order_clause(options[:order_by].to_s)
           rescue Exception => e
             raise
           end
