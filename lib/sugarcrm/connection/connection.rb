@@ -68,6 +68,7 @@ module SugarCRM; class Connection
   
   # Send a request to the Sugar Instance
   def send!(method, json)
+    nb_failed_attempts = 0 # how many times we have failed to send
     @request  = SugarCRM::Request.new(@url, method, json, @options[:debug])
     begin
       if @request.length > 3900
@@ -76,7 +77,12 @@ module SugarCRM; class Connection
         @response = @connection.get(@url.path.dup + "?" + @request.to_s)
       end
     rescue Errno::ECONNRESET, EOFError, Timeout::Error
-      retry!(method, json)
+      nb_failed_attempts += 1
+      unless nb_failed_attempts >= 3
+        retry!(method, json)
+      else
+        raise
+      end
     end
     handle_response
   end
