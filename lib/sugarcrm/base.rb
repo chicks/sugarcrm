@@ -111,6 +111,7 @@ module SugarCRM; class Base
 
   # Creates an instance of a Module Class, i.e. Account, User, Contact, etc.
   def initialize(attributes={}, &block)
+    attributes.delete('id')
     @errors = {}
     @modified_attributes = {}
     merge_attributes(attributes.with_indifferent_access)
