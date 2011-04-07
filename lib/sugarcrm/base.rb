@@ -52,6 +52,9 @@ module SugarCRM; class Base
       self.session.connection
     end
     
+    # return the number of records satifsying the options
+    # note: the REST API has a bug where passing custom attributes in the options will result in the 
+    # options being ignored and '0' being returned, regardless of the existence of records satisfying the options
     def count(options={})
       query = query_from_options(options)
       connection.get_entries_count(self._module.name, query, options)['result_count'].to_i
