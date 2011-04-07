@@ -128,6 +128,16 @@ A less clunky way to interact with SugarCRM via REST.
                                           # because records are passed to the block as they get fetched from SugarCRM (whereas `each`
                                           # will fetch all records, and only then pass them to the block). This will make a major difference
                                           # in resource use and execution time if you're dealing with many records.
+
+  # Create a document instance and upload a file
+  file = File.read(File.join(File.dirname(__FILE__),"test_excel.xls"))
+  doc = SugarCRM::Document.new
+  doc.active_date = Date.today
+  doc.document_name = "test_excel.xls"
+  doc.filename = "test_excel.xls"
+  doc.revision = 0
+  doc.uploadfile = Base64.encode64(file)
+  doc.save!
   
   # Look up the fields for a given module
   SugarCRM::Module.find("Accounts").fields
