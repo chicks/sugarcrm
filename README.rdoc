@@ -200,7 +200,7 @@ An example, accompanied by instructions, can be found in the `config/sugarcrm.ya
 
 1.  Type `irb` in your command prompt
 
-2.  Require the gem with `require 'sugarcrm'`
+2.  Require the gem with `require 'sugarcrm'` (Note: Windows users might need to `require 'rubygems'` before `require 'sugarcrm'`.)
 
 3.  * if your login credentials are stored in the `config/sugarcrm.yaml` file, you have been automagically logged in already ;
     * if your login credentials are stored in a different config file, just call `SugarCRM.load_config` followed by the absolute path to your config file. This will log you in automatically ;
@@ -252,6 +252,8 @@ To disconnect an active session:
 == INSTALL:
 
 * sudo gem install sugarcrm
+
+Note: Windows users might need to `require 'rubygems'` before `require 'sugarcrm'`.
 
 == TEST:
 
