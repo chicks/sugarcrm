@@ -76,7 +76,14 @@ module SugarCRM; class Connection
       else
         @response = @connection.get(@url.path.dup + "?" + @request.to_s)
       end
-    rescue Errno::ECONNRESET, EOFError, Timeout::Error
+    rescue Timeout::Error
+      nb_failed_attempts += 1
+      unless nb_failed_attempts >= 3
+        retry
+      else
+        raise
+      end
+    rescue Errno::ECONNRESET, EOFError
       nb_failed_attempts += 1
       unless nb_failed_attempts >= 3
         retry!(method, json)
