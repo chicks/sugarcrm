@@ -11,14 +11,23 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert first_account.id != new_account.id
     end
     
-    should "implement self.class.count" do
+    should "implement self.count" do
       nb_accounts = SugarCRM::Account.count
       assert nb_accounts > 0
-      nb_inc_accounts = SugarCRM::Account.count(:conditions => {:name => "LIKE '%Inc'"})
+      nb_inc_accounts = nil
+      assert_nothing_raised do
+        nb_inc_accounts = SugarCRM::Account.count(:conditions => {:name => "LIKE '%Inc'"})
+      end
       nb_inc_accounts_size = SugarCRM::Account.all(:conditions => {:name => "LIKE '%Inc'"}).size
       assert nb_inc_accounts > 0
       assert nb_inc_accounts < nb_accounts
       assert_equal nb_inc_accounts_size, nb_inc_accounts
+    end
+    
+    should "raise InvalidAttribute if self.count is called with a custom attribute" do
+      assert_raise SugarCRM::InvalidAttribute do
+        SugarCRM::Account.count(:conditions => {:custom_attribute_c => "value"})
+      end
     end
   end
   

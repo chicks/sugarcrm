@@ -56,6 +56,7 @@ module SugarCRM; class Base
     # note: the REST API has a bug where passing custom attributes in the options will result in the 
     # options being ignored and '0' being returned, regardless of the existence of records satisfying the options
     def count(options={})
+      raise InvalidAttribute, 'Conditions on custom attributes are not supported due to REST API bug' if contains_custom_attribute(options[:conditions])
       query = query_from_options(options)
       connection.get_entries_count(self._module.name, query, options)['result_count'].to_i
     end
@@ -261,6 +262,15 @@ module SugarCRM; class Base
   alias :=== :is_a?
   
   private
+  # returns true if the hash contains a custom attribute created in Studio (and whose name therefore ends in '_c')
+  def self.contains_custom_attribute(attributes)
+    attributes ||= {}
+    attributes.each_key{|k|
+      return true if k.to_s =~ /_c$/
+    }
+    false
+  end
+  
   def superclasses
     return @superclasses if @superclasses
     @superclasses = [self.class]
