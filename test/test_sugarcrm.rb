@@ -1,8 +1,8 @@
 require 'helper'
 
 class TestSugarCRM < ActiveSupport::TestCase
-  context "The SugarCRM::Base class" do
-    should "should ignore 'id' attibute when creating an instance" do
+  context "A class inheriting SugarCRM::Base" do
+    should "ignore 'id' attibute when creating an instance" do
       first_account = SugarCRM::Account.first
       new_account = nil
       assert_difference('SugarCRM::Account.count') do
@@ -10,9 +10,7 @@ class TestSugarCRM < ActiveSupport::TestCase
       end
       assert first_account.id != new_account.id
     end
-  end
-  
-  context "A class inheriting SugarCRM::Base" do
+    
     should "implement self.class.count" do
       nb_accounts = SugarCRM::Account.count
       assert nb_accounts > 0
