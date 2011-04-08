@@ -1,0 +1,7 @@
+Each time a new version of SugarCRM comes out, the following should be checked to see whether it is still an issue. Conditional code based on SugarCRM version can be added if SugarCRM patches buggy functionality.
+
+The get_entries_count function does not work properly (always returns 0) if a condition on a custom (i.e. made with studio and ending in _c) is passed
+When functionality is fixed in SugarCRM: add conditional code so InvalidAttribute exception is raised on ly when dealing with broken versions
+
+get_entry_list function has a bug where, when :limit and :offset options are passed simultaneously, :limit is considered to be the smallest of the two, and :offset is the larger
+When functionality is fixed in SugarCRM: update comment in find_by_sql to reflect the fix (code can stay as is)
