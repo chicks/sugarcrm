@@ -33,15 +33,25 @@ module SugarCRM; module AttributeMethods
         operator ||= '=' 
         # Extract value from query
         value = $3
-        if [TrueClass, FalseClass].include? attribute_condition.class
-          # fix value for checkboxes: users can pass true/false as condition, should be converted to '1' or '0' respectively
-          value = (attribute_condition.class == TrueClass ? '1' : '0')
+        unless attribute_condition.class == FalseClass
+          if attribute_condition.class == TrueClass
+            # fix value for checkboxes: users can pass true as condition, should be converted to '1' (false case for checkboxes is treated separately below)
+            value = (attribute_condition.class == TrueClass ? '1' : '0')
+          end
+          
+          # TODO: Write a test for sending invalid attribute names.  
+          # strip single quotes
+          value = value.strip[/'?([^']*)'?/,1] 
+          conditions << "#{table_name_for(attribute)}.#{attribute} #{operator} \'#{value}\'"
+        else
+          # When a user creates a custom checkbox field, a column is added to the *_cstm table for that module (e.g. contacts_cstm for Contacts module).
+          # Each time a new record is created, the value of the checkbox will be stored in that _cstm table.
+          # However, records that exsited before that field was created are absent from the _cstm table.
+          # To return the expected results when a user is searching for records with an unchecked checkbox, we must return all records that aren't present in
+          # the _cstm table with a value of 1 (returning the record with 0 in the table will ignore the pre-existing records).
+          # Here, we create the appropriate query that will return all records that don't have a value of "true" in the checkbox field.
+          conditions << "#{self._module.table_name}.id NOT IN (SELECT id_c FROM #{table_name_for(attribute)} WHERE #{table_name_for(attribute)}.#{attribute} #{operator} 1)"
         end
-        
-        # TODO: Write a test for sending invalid attribute names.  
-        # strip single quotes
-        value = value.strip[/'?([^']*)'?/,1] 
-        conditions << "#{table_name_for(attribute)}.#{attribute} #{operator} \'#{value}\'"
       end
       conditions
     end
