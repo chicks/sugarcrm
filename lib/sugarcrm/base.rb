@@ -53,7 +53,7 @@ module SugarCRM; class Base
     end
     
     # return the number of records satifsying the options
-    # note: the REST API has a bug where passing custom attributes in the options will result in the 
+    # note: the REST API has a bug (documented with Sugar as bug 43339) where passing custom attributes in the options will result in the 
     # options being ignored and '0' being returned, regardless of the existence of records satisfying the options
     def count(options={})
       raise InvalidAttribute, 'Conditions on custom attributes are not supported due to REST API bug' if contains_custom_attribute(options[:conditions])

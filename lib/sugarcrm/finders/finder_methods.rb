@@ -72,7 +72,7 @@ module SugarCRM; module FinderMethods
       SLICE_SIZE.freeze
       # results accumulator stores the results we have fetched so far, recursively
       def find_by_sql(options, results_accumulator=nil, &block)
-        # SugarCRM REST API has a bug where, when :limit and :offset options are passed simultaneously,
+        # SugarCRM REST API has a bug (documented with Sugar as bug 43338) where, when :limit and :offset options are passed simultaneously,
         # :limit is considered to be the smallest of the two, and :offset is the larger
         # In addition to allowing querying of large datasets while avoiding timeouts (by fetching results in small slices),
         # this implementation fixes the :limit - :offset bug so that it behaves correctly
