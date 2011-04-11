@@ -27,7 +27,19 @@ module SugarCRM; class Base
   class << self # Class methods
     def find(*args, &block)
       options = args.extract_options!
-      options = {:order_by => 'date_entered'}.merge(options)
+      # add default sorting date (necessary for first and last methods to work)
+      # most modules (Contacts, Accounts, etc.) use 'date_entered' to store when the record was created
+      # other modules (e.g. EmailAddresses) use 'date_created'
+      # Here, we account for this discrepancy...
+      self.new # make sure the fields are loaded from SugarCRM so method_defined? will work properly
+      if self.method_defined? :date_entered
+        sort_criteria = 'date_entered'
+      elsif self.method_defined? :date_created
+        sort_criteria = 'date_created'
+      else
+        raise InvalidAttribute, "Unable to determine record creation date for sorting criteria: expected date_entered or date_created attribute to be present"
+      end
+      options = {:order_by => sort_criteria}.merge(options)
       validate_find_options(options)
 
       case args.first

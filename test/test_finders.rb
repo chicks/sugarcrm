@@ -13,6 +13,24 @@ class TestFinders < ActiveSupport::TestCase
       assert users.length == 0
     end
     
+    should "support finding first instance with default sort order (for module using date_entered as creation date)" do
+      expected_account = SugarCRM::Account.first({:order_by => 'date_entered'})
+      account = nil
+      assert_nothing_raised do
+        account = SugarCRM::Account.first
+      end
+      assert_equal expected_account.id, account.id
+    end
+    
+    should "support finding first instance with default sort order (for module using date_created as creation date)" do
+      expected_email = SugarCRM::EmailAddress.first({:order_by => 'date_created'})
+      email = nil
+      assert_nothing_raised do
+        email = SugarCRM::EmailAddress.first
+      end
+      assert_equal expected_email.id, email.id
+    end
+    
     should "support finding first instance (sorted by attribute)" do
       account = SugarCRM::Account.first({
         :order_by => 'name'
