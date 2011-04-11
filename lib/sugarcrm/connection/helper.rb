@@ -38,4 +38,13 @@ module SugarCRM; class Connection
     end
   end
   
+  # We need to strip newlines from Base64 encoding for JSON validation purposes.
+  def b64_encode(file)
+    Base64.encode64(file).gsub(/\n/, '')
+  end
+  
+  def b64_decode(file)
+    Base64.decode64(file)
+  end
+  
 end; end

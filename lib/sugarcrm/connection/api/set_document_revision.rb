@@ -18,7 +18,7 @@ module SugarCRM; class Connection
         "document_revision": {
            "id": "#{document_id}",
            "filename": "#{options[:file_name]}",
-           "file": "#{Base64.encode64(options[:file])}",
+           "file": "#{b64_encode(options[:file])}",
            "revision": "#{revision_number}"
         }
       }

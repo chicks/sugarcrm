@@ -113,8 +113,8 @@ class TestSugarCRM < ActiveSupport::TestCase
     end
     
     should "implement Base#reload!" do
-      a = SugarCRM::User.last
-      b = SugarCRM::User.last
+      a = SugarCRM::User.find("seed_will_id")
+      b = SugarCRM::User.find("seed_will_id")
       assert_not_equal 'admin', a.user_name # make sure we don't mess up admin user
       # Save the original value, so we can set it back.
       orig_last_name = a.last_name.dup

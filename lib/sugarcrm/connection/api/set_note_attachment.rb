@@ -13,7 +13,7 @@ module SugarCRM; class Connection
            "note": {
               "id": "#{id}",
               "filename": "#{filename}",
-              "file": "#{Base64.encode64(file)}",
+              "file": "#{b64_encode(file)}",
               "related_module_id": "#{options[:module_id]}",
               "related_module_name": "#{options[:module_name]}" 
            }
