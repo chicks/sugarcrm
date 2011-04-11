@@ -136,7 +136,7 @@ A less clunky way to interact with SugarCRM via REST.
   doc.document_name = "test_excel.xls"
   doc.filename = "test_excel.xls"
   doc.revision = 0
-  doc.uploadfile = b64_encode(file)
+  doc.uploadfile = SugarCRM.connection.b64_encode(file)
   doc.save!
   
   # Look up the fields for a given module
