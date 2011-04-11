@@ -16,9 +16,7 @@ class TestSetDocumentRevision < ActiveSupport::TestCase
       assert !d.new?
       # Create a new document revision, attaching the file to the document_revision, and associating the document
       # revision with parent document
-      SugarCRM.connection.debug = true
       assert SugarCRM.connection.set_document_revision(d.id, d.revision + 1, {:file => file, :file_name => "config_test.yaml"})
-      SugarCRM.connection.debug = false
       # Delete the document
       assert d.delete
       # Remove any document revisions associated with that document
