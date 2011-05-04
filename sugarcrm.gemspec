@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sugarcrm}
-  s.version = "0.9.13"
+  s.version = "0.9.14"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carl Hicks", "David Sulc"]
-  s.date = %q{2011-04-06}
+  s.date = %q{2011-05-03}
   s.default_executable = %q{sugarcrm}
   s.email = %q{carl.hicks@gmail.com}
   s.executables = ["sugarcrm"]
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
     "./README.rdoc",
     "./Rakefile",
     "./VERSION",
+    "./WATCHLIST.rdoc",
     "./lib/rails/generators/sugarcrm/config/config_generator.rb",
     "./lib/rails/generators/sugarcrm/config/templates/initializer.rb",
     "./lib/rails/generators/sugarcrm/config/templates/sugarcrm.yml",
