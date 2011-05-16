@@ -124,6 +124,17 @@ module SugarCRM; module AttributeMethods
       end
       ?
     end
+    
+    # return the (polymorphic) parent record corresponding to the parent_id and parent_type attributes
+    # (an example of parent polymorphism can be found in the Note module)
+    if (@attributes.keys.include? 'parent_id') && (@attributes.keys.include? 'parent_type')
+      self.class.module_eval %Q?
+      def parent
+        (self.class.session.namespace_const.const_get @attributes['parent_type'].singularize).find(@attributes['parent_id'])
+      end
+      ?
+    end
+    
     self.class.attribute_methods_generated = true
   end
 

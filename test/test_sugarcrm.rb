@@ -189,4 +189,12 @@ class TestSugarCRM < ActiveSupport::TestCase
     end
   end
   
+  context  "A SugarCRM::Note instance" do
+    should "return the correct parent record with the `parent` method" do
+      note = SugarCRM::Note.first
+      parent = note.parent
+      assert_equal note.parent_id, parent.id
+      assert_equal note.parent_type.singularize, parent.class.to_s.split('::').last
+    end
+  end
 end
