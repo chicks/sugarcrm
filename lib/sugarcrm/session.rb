@@ -102,10 +102,11 @@ module SugarCRM; class Session
   end
   
   # load credentials from file, and (re)connect to SugarCRM
-  def load_config(path)
+  def load_config(path, opts = {})
+    opts.reverse_merge! :reconnect => true
     new_config = self.class.parse_config_file(path)
-    @config[:config] = new_config[:config] if new_config
-    reconnect(@config[:base_url], @config[:username], @config[:password]) if connection_info_loaded?
+    update_config(new_config[:config]) if new_config and new_config[:config]
+    reconnect(@config[:base_url], @config[:username], @config[:password]) if opts[:reconnect] and connection_info_loaded?
     @config
   end
   
