@@ -1,7 +1,7 @@
 module SugarCRM; module AttributeValidations
   # Checks to see if we have all the neccessary attributes
   def valid?
-    @errors = ActiveSupport::HashWithIndifferentAccess.new
+    @errors = (defined?(HashWithIndifferentAccess) ? HashWithIndifferentAccess : ActiveSupport::HashWithIndifferentAccess).new
     
     self.class._module.required_fields.each do |attribute|
       valid_attribute?(attribute)
