@@ -13,7 +13,7 @@ class TestSugarCRM < ActiveSupport::TestCase
     
     should "implement self.count" do
       nb_accounts = SugarCRM::Account.count
-      assert nb_accounts > 0
+      assert nb_accounts > 0, "There should be some Accounts"
       nb_inc_accounts = nil
       assert_nothing_raised do
         nb_inc_accounts = SugarCRM::Account.count(:conditions => {:name => "LIKE '%Inc'"})
@@ -38,7 +38,7 @@ class TestSugarCRM < ActiveSupport::TestCase
     end
     
     should "return the module fields" do
-      assert_instance_of ActiveSupport::HashWithIndifferentAccess, SugarCRM::Account._module.fields
+      assert_kind_of Hash, SugarCRM::Account._module.fields
     end
     
     should "respond to self#methods" do
@@ -59,7 +59,7 @@ class TestSugarCRM < ActiveSupport::TestCase
     end
   
     should "respond to self.attributes_from_modules_fields" do
-      assert_instance_of ActiveSupport::HashWithIndifferentAccess, SugarCRM::User.attributes_from_module
+      assert_kind_of Hash, SugarCRM::User.attributes_from_module
     end
   
     should "return an instance of itself when #new" do
