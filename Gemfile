@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "activesupport", ">= 3.0.0", :require => "active_support"
+gem "activesupport", ">= 2.3.10", :require => "active_support"
 gem "i18n"
 gem "json"
 

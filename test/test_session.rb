@@ -15,6 +15,7 @@ CONFIG_CONTENTS.freeze
 class TestSession < ActiveSupport::TestCase
   context "The SugarCRM::Session class" do
     should "raise SugarCRM::MissingCredentials if at least one of url/username/password is missing" do
+      
       assert_raise(SugarCRM::MissingCredentials){ SugarCRM.connect('http://127.0.0.1/sugarcrm', nil, nil) }
     end
     
@@ -33,7 +34,7 @@ class TestSession < ActiveSupport::TestCase
     end
     
     should "parse config parameters from a file" do
-      assert_equal CONFIG_CONTENTS, SugarCRM::Session.parse_config_file(CONFIG_PATH)
+      assert_equal CONFIG_CONTENTS, SugarCRM::Session.parse_config_file(CONFIG_TEST_PATH)
     end
     
     should "create a session from a config file" do
@@ -59,8 +60,9 @@ class TestSession < ActiveSupport::TestCase
     end
     
     should "load config file" do
-      SugarCRM.load_config CONFIG_TEST_PATH
+      SugarCRM.load_config CONFIG_TEST_PATH, :reconnect => false
       CONFIG_CONTENTS[:config].each{|k,v| assert_equal v, SugarCRM.config[k]}
+      SugarCRM.load_config CONFIG_PATH
     end
     
     should "be able to disconnect, and log in to Sugar automatically if credentials are present in config file" do
