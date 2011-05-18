@@ -5,9 +5,9 @@ class TestFinders < ActiveSupport::TestCase
     should "always return an Array when :all" do
       users = SugarCRM::User.all(:limit => 10)
       assert_instance_of Array, users
-      users = SugarCRM::User.find(:all, :conditions => {:user_name => '= admin'})
+      users = SugarCRM::User.find(:all, :conditions => {:user_name => "= #{users.first.user_name}"})
       assert_instance_of Array, users
-      assert users.length == 1
+      assert_equal 1, users.length
       users = SugarCRM::User.find(:all, :conditions => {:user_name => '= invalid_user_123'})
       assert_instance_of Array, users
       assert users.length == 0
@@ -101,12 +101,12 @@ class TestFinders < ActiveSupport::TestCase
     
     should "receive a response containing all fields when sent #get_entry" do
       u = SugarCRM::User.find(1)
-      assert_equal u.user_name, "admin"
+      assert_not_nil u.user_name
     end
     
     should "return an array of records when sent #find([id1, id2, id3])" do
       users = SugarCRM::User.find(["seed_sarah_id", 1])
-      assert_equal "admin", users.last.user_name
+      assert_not_nil users.last.user_name
     end
     
     # test Base#find_by_sql edge case
