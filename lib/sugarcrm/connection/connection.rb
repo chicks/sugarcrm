@@ -4,7 +4,7 @@ module SugarCRM; class Connection
   # Set this to filter out debug output on a certain method (i.e. get_modules, or get_fields)
   DONT_SHOW_DEBUG_FOR = []
   RESPONSE_IS_NOT_JSON = [:get_user_id, :get_user_team_id]
-  
+
   attr :url, true
   attr :user, false
   attr :pass, false
@@ -14,8 +14,8 @@ module SugarCRM; class Connection
   attr :options, true
   attr :request, true
   attr :response, true
-  
-  # This is the singleton connection class. 
+
+  # This is the singleton connection class.
   def initialize(url, user, pass, options={})
     @options  = {
       :debug => false,
@@ -31,19 +31,19 @@ module SugarCRM; class Connection
     login!
     self
   end
-  
+
   # Check to see if we are logged in
   def logged_in?
     connect! unless connected?
     @sugar_session_id ? true : false
   end
-  
+
   # Login
   def login!
     @sugar_session_id = login["id"]
     raise SugarCRM::LoginError, "Invalid Login" unless logged_in?
   end
-  
+
   def logout
     logout
     @sugar_session_id = nil
@@ -55,7 +55,7 @@ module SugarCRM; class Connection
     return false unless @connection.started?
     true
   end
-  
+
   # Connect
   def connect!
     @connection = Net::HTTP.new(@url.host, @url.port)
@@ -65,7 +65,7 @@ module SugarCRM; class Connection
     end
     @connection.start
   end
-  
+
   # Send a request to the Sugar Instance
   def send!(method, json)
     nb_failed_attempts = 0 # how many times we have failed to send
@@ -93,29 +93,29 @@ module SugarCRM; class Connection
     end
     handle_response
   end
-  
-  # Sometimes our connection just disappears but we still have a session.  
-  # This method forces a reconnect and relogin to update the session and resend 
+
+  # Sometimes our connection just disappears but we still have a session.
+  # This method forces a reconnect and relogin to update the session and resend
   # the request.
   def retry!(method, json)
     connect!
     login!
     send!(method,json)
   end
-  
+
   def debug=(debug)
     options[:debug] = debug
   end
-  
+
   def debug?
     options[:debug]
   end
-  
+
   private
-  
+
   def handle_response
     case @response
-    when Net::HTTPOK 
+    when Net::HTTPOK
       return process_response
     when Net::HTTPNotFound
       raise SugarCRM::InvalidSugarCRMUrl, "#{@url} is invalid"
@@ -152,12 +152,12 @@ module SugarCRM; class Connection
     end
     return response_json
   end
-  
+
   def resolve_url
     # Appends the rest.php path onto the end of the URL if it's not included
     if @url.path !~ /rest.php$/
       @url.path += URL
     end
   end
-  
+
 end; end

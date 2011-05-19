@@ -1,21 +1,22 @@
 module SugarCRM
-  class NoActiveSession < RuntimeError; end
-  class MultipleSessions < RuntimeError; end
-  class LoginError < RuntimeError; end
-  class MissingCredentials < RuntimeError; end
-  class ConnectionTimeoutError < RuntimeError; end
-  class EmptyResponse < RuntimeError; end
-  class UnhandledResponse < RuntimeError; end
-  class InvalidSugarCRMUrl < RuntimeError; end
-  class InvalidRequest < RuntimeError; end
-  class InvalidModule <RuntimeError; end
-  class AttributeParsingError < RuntimeError; end
-  class RecordNotFound < RuntimeError; end
-  class InvalidRecord < RuntimeError; end
-  class RecordSaveFailed < RuntimeError; end
-  class AssociationFailed < RuntimeError; end
-  class UninitializedModule < RuntimeError; end
-  class InvalidAttribute < RuntimeError; end
-  class InvalidAttributeType < RuntimeError; end
-  class InvalidAssociation < RuntimeError; end
+  class SugarCRMError < RuntimeError; end
+  class NoActiveSession < SugarCRMError; end
+  class MultipleSessions < SugarCRMError; end
+  class LoginError < SugarCRMError; end
+  class MissingCredentials < SugarCRMError; end
+  class ConnectionTimeoutError < SugarCRMError; end
+  class EmptyResponse < SugarCRMError; end
+  class UnhandledResponse < SugarCRMError; end
+  class InvalidSugarCRMUrl < SugarCRMError; end
+  class InvalidRequest < SugarCRMError; end
+  class InvalidModule <SugarCRMError; end
+  class AttributeParsingError < SugarCRMError; end
+  class RecordNotFound < SugarCRMError; end
+  class InvalidRecord < SugarCRMError; end
+  class RecordSaveFailed < SugarCRMError; end
+  class AssociationFailed < SugarCRMError; end
+  class UninitializedModule < SugarCRMError; end
+  class InvalidAttribute < SugarCRMError; end
+  class InvalidAttributeType < SugarCRMError; end
+  class InvalidAssociation < SugarCRMError; end
 end
