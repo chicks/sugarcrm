@@ -11,12 +11,13 @@ A less clunky way to interact with SugarCRM via REST.
 == FEATURES/PROBLEMS:
 
 * Works with all v2 API calls
-* Supports creation, saving, and deletion of SugarCRM specific objects.
+* Supports Rails 2 and 3
+* ActiveRecord style finders and objects
+* Supports creation, saving, and deletion of SugarCRM specific objects
+* Flexible extension framework
 * Validations, typecasting, and serialization of boolean, date, and integer fields
-* Query, update and delete records from collections! 
-* ActiveRecord style finders!
-* Auto-generation of SugarCRM specific objects.  When a connection is established, get_available_modules is called and the resultant modules are turned into SugarCRM::Module classes.  
-* If you want to use the vanilla API, you can access the methods directly on the SugarCRM.connection object.
+* Query, update and delete records from collections
+* Access API methods directly on the SugarCRM.connection object
 
 == SYNOPSIS:
 
@@ -164,7 +165,7 @@ A less clunky way to interact with SugarCRM via REST.
 
 == USING THE GEM WITH RAILS 3
 
-Note: this gem requires Rails 3 as it depends on Active Support >= 3.
+Note: this gem works with Active Support >= 2.3.10, but is optimized for Rails 3.
 
 1. Add the sugarcrm gem to your Gemfile (sugarcrm gem version >= 0.9.12)
 2. Run `bundle install`
@@ -245,7 +246,7 @@ To disconnect an active session:
 
 == REQUIREMENTS:
 
-* activesupport >= 3.0.0
+* activesupport >= 2.3.10
 * i18n
 * json
 
@@ -271,4 +272,4 @@ Put your credentials in a file called `test/config.yaml` (which you will have to
 
 == Copyright
 
-Copyright (c) 2010 Carl Hicks. See LICENSE for details.
+Copyright (c) 2011 Carl Hicks. See LICENSE for details.
