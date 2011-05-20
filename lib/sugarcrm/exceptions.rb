@@ -4,6 +4,7 @@ module SugarCRM
   class MultipleSessions < SugarCRMError; end
   class LoginError < SugarCRMError; end
   class MissingCredentials < SugarCRMError; end
+  class ConnectionError < SugarCRMError; end
   class ConnectionTimeoutError < SugarCRMError; end
   class EmptyResponse < SugarCRMError; end
   class UnhandledResponse < SugarCRMError; end

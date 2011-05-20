@@ -1,13 +1,13 @@
 module SugarCRM; module FinderMethods
   module ClassMethods
-    private 
+    private
       def find_initial(options)
         options.update(:limit => 1)
         result = find_by_sql(options)
         return result.first if result.instance_of? Array # find_by_sql will return an Array if result are found
         result
       end
-  
+
       def find_from_ids(ids, options, &block)
         expects_array = ids.first.kind_of?(Array)
         return ids.first if expects_array && ids.first.empty?
@@ -24,16 +24,16 @@ module SugarCRM; module FinderMethods
             find_some(ids, options, &block)
         end
       end
-  
+
       def find_one(id, options)
-      
+
         if result = connection.get_entry(self._module.name, id, {:fields => self._module.fields.keys})
           result
         else
           raise RecordNotFound, "Couldn't find #{name} with ID=#{id}#{conditions}"
         end
       end
-    
+
       def find_some(ids, options, &block)
         result = connection.get_entries(self._module.name, ids, {:fields => self._module.fields.keys})
 
@@ -61,11 +61,11 @@ module SugarCRM; module FinderMethods
           raise RecordNotFound, "Couldn't find all #{name.pluralize} with IDs (#{ids_list})#{conditions} (found #{result.size} results, but was looking for #{expected_size})"
         end
       end
-    
+
       def find_every(options, &block)
         find_by_sql(options, &block)
       end
-      
+
       # the number of records we retrieve with each query
       # it is kept small to avoid timeout issues
       SLICE_SIZE = 5
@@ -76,15 +76,15 @@ module SugarCRM; module FinderMethods
         # :limit is considered to be the smallest of the two, and :offset is the larger
         # In addition to allowing querying of large datasets while avoiding timeouts (by fetching results in small slices),
         # this implementation fixes the :limit - :offset bug so that it behaves correctly
-        
+
         offset = options[:offset].to_i >= 1 ? options[:offset].to_i : nil
-        
+
         # if many results are requested (i.e. multiple result slices), we call this function recursively
         # this array keeps track of which slice we are retrieving (by updating the :offset and :limit options)
         local_options = {}
         # ensure results are ordered so :limit and :offset option behave in a deterministic fashion
         local_options[:order_by] = :id unless options[:order_by]
-        
+
         # we must ensure limit <= offset (due to bug mentioned above)
         if offset
           local_options[:limit] = [offset.to_i, SLICE_SIZE].min
@@ -94,11 +94,11 @@ module SugarCRM; module FinderMethods
         end
         local_options[:limit] = [local_options[:limit], options[:limit]].min if options[:limit] # don't retrieve more records than required
         local_options = options.merge(local_options)
-        
+
         query = query_from_options(local_options)
         result_slice = connection.get_entry_list(self._module.name, query, local_options)
         return results_accumulator unless result_slice
-        
+
         result_slice_array = Array.wrap(result_slice)
         if block_given?
           result_slice_array.each{|r| yield r }
@@ -106,12 +106,12 @@ module SugarCRM; module FinderMethods
           results_accumulator = [] unless results_accumulator
           results_accumulator = results_accumulator.concat(result_slice_array)
         end
-        
+
         # adjust options to take into account records that were already retrieved
         updated_options = {:offset => options[:offset].to_i + result_slice_array.size}
         updated_options[:limit] = (options[:limit] ? options[:limit] - result_slice_array.size : nil)
         updated_options = options.merge(updated_options)
-        
+
         # have we retrieved all the records?
         if (updated_options[:limit] && updated_options[:limit] < 1) || local_options[:limit] > result_slice_array.size
           return results_accumulator
@@ -130,7 +130,7 @@ module SugarCRM; module FinderMethods
         end
         conditions.join(" AND ")
       end
-    
+
       # return the opposite of the provided order clause
       # this is used for the :last find option
       # in other words SugarCRM::Account.last(:order_by => "name")
@@ -142,7 +142,7 @@ module SugarCRM; module FinderMethods
         reversed_order = {'ASC' => 'DESC', 'DESC' => 'ASC'}[$2 || 'ASC']
         return "#{column_name} #{reversed_order}"
       end
-    
+
       # Enables dynamic finders like <tt>find_by_user_name(user_name)</tt> and <tt>find_by_user_name_and_password(user_name, password)</tt>
       # that are turned into <tt>find(:first, :conditions => ["user_name = ?", user_name])</tt> and
       # <tt>find(:first, :conditions => ["user_name = ? AND password = ?", user_name, password])</tt> respectively. Also works for
@@ -220,17 +220,17 @@ module SugarCRM; module FinderMethods
           super
         end
       end
-    
+
       def all_attributes_exists?(attribute_names)
         attribute_names.all? { |name| attributes_from_module.include?(name) }
       end
-    
+
       def construct_attributes_from_arguments(attribute_names, arguments)
         attributes = {}
         attribute_names.each_with_index { |name, idx| attributes[name] = arguments[idx] }
         attributes
       end
-    
+
       VALID_FIND_OPTIONS = [ :conditions, :deleted, :fields, :include, :joins, :limit, :link_fields, :offset,
                              :order_by, :select, :readonly, :group, :having, :from, :lock ]
 

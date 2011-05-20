@@ -2,12 +2,7 @@
 # There can be several such simultaneous connections
 module SugarCRM; class Session
   attr_reader :config, :connection_pool, :extensions_path, :namespace, :namespace_const
-  attr_writer :modules
-
-  def modules
-    #lazy loading modules
-    @modules ||= SugarCRM::Module.register_all(self)
-  end
+  attr_accessor :modules
 
   def initialize(url, user, pass, opts={})
     options = {
@@ -96,7 +91,7 @@ module SugarCRM; class Session
     begin
       SugarCRM::Module.deregister_all(self)
       @connection_pool = SugarCRM::ConnectionPool.new(self)
-      # SugarCRM::Module.register_all(self)
+      SugarCRM::Module.register_all(self)
       SugarCRM.add_session(self)
       load_extensions
       true

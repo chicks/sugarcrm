@@ -1,22 +1,22 @@
-module SugarCRM; class Base 
+module SugarCRM; class Base
 
   # Unset all of the instance methods we don't need.
-  instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^nil.$|^methods$|^instance_of.$|^respond_to)/ }
+  # instance_methods.each { |m| undef_method m unless m =~ /(^__|^send$|^object_id$|^define_method$|^class$|^nil.$|^methods$|^instance_of.$|^respond_to)/ }
 
   # Tracks if we have extended our class with attribute methods yet.
   class_attribute :attribute_methods_generated
   self.attribute_methods_generated = false
-  
+
   class_attribute :association_methods_generated
   self.association_methods_generated = false
-  
+
   class_attribute :_module
   self._module = nil
-  
+
   # the session to which we're linked
   class_attribute :session
   self.session = nil
-  
+
   # Contains a list of attributes
   attr :attributes, true
   attr :modified_attributes, true
@@ -58,14 +58,14 @@ module SugarCRM; class Base
           find_from_ids(args, options, &block)
       end
     end
-  
+
     # return the connection to the correct SugarCRM server (there can be several)
     def connection
       self.session.connection
     end
-    
+
     # return the number of records satifsying the options
-    # note: the REST API has a bug (documented with Sugar as bug 43339) where passing custom attributes in the options will result in the 
+    # note: the REST API has a bug (documented with Sugar as bug 43339) where passing custom attributes in the options will result in the
     # options being ignored and '0' being returned, regardless of the existence of records satisfying the options
     def count(options={})
       raise InvalidAttribute, 'Conditions on custom attributes are not supported due to REST API bug' if contains_custom_attribute(options[:conditions])
@@ -90,7 +90,7 @@ module SugarCRM; class Base
     def all(*args, &block)
       find(:all, *args, &block)
     end
-    
+
     # Creates an object (or multiple objects) and saves it to SugarCRM if validations pass.
     # The resulting object is returned whether the object was saved successfully to the database or not.
     #
@@ -141,7 +141,7 @@ module SugarCRM; class Base
   def inspect
     self
   end
-  
+
   def to_s
     attrs = []
     @attributes.keys.sort.each do |k|
@@ -162,15 +162,15 @@ module SugarCRM; class Base
     end
     true
   end
-  
-  # Saves the current object, and any modified associations. 
+
+  # Saves the current object, and any modified associations.
   # Raises an exceptions if save fails for any reason.
   def save!
     save_modified_attributes!
     save_modified_associations!
     true
   end
-  
+
   def delete
     return false if id.blank?
     params          = {}
@@ -179,18 +179,18 @@ module SugarCRM; class Base
     @attributes[:deleted] = (self.class.connection.set_entry(self.class._module.name, params).class == Hash)
   end
   alias :destroy :delete
-  
+
   # Returns if the record is persisted, i.e. it’s not a new record and it was not destroyed
   def persisted?
     !(new_record? || destroyed?)
   end
-  
+
   # Reloads the record from SugarCRM
   def reload!
     self.attributes = self.class.find(self.id).attributes
   end
-  
-  # Returns true if +comparison_object+ is the same exact object, or +comparison_object+ 
+
+  # Returns true if +comparison_object+ is the same exact object, or +comparison_object+
   # is of the same type and +self+ has an ID and it is equal to +comparison_object.id+.
   #
   # Note that new records are different from any other record by definition, unless the
@@ -205,12 +205,12 @@ module SugarCRM; class Base
       comparison_object.id == id
   end
   alias :eql? :==
-  
+
   def update_attribute!(name, value)
     self.send("#{name}=".to_sym, value)
     self.save!
   end
-  
+
   def update_attribute(name, value)
     begin
       update_attribute!(name, value)
@@ -219,14 +219,14 @@ module SugarCRM; class Base
     end
     true
   end
-  
+
   def update_attributes!(attributes)
     attributes.each do |name, value|
       self.send("#{name}=".to_sym, value)
     end
     self.save!
   end
-  
+
   def update_attributes(attributes)
     begin
       update_attributes!(attributes)
@@ -235,12 +235,12 @@ module SugarCRM; class Base
     end
     true
   end
-  
+
   # Returns the URL (in string format) where the module instance is available in CRM
   def url
     "#{SugarCRM.session.config[:base_url]}/index.php?module=#{self.class._module}&action=DetailView&record=#{self.id}"
   end
-    
+
   # Delegates to id in order to allow two records of the same type and id to work with something like:
   #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
   def hash
@@ -253,26 +253,26 @@ module SugarCRM; class Base
 
   def attribute_methods_generated?
     self.class.attribute_methods_generated
-  end  
-  
+  end
+
   def association_methods_generated?
     self.class.association_methods_generated
   end
-  
+
   def to_key
     new_record? ? nil : [ id ]
   end
-  
+
   def to_param
     id.to_s
   end
-  
+
   def is_a?(klass)
     superclasses.include? klass
   end
   alias :kind_of? :is_a?
   alias :=== :is_a?
-  
+
   private
   # returns true if the hash contains a custom attribute created in Studio (and whose name therefore ends in '_c')
   def self.contains_custom_attribute(attributes)
@@ -282,7 +282,7 @@ module SugarCRM; class Base
     }
     false
   end
-  
+
   def superclasses
     return @superclasses if @superclasses
     @superclasses = [self.class]
@@ -292,7 +292,7 @@ module SugarCRM; class Base
     end
     @superclasses
   end
-  
+
   Base.class_eval do
     extend  FinderMethods::ClassMethods
     include AttributeMethods
@@ -305,4 +305,4 @@ module SugarCRM; class Base
     include AssociationCache
   end
 
-end; end 
+end; end

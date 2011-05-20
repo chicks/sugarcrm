@@ -86,7 +86,8 @@ module SugarCRM
     if SugarCRM.session && SugarCRM.session.namespace_const.const_defined?(sym)
       SugarCRM.session.namespace_const.const_get(sym)
     else
-      super
+      # super
+      raise SugarCRM::ConnectionError
     end
   end
 end
