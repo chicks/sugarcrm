@@ -76,19 +76,19 @@ module SugarCRM; class Connection
       else
         @response = @connection.get(@url.path.dup + "?" + @request.to_s)
       end
-    rescue Timeout::Error, Errno::ECONNABORTED
+    rescue Timeout::Error, Errno::ECONNABORTED => e
       nb_failed_attempts += 1
       unless nb_failed_attempts >= 3
         retry
       else
-        raise
+        raise ConnectionError, "SugarCRM connection failed: #{e.message}"
       end
-    rescue Errno::ECONNRESET, EOFError
+    rescue Errno::ECONNRESET, EOFError => e
       nb_failed_attempts += 1
       unless nb_failed_attempts >= 3
         retry!(method, json)
       else
-        raise
+        raise ConnectionError, "SugarCRM connection failed: #{e.message}"
       end
     end
     handle_response

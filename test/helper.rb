@@ -7,7 +7,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'sugarcrm'
 
-CONFIG_PATH = File.join(File.dirname(__FILE__),'config.yaml')
+CONFIG_PATH = File.expand_path(File.join(File.dirname(__FILE__),'config.yaml'))
+CONFIG_TEST_PATH = File.join(File.dirname(__FILE__), 'config_test.yaml')
 
 class ActiveSupport::TestCase
   # put your credentials into a YAML file in the test directory

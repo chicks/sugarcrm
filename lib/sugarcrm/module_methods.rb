@@ -73,21 +73,13 @@ module SugarCRM
   def self.const_missing(sym)
     (raise SugarCRM::MultipleSessions, "There are multiple active sessions: use the session namespace instead of SugarCRM") if @@sessions.size > 1
     # make sure we have an active session
-    begin
-      SugarCRM::Session.from_config unless SugarCRM.connection && SugarCRM.connection.logged_in?
-    rescue SugarCRM::MissingCredentials => e
-      # unable to load necessary login credentials from config file => pass exception on
-      super
-    end
-
-    #SugarCRM.session.present? or raise "Sugar Connection couldnt establish"
+    SugarCRM::Session.from_config unless SugarCRM.connection && SugarCRM.connection.logged_in?
 
     # if user calls (e.g.) SugarCRM::Account, delegate to SugarCRM::Namespace0::Account
     if SugarCRM.session && SugarCRM.session.namespace_const.const_defined?(sym)
       SugarCRM.session.namespace_const.const_get(sym)
     else
-      # super
-      raise SugarCRM::ConnectionError
+      super
     end
   end
 end

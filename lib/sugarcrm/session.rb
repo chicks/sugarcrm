@@ -32,7 +32,6 @@ module SugarCRM; class Session
     config_file_paths.each do |path|
       hash.merge! self.parse_config_file(path) || {} if File.exist? path
     end
-    puts hash.inspect
     from_hash(hash)
   end
 
@@ -57,17 +56,18 @@ module SugarCRM; class Session
     self.config_for_scope(contents)
   end
 
-  def self.config_scope=(*path)
-    @config_scope = path
+  def self.config_scope=(path)
+    @config_scope = [path].flatten
   end
 
   def self.config_scope
-    @config_scope ||= []
+    @config_scope ||= [:config]
   end
 
   def self.config_for_scope(config)
     config_scope.each do |key|
       config = config[key]
+      raise InvalidConfiguration, "Config scope [#{config_scope.map{|v|":#{v}"} * ', '}] couldn't be found" if config.nil?
     end
     config
   end
@@ -88,18 +88,12 @@ module SugarCRM; class Session
       @config[k] = v  unless v.nil?
     }
 
-    begin
-      SugarCRM::Module.deregister_all(self)
-      @connection_pool = SugarCRM::ConnectionPool.new(self)
-      SugarCRM::Module.register_all(self)
-      SugarCRM.add_session(self)
-      load_extensions
-      true
-    rescue => e
-      message = "SugarCRM connection failed: #{e.message}"
-      warn(message)
-    #  defined?(Rails) ? Rails.logger.error(message) : warn(message)
-    end
+    SugarCRM::Module.deregister_all(self)
+    @connection_pool = SugarCRM::ConnectionPool.new(self)
+    SugarCRM::Module.register_all(self)
+    SugarCRM.add_session(self)
+    load_extensions
+    true
   end
   alias :connect! :connect
 
@@ -136,7 +130,7 @@ module SugarCRM; class Session
   def load_config(path, opts = {})
     opts.reverse_merge! :reconnect => true
     new_config = self.class.parse_config_file(path)
-    update_config(new_config[:config]) if new_config and new_config[:config]
+    update_config(new_config)
     reconnect(@config[:base_url], @config[:username], @config[:password]) if opts[:reconnect] and connection_info_loaded?
     @config
   end

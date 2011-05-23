@@ -20,4 +20,5 @@ module SugarCRM
   class InvalidAttribute < SugarCRMError; end
   class InvalidAttributeType < SugarCRMError; end
   class InvalidAssociation < SugarCRMError; end
+  class InvalidConfiguration < SugarCRMError; end
 end
