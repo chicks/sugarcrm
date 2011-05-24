@@ -20,6 +20,7 @@ module SugarCRM; class Base
   # Contains a list of attributes
   attr :attributes, true
   attr :modified_attributes, true
+  attr :relate, true
   attr :associations, true
   attr :debug, true
   attr :errors, true
@@ -128,6 +129,7 @@ module SugarCRM; class Base
   # Creates an instance of a Module Class, i.e. Account, User, Contact, etc.
   def initialize(attributes={}, &block)
     attributes.delete('id')
+    @relate = {}
     @errors = {}
     @modified_attributes = {}
     merge_attributes(attributes.with_indifferent_access)

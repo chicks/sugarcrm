@@ -4,6 +4,7 @@ module SugarCRM; class Response
     # It tries to convert the response into an object such as User
     # or an object collection.  If it fails, it just returns the response hash
     def handle(json, session)
+			#puts "returned json: #{json.inspect}"
       r = new(json, session)
       begin
         return r.to_obj
@@ -39,8 +40,10 @@ module SugarCRM; class Response
     return @response unless @response && @response["entry_list"]
     
     objects = []
-    @response["entry_list"].each do |object|
+    @response["entry_list"].each_index do |index|
+			object = @response["entry_list"][index]
       attributes = []
+			related_attributes = {}
       _module    = resolve_module(object)
       attributes = flatten_name_value_list(object)
       namespace = @session.namespace_const
@@ -48,7 +51,19 @@ module SugarCRM; class Response
         if attributes.length == 0
           raise AttributeParsingError, "response contains objects without attributes!"
         end
-        objects << namespace.const_get(_module).new(attributes) 
+        obj = namespace.const_get(_module).new(attributes) 
+        # Check to see if there is a relationship for this object
+        if @response["relationship_list"][index]
+          @response["relationship_list"][index].each do |list|
+            relate = list["name"]
+            related_attributes[relate] = []
+            list["records"].each do |record|
+              related_attributes[relate] << flatten_name_value_list({ "name_value_list" => record })
+            end
+            obj.relate = related_attributes
+          end  
+        end
+        objects << obj
       else
         raise InvalidModule, "#{_module} does not exist, or is not accessible"
       end
