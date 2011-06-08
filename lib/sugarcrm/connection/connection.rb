@@ -90,6 +90,8 @@ module SugarCRM; class Connection
       else
         raise ConnectionError, "SugarCRM connection failed: #{e.message}"
       end
+    rescue StandardError => e
+      raise ConnectionError, "SugarCRM connection failed: #{e.message}"
     end
     handle_response
   end
