@@ -64,6 +64,8 @@ module SugarCRM; class Connection
       @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
     @connection.start
+  rescue StandardError => e
+    raise ConnectionError, "SugarCRM connection failed: #{e.message}"
   end
 
   # Send a request to the Sugar Instance
