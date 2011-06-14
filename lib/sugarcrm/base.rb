@@ -153,7 +153,6 @@ module SugarCRM; class Base
   # Saves the current object, checks that required fields are present.
   # returns true or false
   def save
-    return false if !(new_record? || changed?)
     return false if !valid?
     begin
       save!
