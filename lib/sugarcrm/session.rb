@@ -111,9 +111,7 @@ module SugarCRM; class Session
   end
   
   def update_config(params)
-    params.each{|k,v|
-      @config[k.to_sym] = v
-    }
+    params.each{ |k,v| @config[k.to_sym] = v }
     @config
   end
   

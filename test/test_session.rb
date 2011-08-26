@@ -15,7 +15,6 @@ CONFIG_CONTENTS.freeze
 class TestSession < ActiveSupport::TestCase
   context "The SugarCRM::Session class" do
     should "raise SugarCRM::MissingCredentials if at least one of url/username/password is missing" do
-      
       assert_raise(SugarCRM::MissingCredentials){ SugarCRM.connect('http://127.0.0.1/sugarcrm', nil, nil) }
     end
     
@@ -32,7 +31,7 @@ class TestSession < ActiveSupport::TestCase
         Three.disconnect!
       end
     end
-    
+        
     should "parse config parameters from a file" do
       assert_equal CONFIG_CONTENTS, SugarCRM::Session.parse_config_file(CONFIG_TEST_PATH)
     end

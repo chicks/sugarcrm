@@ -14,6 +14,7 @@ module SugarCRM; class Connection
   attr :options, true
   attr :request, true
   attr :response, true
+  attr :errors, true
   
   # This is the singleton connection class. 
   def initialize(url, user, pass, options={})
@@ -22,6 +23,7 @@ module SugarCRM; class Connection
       :register_modules => true,
       :load_environment => true
     }.merge(options)
+    @errors   = []
     @url      = URI.parse(url)
     @user     = user
     @pass     = pass
@@ -68,8 +70,10 @@ module SugarCRM; class Connection
   alias :reconnect! :connect!
   
   # Send a request to the Sugar Instance
-  def send!(method, json)
-    nb_failed_attempts = 0 # how many times we have failed to send
+  def send!(method, json, max_retry=3)
+    if max_retry == 0
+      raise SugarCRM::RetryLimitExceeded, "SugarCRM::Connection Errors: \n#{@errors.reverse.join "\n\s\s"}"
+    end
     @request  = SugarCRM::Request.new(@url, method, json, @options[:debug])
     # Send Ze Request
     begin
@@ -80,40 +84,25 @@ module SugarCRM; class Connection
       end
       return handle_response
     # Timeouts are usually a server side issue
-    rescue Timeout::Error
-      nb_failed_attempts += 1
-      unless nb_failed_attempts >= 3
-        retry
-      else
-        raise
-      end
+    rescue Timeout::Error => error
+      @errors << error
+      send!(method, json, max_retry.pred)
     # Lower level errors requiring a reconnect
-    rescue Errno::ECONNRESET, Errno::ECONNABORTED, Errno::EPIPE, EOFError
-      nb_failed_attempts += 1
-      unless nb_failed_attempts >= 3
-        retry!(method, json)
-      else
-        raise
-      end
+    rescue Errno::ECONNRESET, Errno::ECONNABORTED, Errno::EPIPE, EOFError => error
+      @errors << error
+      reconnect!
+      send!(method, json, max_retry.pred)
     # Handle invalid sessions
-    rescue SugarCRM::InvalidSession 
-      nb_failed_attempts += 1
-      unless nb_failed_attempts >= 3
-        login!
-        retry
-      else
-        raise
-      end
-    end
+    rescue SugarCRM::InvalidSession => error
+      @errors << error
+      old_session = @sugar_session_id.dup
+      login!
+      # Update the session id in the request that we want to retry.
+      json.gsub!(old_session, @sugar_session_id)
+      send!(method, json, max_retry.pred)
+    end    
   end
-  
-  # Sometimes our connection just disappears but we still have a session.  
-  # This method forces a reconnect and relogin to update the session and resend 
-  # the request.
-  def retry!(method, json)
-    reconnect!
-    send!(method,json)
-  end
+  alias :retry! :send!
   
   def debug=(debug)
     options[:debug] = debug
@@ -180,13 +169,14 @@ module SugarCRM; class Connection
       # Complain if we can't parse
       raise UnhandledResponse, @response.body
     end
+    # Do ze debugs!
+    nice_debugging_for json
     # Check for an invalid session
     invalid_session? json
     # Check for an empty result set
     if zero_results? json
       return nil
     end
-    nice_debugging_for json
     json
   end
 
@@ -196,9 +186,9 @@ module SugarCRM; class Connection
   #  "number"=>11,
   #  "description"=>"The session ID is invalid"}  
   def invalid_session?(json)
-    if json["name"]
-      raise SugarCRM::InvalidSession if json["name"] == "Invalid Session ID"
-    end
+    return false unless json["name"]
+    return false if @request.method == :logout
+    raise SugarCRM::InvalidSession if json["name"] == "Invalid Session ID"
   end
   
   def zero_results?(json)
