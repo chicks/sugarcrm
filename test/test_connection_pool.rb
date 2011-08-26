@@ -17,7 +17,7 @@ class TestConnectionPool < ActiveSupport::TestCase
       end
     end
     
-    should "be able to specify its timeout" do
+    should "be able to specify its timeout on creation" do
       default_timeout = SugarCRM.session.connection_pool.timeout
       
       config = SugarCRM.session.config
@@ -28,6 +28,13 @@ class TestConnectionPool < ActiveSupport::TestCase
       ensure
         sess.disconnect!
       end
+    end
+    
+    should "be able to specify its timeout after creation" do
+      timeout = SugarCRM.session.connection_pool.timeout
+      SugarCRM.session.connection_pool.timeout += 1
+      
+      assert_equal timeout + 1, SugarCRM.session.connection_pool.timeout
     end
   end
 end

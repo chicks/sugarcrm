@@ -1,7 +1,8 @@
 require 'monitor'
 
 module SugarCRM; class ConnectionPool
-  attr_reader :size, :timeout
+  attr_accessor :timeout
+  attr_reader :size
   def initialize(session)
     @session = session
     
