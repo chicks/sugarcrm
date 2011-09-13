@@ -2,7 +2,7 @@
 
 SugarCRM::Contact.class_eval do
   def self.ten_oldest
-    self.find(:order_by => 'date_entered', :limit => 10)
+    self.all(:order_by => 'date_entered', :limit => 10)
   end
   
   def vip?
