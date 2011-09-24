@@ -122,7 +122,7 @@ module SugarCRM
     end  
       
     def to_s
-      @name
+      @klass
     end
     
     def to_class
