@@ -190,6 +190,10 @@ module SugarCRM; class Base
     self.attributes = self.class.find(self.id).attributes
   end
   
+  def blank?
+    @attributes.empty?
+  end
+  
   # Returns true if +comparison_object+ is the same exact object, or +comparison_object+ 
   # is of the same type and +self+ has an ID and it is equal to +comparison_object.id+.
   #

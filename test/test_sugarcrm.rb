@@ -187,6 +187,10 @@ class TestSugarCRM < ActiveSupport::TestCase
       user = SugarCRM::User.first
       assert_equal "#{SugarCRM.session.config[:base_url]}/index.php?module=Users&action=DetailView&record=#{user.id}", user.url
     end
+    
+    should "respond to #blank?" do
+      assert !SugarCRM::User.first.blank?
+    end
   end
   
   context  "A SugarCRM::Note instance" do
