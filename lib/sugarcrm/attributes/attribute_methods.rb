@@ -164,9 +164,12 @@ module SugarCRM; module AttributeMethods
   
   # Wrapper for invoking save on modified_attributes
   # sets the id if it's a new record
-  def save_modified_attributes!
-    # Complain if we aren't valid
-    raise InvalidRecord, @errors.full_messages.join(", ") unless valid?
+  def save_modified_attributes!(opts={})
+    options = { :validate => true }.merge(opts)
+    if options[:validate]
+      # Complain if we aren't valid
+      raise InvalidRecord, @errors.full_messages.join(", ") unless valid?
+    end
     # Send the save request
     response = self.class.session.connection.set_entry(self.class._module.name, serialize_modified_attributes)
     # Complain if we don't get a parseable response back

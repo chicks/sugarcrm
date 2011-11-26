@@ -157,11 +157,14 @@ module SugarCRM; class Base
 
   # Saves the current object, checks that required fields are present.
   # returns true or false
-  def save
+  def save(opts={})
+    options = { :validate => true }.merge(opts)
     return false if !(new_record? || changed?)
-    return false if !valid?
+    if options[:validate]
+      return false if !valid?
+    end
     begin
-      save!
+      save!(options)
     rescue
       return false
     end
@@ -170,8 +173,8 @@ module SugarCRM; class Base
   
   # Saves the current object, and any modified associations. 
   # Raises an exceptions if save fails for any reason.
-  def save!
-    save_modified_attributes!
+  def save!(opts={})
+    save_modified_attributes!(opts)
     save_modified_associations!
     true
   end

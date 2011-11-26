@@ -191,6 +191,13 @@ class TestSugarCRM < ActiveSupport::TestCase
     should "respond to #blank?" do
       assert !SugarCRM::User.first.blank?
     end
+    
+    should "bypass validation when #save(:validate => false)" do
+      u = SugarCRM::User.new
+      u.last_name = "doe"
+      assert u.save({:validate => false})
+      assert u.delete
+    end
   end
 
   # TODO: Fix this test so it creates the Note properly before asserting.
@@ -202,4 +209,5 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert_equal note.parent_type.singularize, parent.class.to_s.split('::').last
     end
   end
+  
 end
