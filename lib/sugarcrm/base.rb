@@ -36,8 +36,13 @@ module SugarCRM; class Base
         sort_criteria = 'date_entered'
       elsif self.method_defined? :date_created
         sort_criteria = 'date_created'
+      # Added date_modified because TeamSets doesn't have a date_created or date_entered field.  
+      # There's no test for this because it's Pro and above only.
+      # Hope this doesn't break anything!
+      elsif self.method_defined? :date_modified
+        sort_criteria = 'date_modified'
       else
-        raise InvalidAttribute, "Unable to determine record creation date for sorting criteria: expected date_entered or date_created attribute to be present"
+        raise InvalidAttribute, "Unable to determine record creation date for sorting criteria: expected date_entered, date_created, or date_modified attribute to be present"
       end
       options = {:order_by => sort_criteria}.merge(options)
       validate_find_options(options)
@@ -193,6 +198,7 @@ module SugarCRM; class Base
   def blank?
     @attributes.empty?
   end
+  alias :empty? :blank?
   
   # Returns true if +comparison_object+ is the same exact object, or +comparison_object+ 
   # is of the same type and +self+ has an ID and it is equal to +comparison_object.id+.
