@@ -27,7 +27,7 @@ class TestRequest < ActiveSupport::TestCase
     end
       
     should "properly escape JSON" do
-      assert_equal "%22OMG+HAI%21%22", @request.escape("&quot;OMG HAI!&quot;" )
+      assert_equal "%7B%22hello%22%3A+%22%5C%22OMG+HAI%21%5C%22%22%7D", @request.escape('{"hello": "&quot;OMG HAI!&quot;"}')
     end
       
   end

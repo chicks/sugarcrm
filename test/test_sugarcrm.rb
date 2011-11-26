@@ -192,7 +192,8 @@ class TestSugarCRM < ActiveSupport::TestCase
       assert !SugarCRM::User.first.blank?
     end
   end
-  
+
+  # TODO: Fix this test so it creates the Note properly before asserting.
   context  "A SugarCRM::Note instance" do
     should "return the correct parent record with the `parent` method" do
       note = SugarCRM::Note.first

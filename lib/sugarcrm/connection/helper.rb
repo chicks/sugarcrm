@@ -46,5 +46,5 @@ module SugarCRM; class Connection
   def b64_decode(file)
     Base64.decode64(file)
   end
-  
+    
 end; end

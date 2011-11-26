@@ -22,14 +22,14 @@ module SugarCRM; class Request
   end
   
   def escape(json)
-    # BUG: SugarCRM doesn't properly handle '&quot;' inside of JSON for some reason.  Let's convert it back just in case.
-    j = CGI.unescapeHTML(json)
-    # Now we convert everything else.
+    # BUG: SugarCRM doesn't properly handle '&quot;' inside of JSON for some reason.  Let's unescape any html elements.
+    j = convert_reserved_characters(json)
+    # Now we escape the resulting string.
     j = CGI.escape(j)
     j
   end
   
-  # TODO: Fix this so that it parses.
+  # TODO: Fix this so that it JSON.parse will consume it.
   def unescape
     j = CGI.unescape(@json)
     j.gsub!(/\n/, '')
@@ -46,4 +46,15 @@ module SugarCRM; class Request
   def to_s
     @request
   end
+  
+  # A tiny helper for converting reserved characters for html encoding
+  def convert_reserved_characters(string)
+    string.gsub!(/&quot;/, '\"')
+    string.gsub!(/&apos;/, '\'')
+    string.gsub!(/&amp;/,  '\&')
+    string.gsub!(/&lt;/,   '\<')
+    string.gsub!(/&lt;/,   '\>')
+    string
+  end
+  
 end; end
