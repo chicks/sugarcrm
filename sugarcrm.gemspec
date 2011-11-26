@@ -4,14 +4,13 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{sugarcrm}
-  s.version = "0.9.16"
+  s.name = "sugarcrm"
+  s.version = "0.9.17"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carl Hicks", "David Sulc"]
-  s.date = %q{2011-08-26}
-  s.default_executable = %q{sugarcrm}
-  s.email = %q{carl.hicks@gmail.com}
+  s.date = "2011-11-26"
+  s.email = "carl.hicks@gmail.com"
   s.executables = ["sugarcrm"]
   s.extra_rdoc_files = [
     "LICENSE",
@@ -83,10 +82,10 @@ Gem::Specification.new do |s|
     "./sugarcrm.gemspec",
     "./sugarcrm.tmproj"
   ]
-  s.homepage = %q{http://github.com/chicks/sugarcrm}
+  s.homepage = "http://github.com/chicks/sugarcrm"
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
-  s.summary = %q{A less clunky way to interact with SugarCRM via REST.}
+  s.rubygems_version = "1.8.11"
+  s.summary = "A less clunky way to interact with SugarCRM via REST."
   s.test_files = [
     "test/connection/test_get_available_modules.rb",
     "test/connection/test_get_entries.rb",
@@ -100,6 +99,7 @@ Gem::Specification.new do |s|
     "test/connection/test_login.rb",
     "test/connection/test_logout.rb",
     "test/connection/test_set_document_revision.rb",
+    "test/connection/test_set_entry.rb",
     "test/connection/test_set_note_attachment.rb",
     "test/connection/test_set_relationship.rb",
     "test/extensions_test/patch.rb",
@@ -110,6 +110,7 @@ Gem::Specification.new do |s|
     "test/test_connection_pool.rb",
     "test/test_finders.rb",
     "test/test_module.rb",
+    "test/test_request.rb",
     "test/test_response.rb",
     "test/test_session.rb",
     "test/test_sugarcrm.rb"
