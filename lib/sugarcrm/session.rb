@@ -173,6 +173,15 @@ module SugarCRM; class Session
         raise unless @session.respond_to? sym
         @session.send(sym, *args, &block)
       end
+
+      if RUBY_VERSION > '1.9'
+        # In Ruby 1.9 and above, constants are no longer lexically scoped;
+        # By default, const_defined? will check up the ancestor chain, which
+        # is *not* desirable in our case.
+        def self.const_defined?(sym, inherit=false)
+          super
+        end
+      end
     end
     # set the session: will be needed in SugarCRM::Base to call the API methods on the correct session
     namespace_module.session = self
