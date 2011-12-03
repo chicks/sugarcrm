@@ -154,6 +154,14 @@ module SugarCRM; class Base
     end
     "#<#{self.class} #{attrs.join(", ")}>"
   end
+  
+  def to_json(options={})
+    attributes.to_json
+  end
+  
+  def to_xml(options={})
+    attributes.to_xml
+  end
 
   # Saves the current object, checks that required fields are present.
   # returns true or false
