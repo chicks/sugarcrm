@@ -155,6 +155,32 @@ module SugarCRM; class Base
     "#<#{self.class} #{attrs.join(", ")}>"
   end
   
+  # objects are considered equal if they represent the same SugarCRM record
+  # this behavior is required for Rails to be able to properly cast objects to json (lists, in particular)
+  def equal?(other)
+    return false unless other && other.respond_to?(:id)
+     self.id == other.id
+  end
+  
+  # return variables that are defined in SugarCRM, instead of the object's actual variables (such as modified_attributes, errors, etc.)
+  def instance_variables
+    @_instance_variables ||= @attributes.keys.map{|i| ('@' + i).to_sym }
+  end
+  
+  # override to return the value of the SugarCRM record's attributes
+  def instance_variable_get(name)
+    name = name.to_s.gsub(/^@/,'')
+    @attributes[name]
+  end
+  
+  # Rails requires this to (e.g.) generate json representations of models
+  # this code taken directly from the Rails project
+  if defined?(Rails)
+    def instance_values
+      Hash[instance_variables.map { |name| [name.to_s[1..-1], instance_variable_get(name)] }]
+    end
+  end
+  
   def to_json(options={})
     attributes.to_json
   end
