@@ -78,7 +78,7 @@ module SugarCRM; class Connection
       else
         @response = @connection.get(@url.path.dup + "?" + @request.to_s)
       end
-    rescue Timeout::Error, Errno::ECONNABORTED => e
+    rescue Timeout::Error, Errno::ECONNABORTED, SocketError => e
       nb_failed_attempts += 1
       unless nb_failed_attempts >= 3
         retry
