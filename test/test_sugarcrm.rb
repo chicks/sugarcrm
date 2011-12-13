@@ -195,7 +195,7 @@ class TestSugarCRM < ActiveSupport::TestCase
     should "bypass validation when #save(:validate => false)" do
       u = SugarCRM::User.new
       u.last_name = "doe"
-      assert u.save({:validate => false})
+      assert u.save(:validate => false)
       assert u.delete
     end
   end
