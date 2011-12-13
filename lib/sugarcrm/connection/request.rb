@@ -46,6 +46,7 @@ module SugarCRM; class Request
   def to_s
     @request
   end
+  alias :to_str :to_s
   
   # A tiny helper for converting reserved characters for html encoding
   def convert_reserved_characters(string)
