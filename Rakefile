@@ -17,8 +17,10 @@ Jeweler::Tasks.new do |gem|
   gem.email = "carl.hicks@gmail.com"
   gem.homepage = "http://github.com/chicks/sugarcrm"
   gem.authors = ["Carl Hicks", "David Sulc"]
-  gem.executables = ['sugarcrm']
-  gem.files = FileList['./lib/**/*', './*'].exclude("*.lock", "*.tmproj").to_a
+  gem.files         = `git ls-files`.split("\n")
+  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  gem.require_paths = ["lib"]
 end
 Jeweler::RubygemsDotOrgTasks.new
 
