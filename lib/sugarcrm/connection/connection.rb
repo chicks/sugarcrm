@@ -69,7 +69,7 @@ module SugarCRM; class Connection
   end
 
   # Send a request to the Sugar Instance
-  def send!(method, json)
+  def send!(method, json, retries = 3)
     nb_failed_attempts = 0 # how many times we have failed to send
     @request  = SugarCRM::Request.new(@url, method, json, @options[:debug])
     begin
@@ -96,6 +96,11 @@ module SugarCRM; class Connection
       raise ConnectionError, "SugarCRM connection failed: #{e.message}"
     end
     handle_response
+  rescue SugarCRM::UnhandledResponse => e
+    if Object.const_defined?(:Rails)
+      Rails.logger.error e
+    end
+    (retries -= 1) >= 0 ? retry : raise
   end
 
   # Sometimes our connection just disappears but we still have a session.
