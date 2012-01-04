@@ -69,15 +69,15 @@ module SugarCRM; class Connection
   end
 
   # Send a request to the Sugar Instance
-  def send!(method, json, retries = 3)
-    nb_failed_attempts = 0 # how many times we have failed to send
+  def send!(method, json, nb_failed_attempts = 0)
     @request  = SugarCRM::Request.new(@url, method, json, @options[:debug])
     begin
       if @request.length > 3900
         @response = @connection.post(@url.path, @request)
       else
-        @response = @connection.get(@url.path.dup + "?" + @request.to_s)
+        @response = @connection.get(@url.path + "?" + @request.to_s)
       end
+      handle_response
     rescue Timeout::Error, Errno::ECONNABORTED, SocketError => e
       nb_failed_attempts += 1
       unless nb_failed_attempts >= 3
@@ -88,28 +88,25 @@ module SugarCRM; class Connection
     rescue Errno::ECONNRESET, EOFError => e
       nb_failed_attempts += 1
       unless nb_failed_attempts >= 3
-        retry!(method, json)
+        retry!(method, json, nb_failed_attempts)
       else
         raise ConnectionError, "SugarCRM connection failed: #{e.message}"
       end
+    rescue SugarCRM::UnhandledResponse => e
+      Rails.logger.error(e) if Object.const_defined?(:Rails)
+      (nb_failed_attempts += 1) < 3 ? retry : raise
     rescue StandardError => e
       raise ConnectionError, "SugarCRM connection failed: #{e.message}"
     end
-    handle_response
-  rescue SugarCRM::UnhandledResponse => e
-    if Object.const_defined?(:Rails)
-      Rails.logger.error e
-    end
-    (retries -= 1) >= 0 ? retry : raise
   end
 
   # Sometimes our connection just disappears but we still have a session.
   # This method forces a reconnect and relogin to update the session and resend
   # the request.
-  def retry!(method, json)
+  def retry!(method, json, nb_failed_attempts = 0)
     connect!
     login!
-    send!(method,json)
+    send!(method,json, nb_failed_attempts)
   end
 
   def debug=(debug)
