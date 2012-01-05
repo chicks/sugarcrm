@@ -96,7 +96,7 @@ module SugarCRM; class Connection
       raise ConnectionError, "SugarCRM connection failed: #{e.message}"
     end
     json_response = ""
-    attempt :attempts => 3, :exception_class => SugarCRM::UnhandledResponser, :reraise => true do
+    attempt :attempts => 4, :exception_class => SugarCRM::UnhandledResponser, :reraise => true, :sleep => Proc.new { |c| 2 ** c } do
       json_response = handle_response
     end
     json_response
