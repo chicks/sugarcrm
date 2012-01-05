@@ -1,4 +1,5 @@
 module SugarCRM; class Connection
+  include Tins::Attempt
 
   URL = "/service/v2/rest.php"
   # Set this to filter out debug output on a certain method (i.e. get_modules, or get_fields)
@@ -77,7 +78,6 @@ module SugarCRM; class Connection
       else
         @response = @connection.get(@url.path + "?" + @request.to_s)
       end
-      handle_response
     rescue Timeout::Error, Errno::ECONNABORTED, SocketError => e
       nb_failed_attempts += 1
       unless nb_failed_attempts >= 3
@@ -92,12 +92,14 @@ module SugarCRM; class Connection
       else
         raise ConnectionError, "SugarCRM connection failed: #{e.message}"
       end
-    rescue SugarCRM::UnhandledResponse => e
-      Rails.logger.error(e) if Object.const_defined?(:Rails)
-      (nb_failed_attempts += 1) < 3 ? retry : raise
     rescue StandardError => e
       raise ConnectionError, "SugarCRM connection failed: #{e.message}"
     end
+    json_response = ""
+    attempt :attempts => 3, :exception_class => SugarCRM::UnhandledResponser, :reraise => true do
+      json_response = handle_response
+    end
+    json_response
   end
 
   # Sometimes our connection just disappears but we still have a session.

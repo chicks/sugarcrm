@@ -3,6 +3,7 @@ source "http://rubygems.org"
 gem "activesupport", ">= 2.3.10", :require => "active_support"
 gem "i18n"
 gem "json"
+gem "tins", "~> 0.3.7"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

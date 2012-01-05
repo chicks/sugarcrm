@@ -1,3 +1,4 @@
+require 'tins/attempt'
 require 'sugarcrm/connection/helper'
 require 'sugarcrm/connection/connection'
 require 'sugarcrm/connection/request'
