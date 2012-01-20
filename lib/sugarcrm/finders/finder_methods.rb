@@ -1,6 +1,6 @@
-module SugarCRM; module FinderMethods
-  module ClassMethods
-    private
+module SugarCRM
+  module FinderMethods
+    module ClassMethods
       def find_initial(options)
         options.update(:limit => 1)
         result = find_by_sql(options)
@@ -69,15 +69,17 @@ module SugarCRM; module FinderMethods
       # the number of records we retrieve with each query
       # it is kept small to avoid timeout issues
       SLICE_SIZE = 5
-      SLICE_SIZE.freeze
       # results accumulator stores the results we have fetched so far, recursively
       def find_by_sql(options, results_accumulator=nil, &block)
-        # SugarCRM REST API has a bug (documented with Sugar as bug 43338) where, when :limit and :offset options are passed simultaneously,
-        # :limit is considered to be the smallest of the two, and :offset is the larger
-        # In addition to allowing querying of large datasets while avoiding timeouts (by fetching results in small slices),
-        # this implementation fixes the :limit - :offset bug so that it behaves correctly
+        # SugarCRM REST API has a bug (documented with Sugar as bug 43338)
+        # where, when :limit and :offset options are passed simultaneously,
+        # :limit is considered to be the smallest of the two, and :offset is
+        # the larger In addition to allowing querying of large datasets while
+        # avoiding timeouts (by fetching results in small slices), this
+        # implementation fixes the :limit - :offset bug so that it behaves
+        # correctly
 
-        offset = options[:offset].to_i >= 1 ? options[:offset].to_i : nil
+        offset = options[:offset].to_i
 
         # if many results are requested (i.e. multiple result slices), we call this function recursively
         # this array keeps track of which slice we are retrieving (by updating the :offset and :limit options)
@@ -86,7 +88,7 @@ module SugarCRM; module FinderMethods
         local_options[:order_by] = :id unless options[:order_by]
 
         # we must ensure limit <= offset (due to bug mentioned above)
-        if offset
+        if offset > 0
           local_options[:limit] = [offset.to_i, SLICE_SIZE].min
           local_options[:offset] = offset if offset
         else
@@ -95,7 +97,10 @@ module SugarCRM; module FinderMethods
         local_options[:limit] = [local_options[:limit], options[:limit]].min if options[:limit] # don't retrieve more records than required
         local_options = options.merge(local_options)
 
-        query = query_from_options(local_options)
+        query = options[:query] ? options[:query] : query_from_options(local_options)
+        msg = "SugarCRM SQL query #{query.inspect}"
+        Rails.logger.info msg
+        $DEBUG and warn msg
         result_slice = connection.get_entry_list(self._module.name, query, local_options)
         return results_accumulator unless result_slice
 
@@ -108,7 +113,7 @@ module SugarCRM; module FinderMethods
         end
 
         # adjust options to take into account records that were already retrieved
-        updated_options = {:offset => options[:offset].to_i + result_slice_array.size}
+        updated_options = {:offset => options[:offset].to_i + result_slice_array.size, :query => options[:query] }
         updated_options[:limit] = (options[:limit] ? options[:limit] - result_slice_array.size : nil)
         updated_options = options.merge(updated_options)
 
@@ -232,7 +237,7 @@ module SugarCRM; module FinderMethods
       end
 
       VALID_FIND_OPTIONS = [ :conditions, :deleted, :fields, :include, :joins, :limit, :link_fields, :offset,
-                             :order_by, :select, :readonly, :group, :having, :from, :lock ]
+                             :order_by, :select, :readonly, :group, :having, :from, :lock, :query ]
 
       def validate_find_options(options) #:nodoc:
         options.assert_valid_keys(VALID_FIND_OPTIONS)
