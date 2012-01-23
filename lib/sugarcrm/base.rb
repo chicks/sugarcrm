@@ -185,9 +185,12 @@ module SugarCRM; class Base
   end
 
   # Reloads the record from SugarCRM
-  def reload!
+  def reload
     self.attributes = self.class.find(self.id).attributes
+    self
   end
+
+  alias reload! reload
 
   # Returns true if +comparison_object+ is the same exact object, or +comparison_object+
   # is of the same type and +self+ has an ID and it is equal to +comparison_object.id+.
