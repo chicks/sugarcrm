@@ -65,7 +65,17 @@ module SugarCRM; class Connection
       @connection.use_ssl = true
       @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
-    @connection.start
+
+    # Ruby 1.9.3 will throw an error if server does not recognize
+    # SSLv2 hello message - http://bugs.ruby-lang.org/issues/5110
+    # So catch OpenSSL::SSL::SSLError and set version to SSLv3 and
+    # try again
+    begin
+      @connection.start
+    rescue OpenSSL::SSL::SSLError 
+      @connection.ssl_version="SSLv3"
+      @connection.start
+    end
   end
   alias :reconnect! :connect!
   
