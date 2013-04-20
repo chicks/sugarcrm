@@ -81,7 +81,7 @@ module SugarCRM
         p @owner
         p @owner.class.session
         module_name = SugarCRM::Module.find(@attributes["module"], @owner.class.session)
-        return namespace.const_get(module_name.klass) if namespace.const_defined? module_name.klass
+        return namespace.const_get(module_name.klass) if module_name && namespace.const_defined?(module_name.klass)
       end
       # Use the "relationship" target
       if @attributes["relationship"].length > 0
