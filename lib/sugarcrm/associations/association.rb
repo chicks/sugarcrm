@@ -71,17 +71,14 @@ module SugarCRM
     
     # Attempts to determine the class of the target in the association
     def resolve_target
-      return false
       # Use the link_field name first
       klass = @link_field.singularize.camelize
       namespace = @owner.class.session.namespace_const
       return namespace.const_get(klass) if namespace.const_defined? klass
       # Use the link_field attribute "module"
       if @attributes["module"].length > 0
-        p @attributes["module"]
-        p @owner
-        p @owner.class.session
         module_name = SugarCRM::Module.find(@attributes["module"], @owner.class.session)
+        p module_name
         return namespace.const_get(module_name.klass) if module_name && namespace.const_defined?(module_name.klass)
       end
       # Use the "relationship" target
