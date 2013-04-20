@@ -71,6 +71,7 @@ module SugarCRM
     
     # Attempts to determine the class of the target in the association
     def resolve_target
+      return false
       # Use the link_field name first
       klass = @link_field.singularize.camelize
       namespace = @owner.class.session.namespace_const
