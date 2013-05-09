@@ -22,7 +22,7 @@ module SugarCRM; class Connection
         "module_id": "#{id}",
         "link_field_name": "#{related_to.downcase}",
         "related_module_query": "#{options[:query]}",
-        "related_fields": #{options[:related_fields].to_json},     
+        "related_fields": #{((options and options[:related_fields].present?) ? options[:related_fields] : resolve_related_fields(module_name, related_to) ).to_json},     
         "related_module_link_name_to_fields_array": #{options[:link_fields].to_json},
         "deleted": #{options[:deleted]}
       }
