@@ -112,7 +112,7 @@ module SugarCRM; module AttributeMethods
   def define_attribute_methods
     return if attribute_methods_generated?
     @attributes.keys.sort.each do |k|
-      # ajay Singh skip the loop if attribute is null
+      # ajay Singh --> skip the loop if attribute is null
       next if !k.present?
       self.class.module_eval %Q?
         def #{k}

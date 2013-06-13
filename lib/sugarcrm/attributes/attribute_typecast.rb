@@ -16,7 +16,7 @@ module SugarCRM; module AttributeTypeCast
   def typecast_attributes
     @attributes.each_pair do |name,value|
       # skip primary key columns
-      # ajay Singh skip the loop if attribute is null (!name.present?)
+      # ajay Singh --> skip the loop if attribute is null (!name.present?)
       next if (name == "id") or (!name.present?)
       attr_type = attr_type_for(name)
       
