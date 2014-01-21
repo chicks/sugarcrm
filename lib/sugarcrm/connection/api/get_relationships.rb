@@ -27,7 +27,7 @@ module SugarCRM; class Connection
         "deleted": #{options[:deleted]}
       }
     EOF
-    puts "#{json}"
+    #puts "#{json}"
     json.gsub!(/^\s{6}/,'')
     SugarCRM::Response.new(send!(:get_relationships, json), @session, {:always_return_array => true}).to_obj
   end
