@@ -16,7 +16,8 @@ module SugarCRM; module AttributeTypeCast
   def typecast_attributes
     @attributes.each_pair do |name,value|
       # skip primary key columns
-      next if name == "id"
+      # ajay Singh --> skip the loop if attribute is null (!name.present?)
+      next if (name == "id") or (!name.present?)
       attr_type = attr_type_for(name)
       
       # empty attributes should stay empty (e.g. an empty int field shouldn't be typecast as 0)
