@@ -12,7 +12,7 @@ module SugarCRM
       end
     end
     
-    attr :associations
+    attr_reader :associations
     
     def initialize
       @associations = Set.new

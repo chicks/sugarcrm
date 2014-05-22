@@ -1,6 +1,6 @@
 module SugarCRM; module AssociationCache
 
-  attr :association_cache, false
+  attr_reader :association_cache
     
   # Returns true if an association is cached
   def association_cached?(association)

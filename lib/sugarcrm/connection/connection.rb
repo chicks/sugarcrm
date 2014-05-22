@@ -5,16 +5,9 @@ module SugarCRM; class Connection
   DONT_SHOW_DEBUG_FOR = []
   RESPONSE_IS_NOT_JSON = [:get_user_id, :get_user_team_id]
   
-  attr :url, true
-  attr :user, false
-  attr :pass, false
-  attr :session, true
-  attr :sugar_session_id, true
-  attr :connection, true
-  attr :options, true
-  attr :request, true
-  attr :response, true
-  attr :errors, true
+  attr_accessor :url, :session, :sugar_session_id, :connection, :options, :request, :response, :errors
+  attr_reader :user, :pass
+
   
   # This is the singleton connection class. 
   def initialize(url, user, pass, options={})

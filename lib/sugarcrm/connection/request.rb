@@ -1,9 +1,6 @@
 module SugarCRM; class Request
-  attr :request, true
-  attr :url, true
-  attr :method, true
-  attr :json, true
-  attr :http_method
+  attr_accessor :request, :url, :method, :json
+  attr_reader :http_method
 
   def initialize(url, method, json, debug=false)
     @url      = url
