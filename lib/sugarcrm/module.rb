@@ -1,7 +1,7 @@
 module SugarCRM
   # A class for handling SugarCRM Modules
   class Module
-    attr_accessible :name, :table_name, :custom_table_name, :klass, :fields, :link_fields
+    attr_accessor :name, :table_name, :custom_table_name, :klass, :fields, :link_fields
     alias :bean :klass
 
     # Dynamically register objects based on Module name

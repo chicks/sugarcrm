@@ -6,7 +6,7 @@ module SugarCRM
   # of the association is available in @cardinality, and the actual relationship details are held
   # in @relationship.
   class Association
-    attr_accessible :owner, :target, :link_field, :relationship, :attributes, :proxy_methods, :cardinality
+    attr_accessor :owner, :target, :link_field, :relationship, :attributes, :proxy_methods, :cardinality
     
     # Creates a new instance of an Association
     def initialize(owner,link_field,opts={})
