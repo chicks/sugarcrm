@@ -5,14 +5,8 @@ module SugarCRM
   # allow access to the association collection, and are held in @proxy_methods.  The cardinality 
   # of the association is available in @cardinality, and the actual relationship details are held
   # in @relationship.
-  class Association    
-    attr :owner, true
-    attr :target, true
-    attr :link_field, true
-    attr :relationship, true
-    attr :attributes, true 
-    attr :proxy_methods, true
-    attr :cardinality, true
+  class Association
+    attr_accessible :owner, :target, :link_field, :relationship, :attributes, :proxy_methods, :cardinality
     
     # Creates a new instance of an Association
     def initialize(owner,link_field,opts={})

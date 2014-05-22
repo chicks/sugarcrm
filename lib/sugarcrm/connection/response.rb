@@ -23,7 +23,7 @@ module SugarCRM; class Response
     end
   end
 
-  attr :response, false
+  attr_reader :response
   
   def initialize(json, session, opts={})
     @options  = { :always_return_array => false }.merge! opts

@@ -18,11 +18,7 @@ module SugarCRM; class Base
   self.session = nil
   
   # Contains a list of attributes
-  attr :attributes, true
-  attr :modified_attributes, true
-  attr :associations, true
-  attr :debug, true
-  attr :errors, true
+  attr_accessor :attributes,  :modified_attributes, :associations, :debug, :errors
 
   class << self # Class methods
     def find(*args, &block)
