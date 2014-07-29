@@ -12,11 +12,14 @@ module SugarCRM
       @name   = name
       @klass  = name.classify
       unless custom_module?
-        @table_name = name.tableize
+        table_name = name.tableize
       else
-        @table_name = @name
+        table_name = @name.downcase
       end
-      @custom_table_name = resolve_custom_table_name      
+      @table_name = table_name
+      # Set table name for custom attibutes
+      # Custom attributes are contained in a table named after the module, with a '_cstm' suffix.
+      @custom_table_name = table_name + "_cstm"
       @fields = {}
       @link_fields = {}
       @fields_registered = false
@@ -26,21 +29,9 @@ module SugarCRM
     # Return true if this module was created in the SugarCRM Studio (i.e. it is not part of the modules that
     # ship in the default SugarCRM configuration)
     def custom_module?
-      # custom module names are all lower_case, whereas SugarCRM modules are CamelCase
-      @name.downcase == @name 
-    end
-
-    # Set table name for custom attibutes
-    # Custom attributes are contained in a table named after the module, with a '_cstm' suffix.
-    # The module's table name must be tableized for the modules that ship with SugarCRM.
-    # For custom modules (created in the Studio), table name don't need to be tableized since
-    # the name passed to the constructor is already tableized    
-    def resolve_custom_table_name
-      if custom_module?
-        @custom_table_name = @name + "_cstm"
-      else
-        @custom_table_name = @table_name + "_cstm"
-      end
+      # custom module names are snake_case (because they have a package key: KEY_tablename),
+      # whereas SugarCRM modules are CamelCase
+      @name.include? '_'
     end
     
     # Returns the fields associated with the module
