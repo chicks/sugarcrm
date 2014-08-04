@@ -9,7 +9,7 @@ module SugarCRM; class Connection
     
     # Raise an exception of we try to pass :file, but not :file_name
     if (!options[:file].empty? && options[:file_name].empty?)
-      raise ArgumentException, ":file_name must be specified if :file is specified"
+      raise ArgumentError, ":file_name must be specified if :file is specified"
     end
     
     # If no document_name is given, use the file_name

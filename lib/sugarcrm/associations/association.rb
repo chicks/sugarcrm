@@ -96,7 +96,7 @@ module SugarCRM
     
     # Generates the association proxy method for related module
     def define_method(link_field)
-      raise ArgumentException, "argument cannot be nil" if link_field.nil?
+      raise ArgumentError, "argument cannot be nil" if link_field.nil?
       if (@owner.respond_to? link_field.to_sym) && @owner.debug
         warn "Warning: Overriding method: #{@owner.class}##{link_field}"
       end
