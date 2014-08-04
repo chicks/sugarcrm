@@ -130,15 +130,30 @@ A less clunky way to interact with SugarCRM via REST.
                                           # will fetch all records, and only then pass them to the block). This will make a major difference
                                           # in resource use and execution time if you're dealing with many records.
 
-  # Create a document instance and upload a file
-  file = File.read(File.join(File.dirname(__FILE__),"test_excel.xls"))
+  # Download a document from SugarCRM
+  account = SugarCRM::Account.first
+  doc = account.documents.first
+  result = SugarCRM.connection.get_document_revision(doc.document_revision_id)
+  File.open(result['document_revision']['filename'], 'w') do |f|
+    f.write(SugarCRM.connection.b64_decode(result['document_revision']['file']))
+  }
+
+  # Create a new document and add it to the account's documents
+  # (continued from above)
   doc = SugarCRM::Document.new
   doc.active_date = Date.today
-  doc.document_name = "test_excel.xls"
-  doc.filename = "test_excel.xls"
-  doc.revision = 0
-  doc.uploadfile = SugarCRM.connection.b64_encode(file)
-  doc.save!
+  doc.id = doc.save!
+  account.documents << doc
+  account.save!
+
+  # Create a new revision to add a file to the SugarCRM document instance
+  # (continued from above)
+  file = File.read(File.join(File.dirname(__FILE__),"test_excel.xls"))
+  revision_number = 1
+  SugarCRM.connection.set_document_revision(doc.id, revision_number, {
+    filename: "my_file.xls",
+    file: file
+  })
   
   # Look up the fields for a given module
   SugarCRM::Module.find("Accounts").fields
