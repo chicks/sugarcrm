@@ -28,6 +28,7 @@ module SugarCRM
       return true if attribute.class == @target
       return true if attribute == link_field
       return true if methods.include? attribute
+      return true if attribute.link_fields.include? link_field
       false
     end
     
